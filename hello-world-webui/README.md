@@ -102,4 +102,4 @@ Now you should see the Hello World Thing and the details. If you activate the au
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

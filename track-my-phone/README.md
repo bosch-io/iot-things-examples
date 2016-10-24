@@ -36,4 +36,4 @@ To deploy the application to Cloud Foundry, execute the following commands:
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

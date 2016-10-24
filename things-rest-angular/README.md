@@ -28,4 +28,4 @@ Give it a try [here](https://demos.apps.bosch-iot-cloud.com/things-rest-angular/
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

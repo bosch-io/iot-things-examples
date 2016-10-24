@@ -6,7 +6,7 @@ It is integrated in the Inventory Browser example using a QR Code to transport t
 
 ## Configuration
 
-You have to prepare the folling information:
+You have to prepare the following information:
 
 API-Token: your Things solution API Token to execute API Calls
 Technical-User: a technical user (e.g. registered in the Things dashboard). Use a BASE64 encoder (like http://www.tuxgraphics.org/toolbox/base64-javascript.html) to create a a snippet.  
@@ -21,4 +21,4 @@ To deploy the application to Cloud Foundry, execute the following commands:
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

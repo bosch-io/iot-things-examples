@@ -1,0 +1,10 @@
+.checkstyle
+.classpath
+.idea
+*.iml
+logs/
+.project
+.settings
+*.swp
+target/
+META-INF/

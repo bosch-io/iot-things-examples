@@ -1,0 +1,12 @@
+target/
+.extract/
+.idea
+*.iml
+**/config*.properties
+**/CRClient.jks
+mvnw*
+nbactions.xml
+.mvn
+.classpath
+.project
+.settings

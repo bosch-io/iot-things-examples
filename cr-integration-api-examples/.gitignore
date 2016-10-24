@@ -1,0 +1,6 @@
+target/
+/CRClient.jks
+.classpath
+.project
+.settings
+*.cer

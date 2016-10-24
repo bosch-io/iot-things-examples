@@ -1,0 +1,63 @@
+[
+  // "thingId": "car-4711"
+  {
+    "attributes": {
+      "name": "Environmental FourWheeler 4711",
+      "manufacturer": "ACME",
+      "VIN": "0815666337"
+    },
+    "features": {
+      "geolocation": {
+        "properties": {
+          "_definition": "org.eclipse.vorto.Geolocation:1.0.0",
+          "geoposition": {
+            "latitude": 47.66603,
+            "longitude": 9.36584
+          },
+          "accuracy": 10
+        }
+      }
+    }
+  },
+  // "thingId": "trailer-4712"
+  {
+    "attributes": {
+      "name": "Expedition Burro 4712",
+      "manufacturer": "TR Inc",
+      "series": "FastRunner2"
+    },
+    "features": {
+      "geolocation": {
+        "properties": {
+          "_definition": "org.eclipse.vorto.Geolocation:1.0.0",
+          "geoposition": {
+            "latitude": 47.682085,
+            "longitude": 9.386510
+          },
+          "accuracy": 7
+        }
+      }
+    }
+  },
+  // "thingId": "vehicle-53"
+  {
+    "attributes": {
+      "name": "Herbie 53",
+      "manufacturer": "VW",
+      "VIN": "5313879"
+    },
+    "features": {
+      "geolocation": {
+        "properties": {
+          "_definition": "org.eclipse.vorto.Geolocation:1.0.0",
+          "geoposition": {
+            "latitude": 47.68,
+            "longitude": 9.3865
+          },
+          "accuracy": 15
+        }
+      }
+    }
+  }
+
+]

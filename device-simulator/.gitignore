@@ -1,0 +1,12 @@
+.checkstyle
+.classpath
+.idea
+*.iml
+*.log
+nginx-dev.conf
+logs/
+.project
+.settings
+*.swp
+target/
+META-INF/

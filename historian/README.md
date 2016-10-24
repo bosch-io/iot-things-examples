@@ -1,7 +1,7 @@
 ## Bosch IoT Things - Example Data Historian
 
 This example shows how to collect and use data history of property values.
-It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a timeseries chart.
+It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a time series chart.
 
 ![Screenshot](screenshot.png)
 
@@ -104,8 +104,8 @@ Use the following URL to look at the collected data:
 
 http://localhost:8080/history/data/###thingId###/features/###featureId###/properties/###propertyPath###
 
-You can specifiy multiple things/features/properties to get data for mulitple values in one result.
-To do this you can use comma seperated values within square brackets to define multiple parameters.
+You can specify multiple things/features/properties to get data for multiple values in one result.
+To do this you can use comma separated values within square brackets to define multiple parameters.
 
 e.g.
 

@@ -2,7 +2,7 @@
 
 This example shows in a simple test how to connect to Bosch IoT Things with the Signature Authentication (CRS).
 The CRS Authentication allows (technical) clients to connect with a signature instead of BASIC auth.
-You can find more information on the different authentication processes at our [wiki](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:004_rest_api:011_authenticate_as_a_client).
+You can find more information on the different authentication processes at our [Wiki](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:004_rest_api:011_authenticate_as_a_client).
 
 ## Configure
 
@@ -36,4 +36,4 @@ mvn test
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

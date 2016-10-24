@@ -2,4 +2,4 @@
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

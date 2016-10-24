@@ -16,7 +16,7 @@ The following diagram shows how the Example Data Historian could work:
 Step by step:
 
 - Your (existing) IoT solution uses Bosch IoT Things to integrate it's devices
-- This Historian appication can run seperatly to your applications
+- This Historian application can run separately to your applications
 - For things that it is allowed to it subscribes to all changes on the different Features of the managed Things
 - All fetched changes are stored as a time series record in a MongoDB database
 - The Historian application can be used by your business solution to access or to display history data of individual Thing properties
@@ -25,7 +25,7 @@ Step by step:
 
 The time serias data is recorded in a simple document structure in MongoDB.
 
-For each and every single (scalar) property of a Thing excactly one document is managed.
+For each and every single (scalar) property of a Thing exactly one document is managed.
 This document has a unique id consisting of "<thing-id>/<feature-id>/properties/<property-path>".
 The documents have to array fields: a "values" array and a "timestamps" array.
 Both arrays are updated on every property change. 
@@ -124,4 +124,4 @@ e.g.
 
 ## License
 
-See the cr-examples top level README.md file for license details.
+See the iot-things-examples top level README.md file for license details.

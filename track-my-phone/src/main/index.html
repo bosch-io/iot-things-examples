@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Bosch IoT Things - Demos - Track my Phone</title>
+    <!--
+												Bosch SI Example Code License
+												  Version 1.0, January 2016
+
+	 Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+	 
+	 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
+	 following conditions are met:
+	 
+	 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+	 disclaimer.
+	 
+	 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+	 following disclaimer in the documentation and/or other materials provided with the distribution.
+	 
+	 BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+	 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+	 THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF 
+	 ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH 
+	 BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+	 LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+	 THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+	 UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF 
+	 LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+	 EMPLOYEES, REPRESENTATIVES AND ORGANS.
+    -->
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <!-- Custom styles for this template -->
+    <link href="css/index.css" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Bosch IoT Things - Demos - Track my Phone</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav nav-pills pull-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <span class="label label-default">Geolocation</span>
+            <pre id="geolocation-label"></pre>
+        </div>
+        <div class="col-lg-12">
+            <span class="label label-default">Orientation</span>
+            <pre id="orientation-label"></pre>
+        </div>
+        <div class="col-lg-12">
+            <span class="label label-default">Permissions</span>
+
+            <div class="well well-sm" id="permissions">
+                <div class="checkbox">
+                    <label><input type="checkbox" disabled="disabled" checked="check">Full access for yourself</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" data-sid="d5c8d0c0-891e-11e5-87e5-029356ab364a">Read access for global Inventory Manager</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.container -->
+
+<!-- Login Modal based on http://http://bootsnipp.com/snippets/featured/clean-modal-login-form -->
+<!--
+Snippets License (MIT license)
+
+Copyright (c) 2013 Bootsnipp.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ -->
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog">
+        <div class="loginmodal-container">
+            <h1>Login to Your Account</h1><br>
+
+            <form id="login-form">
+                <input type="text" name="username" placeholder="Username" autocorrect=off autocapitalize=none required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="submit" name="login" class="login loginmodal-submit" value="Login">
+            </form>
+
+            <div class="login-help">
+                <a href="#" data-toggle="collapse" data-target="#login-register">Register</a>
+            </div>
+            <div id="login-register" class="collapse">
+                <h1>Register a new User</h1><br>
+
+                <form id="login-register-form">
+                    <input type="text" name="username" placeholder="Username" autocorrect=off autocapitalize=none
+                           required>
+                    <input type="submit" name="register" class="login loginmodal-submit" value="Register">
+                </form>
+                <div class="well well-sm" id="login-register-form-result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<script src="js/app.js"></script>
+</body>
+</html>

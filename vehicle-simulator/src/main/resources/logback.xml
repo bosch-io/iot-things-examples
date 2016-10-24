@@ -1,0 +1,16 @@
+<configuration debug="false" scan="false" scanPeriod="30 seconds">
+   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+   </appender>
+
+   <logger name="com.bosch.cr.integration.helloworld" level="info"
+           additivity="false">
+      <appender-ref ref="STDOUT" />
+   </logger>
+
+   <root level="${LOG_LEVEL:-WARN}">
+      <appender-ref ref="STDOUT"/>
+   </root>
+</configuration>

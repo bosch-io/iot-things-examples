@@ -1,0 +1,17 @@
+{
+   "id": "66b9bdc2-b19e-ba18-b72d-3688d0d50886",
+   "name": "env_CRaaS-prod",
+   "values": [
+      {
+         "key": "craas.baseurl",
+         "value": "https://cr.apps.bosch-iot-cloud.com",
+         "type": "text"
+      },
+      {
+         "key": "namespace",
+         "value": "com.bosch.cr.demo",
+         "type": "text"
+      }
+   ],
+   "timestamp": 1440653923186
+}

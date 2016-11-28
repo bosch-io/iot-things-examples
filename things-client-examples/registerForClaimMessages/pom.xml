@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-	<!--
-	/**
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <!--
+   /**
 	*                                            Bosch SI Example Code License
 	*                                              Version 1.0, January 2016
 	*
@@ -29,35 +27,23 @@
 	* UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
 	* LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
 	* EMPLOYEES, REPRESENTATIVES AND ORGANS.
-	*/
-	-->
+    */
+   -->
    <parent>
+      <artifactId>things-client-examples</artifactId>
       <groupId>com.bosch.iot.things.examples</groupId>
-      <artifactId>iot-things-examples</artifactId>
       <version>0-SNAPSHOT</version>
-      <relativePath>../</relativePath>
    </parent>
 
-    <artifactId>hello-world-java-client</artifactId>
-    <packaging>jar</packaging>
-    <name>Bosch IoT Things :: Hello World in Java</name>
-    <description>Hello World Example in Java for Bosch IoT Things</description>
+   <artifactId>registerForClaimMessages</artifactId>
+   <name>Bosch IoT Things :: Java Client Examples :: Register for Claim Messages</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.bosch.iot.things</groupId>
-            <artifactId>things-client</artifactId>
-        </dependency>
-
-        <!--Logging-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-    </dependencies>
+   <dependencies>
+      <dependency>
+         <groupId>com.bosch.iot.things.examples</groupId>
+         <artifactId>common</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+   </dependencies>
 
 </project>

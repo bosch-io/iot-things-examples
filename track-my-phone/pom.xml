@@ -31,11 +31,17 @@
 	* EMPLOYEES, REPRESENTATIVES AND ORGANS.
     */
    -->
+   <parent>
+      <groupId>com.bosch.iot.things.examples</groupId>
+      <artifactId>iot-things-examples</artifactId>
+      <version>0-SNAPSHOT</version>
+      <relativePath>../</relativePath>
+   </parent>
 
-   <groupId>com.bosch.cr.examples</groupId>
    <artifactId>track-my-phone</artifactId>
-   <version>0-SNAPSHOT</version>
    <packaging>pom</packaging>
+   <name>Bosch IoT Things :: Track my Phone Example</name>
+   <description>Track my Phone Example for Bosch IoT Things</description>
 
    <properties>
       <!-- The URL of the Things service REST API -->

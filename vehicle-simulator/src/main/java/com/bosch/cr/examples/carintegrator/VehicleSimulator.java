@@ -47,13 +47,12 @@ import java.util.concurrent.TimeoutException;
 import io.netty.util.internal.ThreadLocalRandom;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.SubscriptionConsumeOptions;
 import com.bosch.cr.integration.client.IntegrationClientImpl;
 import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TrustStoreConfiguration;
+import com.bosch.cr.integration.client.messaging.MessagingProviders;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonObject;
@@ -91,9 +90,9 @@ public class VehicleSimulator
          throw new RuntimeException(ex);
       }
 
-      String thingsServiceMessagingUrl = props.getProperty("thingsServiceMessagingUrl");
-
       String clientId = props.getProperty("clientId");
+      String apiToken = props.getProperty("apiToken");
+      String defaultNamespace = props.getProperty("defaultNamespace");
 
       URI keystoreUri = new File("CRClient.jks").toURI();
       String keystorePassword = props.getProperty("keyStorePassword");
@@ -107,15 +106,13 @@ public class VehicleSimulator
          PublicKeyAuthenticationConfiguration.newBuilder().clientId(clientId).keyStoreLocation(keystoreUri.toURL())
             .keyStorePassword(keystorePassword).alias(keyAlias).aliasPassword(keyAliasPassword).build();
 
-      TrustStoreConfiguration trustStore =
-         TrustStoreConfiguration.newBuilder().location(VehicleSimulator.class.getResource("/bosch-iot-cloud.jks"))
-            .password("jks").build();
 
       IntegrationClientConfiguration.OptionalConfigSettable configSettable =
          IntegrationClientConfiguration.newBuilder()
+                 .apiToken(apiToken)
+                 .defaultNamespace(defaultNamespace)
                  .authenticationConfiguration(authenticationConfiguration)
-                 .centralRegistryEndpointUrl(thingsServiceMessagingUrl)
-                 .trustStoreConfiguration(trustStore);
+                 .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
       if (proxyHost != null && proxyPort != null)
       {
          configSettable = configSettable.proxyConfiguration(
@@ -141,7 +138,6 @@ public class VehicleSimulator
          }
       });
 
-      client.subscriptions().create(SubscriptionConsumeOptions.newBuilder().enableConsumeOwnEvents().build()).get(10, TimeUnit.SECONDS);
       client.subscriptions().consume().get(10, TimeUnit.SECONDS);
 
       Thread thread = new Thread(() -> {

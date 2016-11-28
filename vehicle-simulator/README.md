@@ -28,8 +28,9 @@ Create file "config.properties" in your project root folder. _Please change the 
 
 
 ```
-thingsServiceMessagingUrl=wss://events.apps.bosch-iot-cloud.com
 clientId=###your solution id ###:gateway
+apiToken=###your solution API token###
+defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
 keyStorePassword=### your key password ###
 keyAliasPassword=### your key alias password ###

@@ -39,7 +39,7 @@ import com.bosch.cr.integration.client.IntegrationClientImpl;
 import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TrustStoreConfiguration;
+import com.bosch.cr.integration.client.messaging.MessagingProviders;
 import com.bosch.cr.integration.things.FeatureHandle;
 import com.bosch.cr.integration.things.ThingIntegration;
 import com.bosch.cr.json.JsonObject;
@@ -55,12 +55,11 @@ import com.bosch.cr.model.things.Thing;
 public class HelloWorld
 {
 
-   // WS-URL of Bosch IoT Things service in cloud
-   private static final String BOSCH_IOT_THINGS_WS_ENDPOINT_URL = "wss://events.apps.bosch-iot-cloud.com";
-
    // Insert your Solution ID here
    private static final String SOLUTION_ID = "<your-solution-id>";
    private static final String CLIENT_ID = SOLUTION_ID + ":connector";
+   private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
+   private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
    private static final String USER_ID = "<UUID-of-your-user>";
 
    // Insert your keystore passwords here
@@ -68,10 +67,6 @@ public class HelloWorld
    private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
    private static final String ALIAS = "CR";
    private static final String ALIAS_PASSWORD = "<your-alias-password>";
-
-   // Currently necessary for accepting bosch self signed certificates
-   private static final URL TRUSTSTORE_LOCATION = HelloWorld.class.getResource("/bosch-iot-cloud.jks");
-   private static final String TRUSTSTORE_PASSWORD = "jks";
 
    // optionally configure a proxy server
    // public static final String PROXY_HOST = "proxy.server.com";
@@ -144,24 +139,20 @@ public class HelloWorld
       // .proxyHost(PROXY_HOST) //
       // .proxyPort(PROXY_PORT) //
       // .build();
-      // Configure a truststore that contains trusted certificates
-      final TrustStoreConfiguration trustStore = TrustStoreConfiguration.newBuilder() //
-         .location(TRUSTSTORE_LOCATION) //
-         .password(TRUSTSTORE_PASSWORD) //
-         .build();
 
       /**
-       * Provide required configuration (authentication configuration and CR URI), optional proxy configuration can be
+       * Provide required configuration (authentication configuration), optional proxy configuration can be
        * added when needed
        */
       final IntegrationClientConfiguration integrationClientConfiguration = IntegrationClientConfiguration.newBuilder() //
+         .apiToken(SOLUTION_API_TOKEN) //
+         .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE) //
          .authenticationConfiguration(authenticationConfiguration)
-         .centralRegistryEndpointUrl(BOSCH_IOT_THINGS_WS_ENDPOINT_URL) //
-         .trustStoreConfiguration(trustStore) //
+         .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build()) //
          // .proxyConfiguration(proxy) //
          .build();
 
-      LOGGER.info("Creating CR Integration Client for ClientID: {}", CLIENT_ID);
+      LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
 
       // Create a new integration client object to start interacting service
       integrationClient = IntegrationClientImpl.newInstance(integrationClientConfiguration);

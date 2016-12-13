@@ -1,7 +1,7 @@
 ## Bosch IoT Things - Example Data Historian
 
 This example shows how to collect and use data history of property values.
-It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a timeseries chart.
+It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a time series chart.
 
 ![Screenshot](screenshot.png)
 
@@ -51,9 +51,9 @@ Create file "config.properties" in folder "src/main/resources". _Please change t
 
 ```
 thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
-thingsServiceMessagingUrl=wss\://events.apps.bosch-iot-cloud.com
 clientId=###your solution id ###:historian
-apiToken=###your solution api token ###
+apiToken=###your solution API token###
+defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
 keyStorePassword=#### your key password ###
 keyAliasPassword=#### your key alias password ###
@@ -98,35 +98,6 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
 }
 ```
 
-## Collect changes
-
-The change collections happens automatically on all prepared Things whenever a property change is issued using the Things service.
-The historian takes over the changes into its change history.
-In this step there are two options to define the timestamp of the change:
-- if no additional information is provided then the timestamp is recorded as incoming timestamp of the change event when received by the Historian application.
-This could potentially not match the technical timestamp of the real-world sensor event because of the way these change events are transmitted/processed (e.g. transmitted in blocks).
-- if anywhere in the Thing property change structure a property called "timestamp" is found then this will be used for all property changes on the same level or on nested properties.
-This means that you can submit property changes with their corresponding timestamp by applying this property change in one change operation. 
-Of course in this case changes of the timestamp property itself will not recorded as separate history collection entries. 
-The "timestamp" property should be issued in [ISO-Date](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_LOCAL_DATE_TIME) format.    
-
-Example of property with matching timestamp field. 
-```
-{
-   ...
-   "features": {
-      "envscanner": {
-         "properties": {
-             ...
-             "velocity": 23.5,
-             "timestamp": "2016-04-28T22:19:59.841Z"
-         }
-      }
-   }
-   ...
-}
-```
-
 ## Usage
 
 Use the following URL to look at the collected data:
@@ -143,7 +114,7 @@ e.g.
 - http://localhost:8080/history/data/demo:vehicle-53/features/[geolocation/properties/geoposition/latitude,enginetemperature/properties/value]
 - http://localhost:8080/history/data/[demo:vehicle-53/features/geolocation/properties/geoposition/latitude,demo:vehicle-99/features/geolocation/properties/geoposition/latitude]
 
-Use the following URL to view at the collected data as a time series chart, following the same format above to take into account multiple feature/values.
+Use the following URL to view at the collected data as a timeseries chart, following the same format above to take into account multiple feature/values.
 
 http://localhost:8080/history/view/###thingId###/features/###featureId###/properties/###propertyPath###
 

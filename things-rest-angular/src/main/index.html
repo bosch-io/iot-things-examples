@@ -205,13 +205,13 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form ng-submit="removeThing(removeThingId)">
+                                <form ng-submit="deleteThing(deleteThingId)">
                                     <div class="input-group">
                                         <span class="input-group-addon form-addon" id="remove-thing-thingId">Thing ID</span>
                                         <input type="text" class="form-control"
                                                placeholder="the.namespace:theThingId"
                                                aria-describedby="remove-thing-thingId"
-                                               ng-model="removeThingId" required>
+                                               ng-model="deleteThingId" required>
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="submit">Go!</button>
                                         </span>

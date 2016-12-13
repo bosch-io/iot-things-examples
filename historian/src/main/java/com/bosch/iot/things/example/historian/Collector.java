@@ -58,20 +58,17 @@ import org.springframework.stereotype.Component;
 import com.mongodb.BasicDBObject;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.SubscriptionConsumeOptions;
 import com.bosch.cr.integration.client.IntegrationClientImpl;
 import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TrustStoreConfiguration;
+import com.bosch.cr.integration.client.messaging.MessagingProviders;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonArray;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
-import java.time.format.DateTimeParseException;
-import java.util.Optional;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -120,7 +117,7 @@ public class Collector implements Runnable
    @PostConstruct
    public void start()
    {
-      mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+       mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
 
       if (!mongoTemplate.collectionExists("history")) {
          mongoTemplate.createCollection("history");
@@ -145,7 +142,7 @@ public class Collector implements Runnable
             // collect list of individual property changes
             List<History> target = new LinkedList<>();
             collectChanges(target, change.getThingId(), change.getFeature().getId(),
-                    JsonPointer.newInstance(), change.getValue().get(), LocalDateTime.now());
+                    JsonPointer.newInstance(), change.getValue().get());
 
             // write them all the the MongoDB
             target.stream().forEachOrdered(h -> storeHistory(h));
@@ -154,7 +151,6 @@ public class Collector implements Runnable
 
       // start consuming changes
       try {
-         client.subscriptions().create(SubscriptionConsumeOptions.newBuilder().build()).get(10, TimeUnit.SECONDS);
          client.subscriptions().consume().get(10, TimeUnit.SECONDS);
       } catch (InterruptedException | ExecutionException | TimeoutException ex) {
          throw new RuntimeException(ex);
@@ -187,29 +183,13 @@ public class Collector implements Runnable
    /**
     * Collect list of individual property changes
     */
-   private static void collectChanges(List target, String thingId, String featureId, JsonPointer path, JsonValue value,
-           LocalDateTime timestamp)
+   private static void collectChanges(List target, String thingId, String featureId, JsonPointer path, JsonValue value)
    {
       if (value.isObject()) {
          // on Object recursively collect all individual properties with concatenated property path
          JsonObject obj = value.asObject();
-
-         // try to optionally take over nested "timestamp" propertry
-         Optional<JsonValue> ts = obj.get("timestamp");
-         if (ts.isPresent()) {
-            String isoDate = ts.get().asString();
-            try {
-               timestamp = LocalDateTime.parse(isoDate);
-            } catch (DateTimeParseException ex) {
-               LOGGER.debug("Unparsable timestamp: thingId {}, timestamp {}, error {}", thingId, isoDate, ex);
-            }
-         }
-         final LocalDateTime timestampToUse = timestamp;
-
          obj.forEach(c -> {
-            if (!"timestamp".equals(c.getKey())) {
-               collectChanges(target, thingId, featureId, path.addLeaf(c.getKey()), c.getValue(), timestampToUse);
-            }
+            collectChanges(target, thingId, featureId, path.addLeaf(c.getKey()), c.getValue());
          });
       } else {
          target.add(new History(thingId, featureId, path, value, LocalDateTime.now()));
@@ -265,17 +245,14 @@ public class Collector implements Runnable
             props.load(i);
             i.close();
          }
-         Properties logProps = new Properties();
-         logProps.putAll(props);
-         logProps.replace("keyStorePassword", "xxx");
-         logProps.replace("keyAliasPassword", "xxx");
-         LOGGER.info("Used integration client config: {}", logProps);
+         LOGGER.info("Used integration client config: {}", props);
       } catch (IOException ex) {
          throw new RuntimeException(ex);
       }
 
-      String thingsMessagingUrl = props.getProperty("thingsServiceMessagingUrl");
       String clientId = props.getProperty("clientId");
+      String apiToken = props.getProperty("apiToken");
+      String defaultNamespace = props.getProperty("defaultNamespace");
       URI keystoreUri;
       try {
          keystoreUri = Collector.class.getResource("/CRClient.jks").toURI();
@@ -297,12 +274,12 @@ public class Collector implements Runnable
          throw new RuntimeException(ex);
       }
 
-      TrustStoreConfiguration trustStore
-              = TrustStoreConfiguration.newBuilder().location(Collector.class.getResource("/bosch-iot-cloud.jks"))
-              .password("jks").build();
-      IntegrationClientConfiguration.OptionalConfigSettable configSettable
-              = IntegrationClientConfiguration.newBuilder().authenticationConfiguration(authenticationConfiguration)
-              .centralRegistryEndpointUrl(thingsMessagingUrl).trustStoreConfiguration(trustStore);
+      IntegrationClientConfiguration.OptionalConfigSettable configSettable =
+         IntegrationClientConfiguration.newBuilder()
+            .apiToken(apiToken)
+            .defaultNamespace(defaultNamespace)
+            .authenticationConfiguration(authenticationConfiguration)
+            .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
 
       if (proxyHost != null && proxyPort != null) {
          configSettable = configSettable.proxyConfiguration(

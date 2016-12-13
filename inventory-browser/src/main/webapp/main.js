@@ -239,25 +239,7 @@ $(document).ready(function () {
     // --- Click handler for creating new things
     var createThing = function () {
 
-        var callbackThingCreated = function(thing, status) {
-
-            var callbackSimualtorAclAdded = function() {
-                // include READ ACL for historian-client (b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian)
-                $.ajax("api/1/things/" + thing.thingId + "/acl/b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian", {
-                    method: "PUT",
-                    data: JSON.stringify({
-                        READ: true,
-                        WRITE: false,
-                        ADMINISTRATE: false
-                    })
-                })
-                .fail(failHandler)
-                .done(function () {
-                    $("#details").attr("thingId", thing.thingId);
-                    refreshDetails();
-                });
-            };
-
+        var created = function(thing, status) {
             // include WRITE ACL for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688)
             $.ajax("api/1/things/" + thing.thingId + "/acl/1d138250-49a8-11e6-826c-c2ae337e6688", {
                 method: "PUT",
@@ -268,25 +250,28 @@ $(document).ready(function () {
                 })
             })
             .fail(failHandler)
-            .done(callbackSimualtorAclAdded);
+            .done(function () {
+                $("#details").attr("thingId", thing.thingId);
+                refreshDetails();
+            });
         };
 
         var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
-            +"You will have full access rights, the device simulator will have write access, the historian will have read access.");
+            +"You will have full access rights and the device simulator will have write access.");
         if (thingId == "") {
             $.ajax("api/1/things", {
                 method: "POST",
                 data: JSON.stringify({})
             })
             .fail(failHandler)
-            .done(thingCreatedCallback);
+            .done(created);
         } else if (thingId != null) {
             $.ajax("api/1/things/" + thingId, {
                 method: "PUT",
                 data: JSON.stringify({})
             })
             .fail(failHandler)
-            .done(thingCreatedCallback);
+            .done(created);
         }
     };
     // --- Click handler for showing simulator popup

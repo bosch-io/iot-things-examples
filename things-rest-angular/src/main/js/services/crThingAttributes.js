@@ -29,7 +29,7 @@
     var service = angular.module('crThingAttributes', ['crCore', 'ngResource']);
 
     service.factory('Attributes', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/attributes';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/attributes';
         var actions = {
             get: {
                 method: 'GET',
@@ -50,7 +50,7 @@
     });
 
     service.factory('Attribute', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/attributes/:jsonPointer';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/attributes/:jsonPointer';
         var actions = {
             get: {
                 method: 'GET',

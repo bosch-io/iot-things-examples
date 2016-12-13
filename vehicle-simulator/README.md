@@ -10,7 +10,7 @@ mvn clean install
 
 # Create a Solution with a private/public key
 
-[Book the Bosch IoT Things cloud service](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:cr_02_booking-cr-service.txt)
+<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:cr_02_booking-cr-service.txt">Book the Bosch IoT Things cloud service</a>
 
 
 # Create a User
@@ -28,8 +28,9 @@ Create file "config.properties" in your project root folder. _Please change the 
 
 
 ```
-thingsServiceMessagingUrl=wss://events.apps.bosch-iot-cloud.com
 clientId=###your solution id ###:gateway
+apiToken=###your solution API token###
+defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
 keyStorePassword=### your key password ###
 keyAliasPassword=### your key alias password ###
@@ -85,4 +86,3 @@ Login to the [Inventory Browser](http://demos.apps.bosch-iot-cloud.com/inventory
 # License
 
 See the iot-things-examples top level README.md file for license details.
-

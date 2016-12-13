@@ -32,17 +32,17 @@
   * EMPLOYEES, REPRESENTATIVES AND ORGANS.
    */
   -->
+   <parent>
+      <groupId>com.bosch.iot.things.examples</groupId>
+      <artifactId>iot-things-examples</artifactId>
+      <version>0-SNAPSHOT</version>
+      <relativePath>../</relativePath>
+   </parent>
 
-   <groupId>com.bosch.cr.examples</groupId>
    <artifactId>hello-world-webui</artifactId>
-   <version>0.0.1-SNAPSHOT</version>
    <packaging>war</packaging>
-   <description>Boch IoT Things - Hello World Web UI</description>
-
-   <properties>
-      <maven.compiler.source>1.8</maven.compiler.source>
-      <maven.compiler.target>1.8</maven.compiler.target>
-   </properties>
+   <name>Bosch IoT Things :: Hello World Web UI</name>
+   <description>Hello World Web UI for Bosch IoT Things</description>
 
    <dependencies>
       <dependency>

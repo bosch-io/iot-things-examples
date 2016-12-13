@@ -29,7 +29,7 @@
     var service = angular.module('crThingAcl', ['crCore', 'ngResource']);
 
     service.factory('Acl', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/acl';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/acl';
         var actions = {
             get: {
                 method: 'GET',
@@ -50,7 +50,7 @@
     });
     
     service.factory('AclEntry', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/acl/:subject';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/acl/:subject';
         var actions = {
             get: {
                 method: 'GET',

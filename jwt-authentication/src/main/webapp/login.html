@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bosch IoT Things - JWT Authentication</title>
+    <!--
+       Bosch SI Example Code License
+       Version 1.0, January 2016
+
+       Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+
+       Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+       following conditions are met:
+
+       1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+       disclaimer.
+
+       2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+       following disclaimer in the documentation and/or other materials provided with the distribution.
+
+       BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+       LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+       THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+       ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+       BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+       LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+       THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+       UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+       LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+       EMPLOYEES, REPRESENTATIVES AND ORGANS.
+       -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.0.0/bootstrap-social.min.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <div class="navbar-brand">Bosch IoT Things - JWT Authentication</div>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Login</h3>
+            <p>Please login with your Bosch IoT Permission user or with a social account.</p>
+        </div>
+    </div>
+
+    <div id="login-error-message-row" class="row">
+        <div class="col-md-12">
+            <div id="login-error-message" class="alert alert-warning" role="alert"></div>
+        </div>
+    </div>
+
+    <div class="row row-divided">
+        <div class="col-xs-6 column-one">
+            <h4>Sign in with Bosch IoT Permissions</h4>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Tenant</label>
+                    <input id="login-tenant-input" class="form-control" type="text" name="tenantnameorid"
+                           placeholder="Tenant name or id"
+                           autocorrect=off autocapitalize=none>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input class="form-control" type="text" name="username" placeholder="Username" autocorrect=off
+                           autocapitalize=none required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input class="form-control" type="password" name="password" placeholder="Password" required>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input id="login-tenant-checkbox" type="checkbox" value="">Use evaluation tenant
+                        </label>
+                    </div>
+                </div>
+
+                <input type="submit" name="login" class="btn btn-default" value="Login">
+            </form>
+        </div>
+
+        <div class="vertical-divider">or</div>
+
+        <div class="col-xs-6 column-two">
+            <h4>Social Account</h4>
+            <div class="center-block">
+                <a id="login-with-google-button" class="btn btn-block btn-social btn-google">
+                    <span class="fa fa-google"></span> Sign in with Google
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="login.js"></script>
+</body>
+</html>

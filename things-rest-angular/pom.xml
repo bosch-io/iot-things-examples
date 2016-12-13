@@ -31,12 +31,17 @@
 	* EMPLOYEES, REPRESENTATIVES AND ORGANS.
     */
    -->
+   <parent>
+      <groupId>com.bosch.iot.things.examples</groupId>
+      <artifactId>iot-things-examples</artifactId>
+      <version>0-SNAPSHOT</version>
+      <relativePath>../</relativePath>
+   </parent>
 
-   <groupId>com.bosch.cr.examples</groupId>
    <artifactId>things-rest-angular</artifactId>
-   <version>0-SNAPSHOT</version>
    <packaging>pom</packaging>
-   <name>IoT Central Registry :: Examples :: Things REST Angular</name>
+   <name>Bosch IoT Things :: Angular REST Example</name>
+   <description>Example Angular UI via REST for Bosch IoT Things</description>
 
    <build>
       <resources>

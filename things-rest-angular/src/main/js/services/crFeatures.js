@@ -29,7 +29,7 @@
     var service = angular.module('crFeatures', ['crCore', 'ngResource']);
 
     service.factory('Features', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/features';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/features';
         var actions = {
             get: {
                 method: 'GET',
@@ -50,7 +50,7 @@
     });
 
     service.factory('Feature', function ($core, $resource) {
-        var url = '/api/1/things/:thingId/features/:featureId';
+        var url = $core.configuration.getBaseUrl() + '/things/:thingId/features/:featureId';
         var actions = {
             get: {
                 method: 'GET',

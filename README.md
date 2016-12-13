@@ -6,7 +6,7 @@ This repository contains examples for using the Bosch IoT Things in the cloud.
 
 ### Maven Repository
 
-In order to be able to run the examples (or to implement your own), you need the "Bosch IoT Things - Integration Client".
+In order to be able to run the examples (or to implement your own), you need the "Bosch IoT Things - Things Client".
 This is available via our public Maven repository. Add following Maven-Repository to your Maven `settings.xml`:
 
 ```
@@ -31,13 +31,13 @@ This is available via our public Maven repository. Add following Maven-Repositor
 
 ### Maven Dependency
 
-After adding the public repository as described above, you can simply use the CRIC dependency to your `pom.xml`:
+After adding the public repository as described above, you can simply use the Things Client dependency to your `pom.xml`:
 
 ```
 <dependency>
-   <groupId>com.bosch.cr</groupId>
-   <artifactId>cr-integration-client</artifactId>
-   <version>2.4.0</version>
+   <groupId>com.bosch.iot.things</groupId>
+   <artifactId>things-client</artifactId>
+   <version>3.0.0.RC6</version>
 </dependency>
 ```
 
@@ -45,9 +45,9 @@ We also provide an OSGi-bundle:
 
 ```
 <dependency>
-   <groupId>com.bosch.cr</groupId>
-   <artifactId>cr-integration-client-osgi</artifactId>
-   <version>2.4.0</version>
+   <groupId>com.bosch.iot.things</groupId>
+      <artifactId>things-client-osgi</artifactId>
+   <version>3.0.0.RC6</version>
 </dependency>
 ```
 
@@ -66,7 +66,7 @@ This is a list of prepared REST call examples to demonstrate typical usages of t
 
 The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
 
-### Example "integration-api-examples"
+### Example "things-client-examples"
 
 This example shows how to use the CR-Integration Client for Java.
 

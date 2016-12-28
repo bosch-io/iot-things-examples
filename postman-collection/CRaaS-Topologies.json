@@ -1,0 +1,91 @@
+{
+	"variables": [],
+	"info": {
+		"name": "CRaaS-Topologies",
+		"_postman_id": "7b52e114-b46f-034d-eec3-5820d18defb4",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create: A Topology",
+			"request": {
+				"url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"mutation { createTopology (topology : { version : \\\"1\\\", campus : [] }) { version } }\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Query: A Topology",
+			"request": {
+				"url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"{ topology { id, version, campus { id, buildings { id, displayName, levels, floors { id, displayName, rooms { id, displayName } } } } } }\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update: A Topology",
+			"request": {
+				"url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"mutation { updateTopology (topology : { version : \\\"4\\\", campus : [] }) { id,version }}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete: A Topology",
+			"request": {
+				"url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"mutation { deleteTopology { ID }}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

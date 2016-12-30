@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -32,51 +32,44 @@ import javax.xml.bind.annotation.XmlRootElement;
  * This model class demonstrates how to use a custom serialization (in this case XML-Serialization with JAXB) for
  * Messages.
  */
-@XmlRootElement(name = "User" )
-public class ExampleUser
-{
-   public static final String USER_CUSTOM_CONTENT_TYPE = "application/vnd.my-company.user+xml";
+@XmlRootElement(name = "User")
+public class ExampleUser {
 
-   private String userName;
-   private String email;
+    public static final String USER_CUSTOM_CONTENT_TYPE = "application/vnd.my-company.user+xml";
 
-   public ExampleUser()
-   {
-      super();
-   }
+    private String userName;
+    private String email;
 
-   public ExampleUser(String userName, String email)
-   {
-      this.userName = userName;
-      this.email = email;
-   }
+    public ExampleUser() {
+        super();
+    }
 
-   public String getUserName()
-   {
-      return userName;
-   }
+    public ExampleUser(String userName, String email) {
+        this.userName = userName;
+        this.email = email;
+    }
 
-   public void setUserName(String userName)
-   {
-      this.userName = userName;
-   }
+    public String getUserName() {
+        return userName;
+    }
 
-   public String getEmail()
-   {
-      return email;
-   }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-   public void setEmail(String email)
-   {
-      this.email = email;
-   }
+    public String getEmail() {
+        return email;
+    }
 
-   @Override
-   public String toString()
-   {
-      return getClass().getSimpleName() + " [" +
-         "userName=" + userName +
-         ", email=" + email +
-         "]";
-   }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [" +
+                "userName=" + userName +
+                ", email=" + email +
+                "]";
+    }
 }

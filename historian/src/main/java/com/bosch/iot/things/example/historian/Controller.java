@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -32,12 +32,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -61,331 +71,314 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Web/REST Controll of Example Historian.
- *
+ * <p>
  * Provides two endpoints: /history/data for the raw json history data and /history/view as a web chart view of the
  * history.
  */
 @RestController
-public class Controller
-{
+public class Controller {
 
-   public static class HistoricData
-   {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+    // URL Pattern: * / history / [data|view|embeddedview] / <thingId> / features / <featureId> / properties / <propertyPath>
+    // with support for the following repeat-syntax: a [ b, c ] z --> a b z + a c z
+    private static final Pattern PARAM_PATTERN = Pattern.compile(".*/history/.+?/(.+?)/features/(.+?)/properties/(.+)");
+    // Property Pattern: features/
+    private Properties theConfig;
+    private CloseableHttpClient theHttpClient;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-      private final Param param;
-      private final Map data;
+    /**
+     * Expand comma seperated alternatives put in square brackets in a String.
+     */
+    private static List<String> expandBracketRepeats(String s) {
+        List<String> result = new ArrayList<>();
 
-      public HistoricData(Param param, Map data)
-      {
-         this.param = param;
-         this.data = data;
-      }
-
-      public Param getParam()
-      {
-         return this.param;
-      }
-
-      public Map getData()
-      {
-         return this.data;
-      }
-   }
-
-   public static final class Param
-   {
-
-      private final String thingId;
-      private final String featureId;
-      private final String propertyPath;
-
-      private Param(String thingId, String featureId, String propertyPath)
-      {
-         this.thingId = thingId;
-         this.featureId = featureId;
-         this.propertyPath = propertyPath;
-      }
-
-      public String getThingId()
-      {
-         return thingId;
-      }
-
-      public String getFeatureId()
-      {
-         return featureId;
-      }
-
-      public String getPropertyPath()
-      {
-         return propertyPath;
-      }
-
-      static List<Param> createFromRequest()
-      {
-         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-         String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-
-         List<String> paths = expandBracketRepeats(fullPath);
-
-         List<Param> result = new ArrayList<>();
-         for (String p : paths) {
-            Matcher matcher = PARAM_PATTERN.matcher(p);
-            if (!matcher.matches()) {
-               throw new IllegalArgumentException(fullPath);
+        int p = s.indexOf("[");
+        if (p >= 0) {
+            // find matching closing bracket
+            int q = p;
+            int level = 0;
+            while (q < s.length() && level >= 0) {
+                q++;
+                if (s.charAt(q) == '[') {
+                    level++;
+                } else if (s.charAt(q) == ']') {
+                    level--;
+                }
             }
-            result.add(new Param(matcher.group(1), matcher.group(2), matcher.group(3)));
-         }
-         return result;
-      }
-
-      @Override
-      public String toString()
-      {
-         return "{" + "thingId: " + thingId + ", featureId: " + featureId + ", propertyPath: " + propertyPath + "}";
-      }
-   }
-
-   private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
-
-   // URL Pattern: * / history / [data|view|embeddedview] / <thingId> / features / <featureId> / properties / <propertyPath>
-   // with support for the following repeat-syntax: a [ b, c ] z --> a b z + a c z
-   private static final Pattern PARAM_PATTERN = Pattern.compile(".*/history/.+?/(.+?)/features/(.+?)/properties/(.+)");
-
-   // Property Pattern: features/
-   private Properties theConfig;
-   private CloseableHttpClient theHttpClient;
-
-   @Autowired
-   private MongoTemplate mongoTemplate;
-
-   @PostConstruct
-   public void postConstruct()
-   {
-      mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-   }
-
-   @RequestMapping("/history/data/**")
-   public List<HistoricData> getHistoricData() throws Exception
-   {
-      List<Param> params = Param.createFromRequest();
-
-      List<HistoricData> data = new ArrayList<>();
-      for (Param p : params) {
-
-         if (!checkAccess(p.thingId, p.featureId, p.propertyPath)) {
-            LOGGER.info("Property not found or access denied: {}", params);
-            return null;
-         }
-
-         String id = p.thingId + "/features/" + p.featureId + "/properties/" + p.propertyPath;
-         LOGGER.debug("Query MongoDB on id: {}", id);
-
-         Map m = mongoTemplate.findById(id, Map.class, "history");
-         if (m == null) {
-            return null;
-         }
-         m.remove("_id");
-
-         data.add(new HistoricData(p, m));
-      }
-
-      return data;
-   }
-
-   @RequestMapping("/history/view/**")
-   public ModelAndView getViewHistory() throws Exception
-   {
-      return getViewHistory(false);
-   }
-
-   @RequestMapping("/history/embeddedview/**")
-   public ModelAndView getEmbeddedViewHistory() throws Exception
-   {
-      return getViewHistory(true);
-   }
-
-   public ModelAndView getViewHistory(boolean embedded) throws Exception
-   {
-      List<HistoricData> m = getHistoricData();
-      List<Param> p = Param.createFromRequest();
-
-      ModelAndView mav = new ModelAndView();
-      mav.addObject("params", p);
-      mav.addObject("values", m);
-
-      mav.addObject("clientId", getConfig().getProperty("clientId"));
-      if (embedded) {
-         mav.addObject("embedded", Boolean.TRUE);
-      }
-      mav.setViewName("historyview");
-      return mav;
-   }
-
-   /**
-    * Check access on specific property by doing a callback to the Things service.
-    */
-   private boolean checkAccess(String thingId, String featureId, String propertyPath) throws UnsupportedEncodingException, IOException
-   {
-      HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-      HttpServletResponse httpRes = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
-
-      // enforce BASIC auth
-      String auth = httpReq.getHeader("Authorization");
-      if (auth == null) {
-         httpRes.setHeader("WWW-Authenticate", "BASIC realm=\"Proxy for Bosch IoT Things\"");
-         httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-         return false;
-      }
-
-      String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") + "/properties/" + propertyPath;
-      HttpGet thingsRequest = new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl")
-              + "/cr/1/things/" + httpid);
-
-      // fill in apiToken if not provided
-      String apiToken = getConfig().getProperty("apiToken");
-      if (apiToken != null && httpReq.getHeader("x-cr-api-token") == null) {
-         thingsRequest.addHeader("x-cr-api-token", apiToken);
-      }
-
-      // forward all other Headers to Things service
-      Enumeration<String> headerNames = httpReq.getHeaderNames();
-      if (headerNames != null) {
-         final Set<String> headersToIgnore = new HashSet(Arrays.asList(new String[]{"host"}));
-         while (headerNames.hasMoreElements()) {
-            String name = headerNames.nextElement();
-            if (!headersToIgnore.contains(name)) {
-               thingsRequest.addHeader(name, httpReq.getHeader(name));
+            if (level >= 0) {
+                throw new IllegalArgumentException("Matching bracket not found: " + s);
             }
-         }
-      }
 
-      String username = null;
-      if (auth.toUpperCase().startsWith("BASIC ")) {
-         String userpassDecoded = new String(Base64.getDecoder().decode(auth.substring("BASIC ".length())));
-          username = userpassDecoded.substring(0, userpassDecoded.indexOf(':'));
-     }
-      LOGGER.debug("Callback to Things service: {} - with user {}", thingsRequest, username);
+            String prefix = s.substring(0, p);
+            String repeats = s.substring(p + 1, q);
+            String suffix = s.substring(q + 1);
 
-      try (CloseableHttpResponse response = getHttpClient().execute(thingsRequest)) {
-         LOGGER.debug("... retured {}", response.getStatusLine());
+            // first do recursive expand within current bracket pair
+            List<String> expands = expandBracketRepeats(repeats);
 
-         int statusCode = response.getStatusLine().getStatusCode();
-         if (statusCode < 200 || statusCode > 299) {
-            httpRes.setStatus(statusCode);
+            // then expand current bracket pair
+            for (String e : expands) {
+                String[] parts = e.split(",");
+                for (String part : parts) {
+                    // expand recursivly to also do expand in suffixes
+                    result.addAll(expandBracketRepeats(prefix + part + suffix));
+                }
+            }
+        } else {
+            result.add(s);
+        }
+
+        return result;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+    }
+
+    @RequestMapping("/history/data/**")
+    public List<HistoricData> getHistoricData() throws Exception {
+        List<Param> params = Param.createFromRequest();
+
+        List<HistoricData> data = new ArrayList<>();
+        for (Param p : params) {
+
+            if (!checkAccess(p.thingId, p.featureId, p.propertyPath)) {
+                LOGGER.info("Property not found or access denied: {}", params);
+                return null;
+            }
+
+            String id = p.thingId + "/features/" + p.featureId + "/properties/" + p.propertyPath;
+            LOGGER.debug("Query MongoDB on id: {}", id);
+
+            Map m = mongoTemplate.findById(id, Map.class, "history");
+            if (m == null) {
+                return null;
+            }
+            m.remove("_id");
+
+            data.add(new HistoricData(p, m));
+        }
+
+        return data;
+    }
+
+    @RequestMapping("/history/view/**")
+    public ModelAndView getViewHistory() throws Exception {
+        return getViewHistory(false);
+    }
+
+    @RequestMapping("/history/embeddedview/**")
+    public ModelAndView getEmbeddedViewHistory() throws Exception {
+        return getViewHistory(true);
+    }
+
+    public ModelAndView getViewHistory(boolean embedded) throws Exception {
+        List<HistoricData> m = getHistoricData();
+        List<Param> p = Param.createFromRequest();
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("params", p);
+        mav.addObject("values", m);
+
+        mav.addObject("clientId", getConfig().getProperty("clientId"));
+        if (embedded) {
+            mav.addObject("embedded", Boolean.TRUE);
+        }
+        mav.setViewName("historyview");
+        return mav;
+    }
+
+    /**
+     * Check access on specific property by doing a callback to the Things service.
+     */
+    private boolean checkAccess(String thingId, String featureId, String propertyPath)
+            throws UnsupportedEncodingException, IOException {
+        HttpServletRequest httpReq =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletResponse httpRes =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+
+        // enforce BASIC auth
+        String auth = httpReq.getHeader("Authorization");
+        if (auth == null) {
+            httpRes.setHeader("WWW-Authenticate", "BASIC realm=\"Proxy for Bosch IoT Things\"");
+            httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
-         }
-      }
+        }
 
-      return true;
-   }
+        String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") +
+                "/properties/" + propertyPath;
+        HttpGet thingsRequest = new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl")
+                + "/cr/1/things/" + httpid);
 
-   private synchronized Properties getConfig()
-   {
-      if (theConfig == null) {
-         theConfig = new Properties(System.getProperties());
-         try {
-            if (new File("config.properties").exists()) {
-               theConfig.load(new FileReader("config.properties"));
-            } else {
-               InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
-               theConfig.load(i);
-               i.close();
+        // fill in apiToken if not provided
+        String apiToken = getConfig().getProperty("apiToken");
+        if (apiToken != null && httpReq.getHeader("x-cr-api-token") == null) {
+            thingsRequest.addHeader("x-cr-api-token", apiToken);
+        }
+
+        // forward all other Headers to Things service
+        Enumeration<String> headerNames = httpReq.getHeaderNames();
+        if (headerNames != null) {
+            final Set<String> headersToIgnore = new HashSet(Arrays.asList(new String[]{"host"}));
+            while (headerNames.hasMoreElements()) {
+                String name = headerNames.nextElement();
+                if (!headersToIgnore.contains(name)) {
+                    thingsRequest.addHeader(name, httpReq.getHeader(name));
+                }
             }
-            LOGGER.info("Used integration client config: {}", theConfig);
-         } catch (IOException ex) {
-            throw new RuntimeException(ex);
-         }
-      }
-      return theConfig;
-   }
+        }
 
-   private synchronized CloseableHttpClient getHttpClient()
-   {
-      if (theHttpClient == null) {
+        String username = null;
+        if (auth.toUpperCase().startsWith("BASIC ")) {
+            String userpassDecoded = new String(Base64.getDecoder().decode(auth.substring("BASIC ".length())));
+            username = userpassDecoded.substring(0, userpassDecoded.indexOf(':'));
+        }
+        LOGGER.debug("Callback to Things service: {} - with user {}", thingsRequest, username);
 
-         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        try (CloseableHttpResponse response = getHttpClient().execute(thingsRequest)) {
+            LOGGER.debug("... retured {}", response.getStatusLine());
 
-         // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
-         //try {
-         //   SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
-         //   httpClientBuilder.setSSLContext(sslContext);
-         //
-         //   // #### ONLY FOR TEST: Do NOT verify hostname
-         //   SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-         //
-         //   Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-         //           .register("http", PlainConnectionSocketFactory.getSocketFactory())
-         //           .register("https", sslConnectionSocketFactory)
-         //           .build();
-         //   PoolingHttpClientConnectionManager httpClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-         //   httpClientBuilder.setConnectionManager(httpClientConnectionManager);
-         //} catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-         //   LOGGER.error(ex.getMessage(), ex);
-         //}
-
-         Properties config = getConfig();
-         if (config.getProperty("http.proxyHost") != null) {
-            httpClientBuilder.setProxy(new HttpHost(config.getProperty("http.proxyHost"), Integer.parseInt(config.getProperty("http.proxyPort"))));
-         }
-         if (config.getProperty("http.proxyUser") != null) {
-            CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            credsProvider.setCredentials(new AuthScope(HttpHost.create(getConfig().getProperty("thingsServiceEndpointUrl"))),
-                    new UsernamePasswordCredentials(config.getProperty("http.proxyUser"), config.getProperty("http.proxyPwd")));
-            httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
-         }
-
-         theHttpClient = httpClientBuilder.build();
-      }
-      return theHttpClient;
-   }
-
-   /** Expand comma seperated alternatives put in square brackets in a String. */
-   private static List<String> expandBracketRepeats(String s)
-   {
-      List<String> result = new ArrayList<>();
-
-      int p = s.indexOf("[");
-      if (p >= 0) {
-         // find matching closing bracket
-         int q = p;
-         int level = 0;
-         while (q < s.length() && level >= 0)
-         {
-            q++;
-            if (s.charAt(q) == '[')
-            {
-               level++;
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                httpRes.setStatus(statusCode);
+                return false;
             }
-            else if (s.charAt(q) == ']')
-            {
-               level--;
+        }
+
+        return true;
+    }
+
+    private synchronized Properties getConfig() {
+        if (theConfig == null) {
+            theConfig = new Properties(System.getProperties());
+            try {
+                if (new File("config.properties").exists()) {
+                    theConfig.load(new FileReader("config.properties"));
+                } else {
+                    InputStream i =
+                            Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
+                    theConfig.load(i);
+                    i.close();
+                }
+                LOGGER.info("Used integration client config: {}", theConfig);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
-         }
-         if (level >= 0) {
-            throw new IllegalArgumentException("Matching bracket not found: " + s);
-         }
+        }
+        return theConfig;
+    }
 
-         String prefix = s.substring(0, p);
-         String repeats = s.substring(p + 1, q);
-         String suffix = s.substring(q + 1);
+    private synchronized CloseableHttpClient getHttpClient() {
+        if (theHttpClient == null) {
 
-         // first do recursive expand within current bracket pair
-         List<String> expands = expandBracketRepeats(repeats);
+            HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
-         // then expand current bracket pair
-         for (String e : expands) {
-            String[] parts = e.split(",");
-            for (String part : parts) {
-               // expand recursivly to also do expand in suffixes
-               result.addAll(expandBracketRepeats(prefix + part + suffix));
+            // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
+            //try {
+            //   SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
+            //   httpClientBuilder.setSSLContext(sslContext);
+            //
+            //   // #### ONLY FOR TEST: Do NOT verify hostname
+            //   SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+            //
+            //   Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+            //           .register("http", PlainConnectionSocketFactory.getSocketFactory())
+            //           .register("https", sslConnectionSocketFactory)
+            //           .build();
+            //   PoolingHttpClientConnectionManager httpClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            //   httpClientBuilder.setConnectionManager(httpClientConnectionManager);
+            //} catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
+            //   LOGGER.error(ex.getMessage(), ex);
+            //}
+
+            Properties config = getConfig();
+            if (config.getProperty("http.proxyHost") != null) {
+                httpClientBuilder.setProxy(new HttpHost(config.getProperty("http.proxyHost"),
+                        Integer.parseInt(config.getProperty("http.proxyPort"))));
             }
-         }
-      } else {
-         result.add(s);
-      }
+            if (config.getProperty("http.proxyUser") != null) {
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(
+                        new AuthScope(HttpHost.create(getConfig().getProperty("thingsServiceEndpointUrl"))),
+                        new UsernamePasswordCredentials(config.getProperty("http.proxyUser"),
+                                config.getProperty("http.proxyPwd")));
+                httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
+            }
 
-      return result;
-   }
-   
+            theHttpClient = httpClientBuilder.build();
+        }
+        return theHttpClient;
+    }
+
+    public static class HistoricData {
+
+        private final Param param;
+        private final Map data;
+
+        public HistoricData(Param param, Map data) {
+            this.param = param;
+            this.data = data;
+        }
+
+        public Param getParam() {
+            return this.param;
+        }
+
+        public Map getData() {
+            return this.data;
+        }
+    }
+
+    public static final class Param {
+
+        private final String thingId;
+        private final String featureId;
+        private final String propertyPath;
+
+        private Param(String thingId, String featureId, String propertyPath) {
+            this.thingId = thingId;
+            this.featureId = featureId;
+            this.propertyPath = propertyPath;
+        }
+
+        static List<Param> createFromRequest() {
+            HttpServletRequest request =
+                    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+            List<String> paths = expandBracketRepeats(fullPath);
+
+            List<Param> result = new ArrayList<>();
+            for (String p : paths) {
+                Matcher matcher = PARAM_PATTERN.matcher(p);
+                if (!matcher.matches()) {
+                    throw new IllegalArgumentException(fullPath);
+                }
+                result.add(new Param(matcher.group(1), matcher.group(2), matcher.group(3)));
+            }
+            return result;
+        }
+
+        public String getThingId() {
+            return thingId;
+        }
+
+        public String getFeatureId() {
+            return featureId;
+        }
+
+        public String getPropertyPath() {
+            return propertyPath;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + "thingId: " + thingId + ", featureId: " + featureId + ", propertyPath: " + propertyPath + "}";
+        }
+    }
+
 }

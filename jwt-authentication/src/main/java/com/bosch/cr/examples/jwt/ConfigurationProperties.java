@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -34,88 +34,75 @@ import java.util.Properties;
 /**
  * Provides access to {@link Properties} defined in the {@code config.properties} file.
  */
-public final class ConfigurationProperties
-{
+public final class ConfigurationProperties {
 
-   private static final String CONFIG_PROPERTIES_FILE_NAME = "config.properties";
+    private static final String CONFIG_PROPERTIES_FILE_NAME = "config.properties";
 
-   private static final ConfigurationProperties INSTANCE = new ConfigurationProperties();
+    private static final ConfigurationProperties INSTANCE = new ConfigurationProperties();
 
-   private final Properties config;
+    private final Properties config;
 
-   private ConfigurationProperties()
-   {
-      config = getConfig();
-   }
+    private ConfigurationProperties() {
+        config = getConfig();
+    }
 
-   /**
-    * Returns the {@code ConfigurationProperties} instance.
-    * 
-    * @return the ConfigurationProperties.
-    */
-   public static ConfigurationProperties getInstance()
-   {
-      return INSTANCE;
-   }
+    /**
+     * Returns the {@code ConfigurationProperties} instance.
+     *
+     * @return the ConfigurationProperties.
+     */
+    public static ConfigurationProperties getInstance() {
+        return INSTANCE;
+    }
 
-   /**
-    * Returns the value of the given {@code property} as a {@code String}.
-    * 
-    * @param property the property.
-    * @return the value.
-    */
-   public String getPropertyAsString(final ConfigurationProperty property)
-   {
-      return config.getProperty(property.getName());
-   }
+    /**
+     * Returns the value of the given {@code property} as a {@code String}.
+     *
+     * @param property the property.
+     * @return the value.
+     */
+    public String getPropertyAsString(final ConfigurationProperty property) {
+        return config.getProperty(property.getName());
+    }
 
-   /**
-    * Returns the value of the given {@code property} as an {@code int}.
-    *
-    * @param property the property.
-    * @return the value.
-    */
-   public int getPropertyAsInt(final ConfigurationProperty property)
-   {
-      return Integer.parseInt(config.getProperty(property.getName()));
-   }
+    /**
+     * Returns the value of the given {@code property} as an {@code int}.
+     *
+     * @param property the property.
+     * @return the value.
+     */
+    public int getPropertyAsInt(final ConfigurationProperty property) {
+        return Integer.parseInt(config.getProperty(property.getName()));
+    }
 
-   /**
-    * Returns the value of the given {@code property} as a {@code boolean}.
-    *
-    * @param property the property.
-    * @return the value.
-    */
-   public boolean getPropertyAsBoolean(final ConfigurationProperty property)
-   {
-      return Boolean.parseBoolean(config.getProperty(property.getName()));
-   }
+    /**
+     * Returns the value of the given {@code property} as a {@code boolean}.
+     *
+     * @param property the property.
+     * @return the value.
+     */
+    public boolean getPropertyAsBoolean(final ConfigurationProperty property) {
+        return Boolean.parseBoolean(config.getProperty(property.getName()));
+    }
 
-   private synchronized Properties getConfig()
-   {
-      final Properties config;
+    private synchronized Properties getConfig() {
+        final Properties config;
 
-      try
-      {
-         config = new Properties(System.getProperties());
-         if (new File(CONFIG_PROPERTIES_FILE_NAME).exists())
-         {
-            config.load(new FileReader(CONFIG_PROPERTIES_FILE_NAME));
-         }
-         else
-         {
-            final InputStream i =
-               Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_PROPERTIES_FILE_NAME);
-            config.load(i);
-            i.close();
-         }
-      }
-      catch (final IOException ex)
-      {
-         throw new RuntimeException(ex);
-      }
+        try {
+            config = new Properties(System.getProperties());
+            if (new File(CONFIG_PROPERTIES_FILE_NAME).exists()) {
+                config.load(new FileReader(CONFIG_PROPERTIES_FILE_NAME));
+            } else {
+                final InputStream i =
+                        Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_PROPERTIES_FILE_NAME);
+                config.load(i);
+                i.close();
+            }
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
-      return config;
-   }
+        return config;
+    }
 
 }

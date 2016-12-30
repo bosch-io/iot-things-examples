@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -52,231 +52,206 @@ import com.bosch.cr.model.things.Thing;
 /**
  * This example shows how to create and use the Java Integration Client for managing your first Hello World Thing.
  */
-public class HelloWorld
-{
+public class HelloWorld {
 
-   // Insert your Solution ID here
-   private static final String SOLUTION_ID = "<your-solution-id>";
-   private static final String CLIENT_ID = SOLUTION_ID + ":connector";
-   private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
-   private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
-   private static final String USER_ID = "<UUID-of-your-user>";
+    // Insert your Solution ID here
+    private static final String SOLUTION_ID = "<your-solution-id>";
+    private static final String CLIENT_ID = SOLUTION_ID + ":connector";
+    private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
+    private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
+    private static final String USER_ID = "<UUID-of-your-user>";
 
-   // Insert your keystore passwords here
-   private static final URL KEYSTORE_LOCATION = HelloWorld.class.getResource("/CRClient.jks");
-   private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
-   private static final String ALIAS = "CR";
-   private static final String ALIAS_PASSWORD = "<your-alias-password>";
+    // Insert your keystore passwords here
+    private static final URL KEYSTORE_LOCATION = HelloWorld.class.getResource("/CRClient.jks");
+    private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
+    private static final String ALIAS = "CR";
+    private static final String ALIAS_PASSWORD = "<your-alias-password>";
 
-   // optionally configure a proxy server
-   // public static final String PROXY_HOST = "proxy.server.com";
-   // public static final int PROXY_PORT = 8080;
+    // optionally configure a proxy server
+    // public static final String PROXY_HOST = "proxy.server.com";
+    // public static final int PROXY_PORT = 8080;
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorld.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorld.class);
 
-   private static final int TIMEOUT = 5;
-   private static final String NAMESPACE = "com.bosch.example:";
-   private static final String THING_ID = NAMESPACE + UUID.randomUUID().toString();
-   private static final String COUNTER = "counter";
-   private static final String COUNTER_VALUE = "value";
+    private static final int TIMEOUT = 5;
+    private static final String NAMESPACE = "com.bosch.example:";
+    private static final String THING_ID = NAMESPACE + UUID.randomUUID().toString();
+    private static final String COUNTER = "counter";
+    private static final String COUNTER_VALUE = "value";
 
-   final IntegrationClient integrationClient;
-   final ThingIntegration thingIntegration;
+    final IntegrationClient integrationClient;
+    final ThingIntegration thingIntegration;
 
-   public static void main(final String... args)
-   {
-      new HelloWorld().execute();
-   }
+    /**
+     * Client instantiation
+     */
+    public HelloWorld() {
+        // Build an authentication configuration
+        final AuthenticationConfiguration authenticationConfiguration =
+                PublicKeyAuthenticationConfiguration.newBuilder().clientId(CLIENT_ID) //
+                        .keyStoreLocation(KEYSTORE_LOCATION) //
+                        .keyStorePassword(KEYSTORE_PASSWORD) //
+                        .alias(ALIAS) //
+                        .aliasPassword(ALIAS_PASSWORD) //
+                        .build();
 
-   /**
-    * Create and update a thing with the java client.
-    */
-   public void execute()
-   {
-      try
-      {
-         // Create a Thing with a counter Feature and get the FeatureHandle
-         final FeatureHandle counter = createThingWithCounter();
+        // Optionally configure a proxy server
+        // final ProxyConfiguration proxy = ProxyConfiguration.newBuilder() //
+        // .proxyHost(PROXY_HOST) //
+        // .proxyPort(PROXY_PORT) //
+        // .build();
 
-         // Update the ACL with your User ID to see your thing in the Demo Web UI
-         updateACL();
+        /**
+         * Provide required configuration (authentication configuration), optional proxy configuration can be
+         * added when needed
+         */
+        final IntegrationClientConfiguration integrationClientConfiguration =
+                IntegrationClientConfiguration.newBuilder() //
+                        .apiToken(SOLUTION_API_TOKEN) //
+                        .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE) //
+                        .authenticationConfiguration(authenticationConfiguration)
+                        .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build()) //
+                        // .proxyConfiguration(proxy) //
+                        .build();
 
-         // Log full Thing info (as JSON)
-         LOGGER.info("Thing looks like this: {}", getThingById(THING_ID).toJson());
+        LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
 
-         // Loop to update the attributes of the Thing
-         for (int i = 0; i <= 100; i++)
-         {
-            updateCounter(counter, i);
-            Thread.sleep(2000);
-         }
+        // Create a new integration client object to start interacting service
+        integrationClient = IntegrationClientImpl.newInstance(integrationClientConfiguration);
 
-         // This step must always be concluded to terminate the Java client.
-         terminate();
-      }
-      catch (InterruptedException | ExecutionException | TimeoutException e)
-      {
-         LOGGER.error(e.getMessage());
-      }
-   }
+        // Create a new thing integration object for working with things
+        thingIntegration = integrationClient.things();
+    }
 
-   /**
-    * Client instantiation
-    */
-   public HelloWorld()
-   {
-      // Build an authentication configuration
-      final AuthenticationConfiguration authenticationConfiguration =
-         PublicKeyAuthenticationConfiguration.newBuilder().clientId(CLIENT_ID) //
-            .keyStoreLocation(KEYSTORE_LOCATION) //
-            .keyStorePassword(KEYSTORE_PASSWORD) //
-            .alias(ALIAS) //
-            .aliasPassword(ALIAS_PASSWORD) //
-            .build();
+    public static void main(final String... args) {
+        new HelloWorld().execute();
+    }
 
-      // Optionally configure a proxy server
-      // final ProxyConfiguration proxy = ProxyConfiguration.newBuilder() //
-      // .proxyHost(PROXY_HOST) //
-      // .proxyPort(PROXY_PORT) //
-      // .build();
+    /**
+     * Create and update a thing with the java client.
+     */
+    public void execute() {
+        try {
+            // Create a Thing with a counter Feature and get the FeatureHandle
+            final FeatureHandle counter = createThingWithCounter();
 
-      /**
-       * Provide required configuration (authentication configuration), optional proxy configuration can be
-       * added when needed
-       */
-      final IntegrationClientConfiguration integrationClientConfiguration = IntegrationClientConfiguration.newBuilder() //
-         .apiToken(SOLUTION_API_TOKEN) //
-         .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE) //
-         .authenticationConfiguration(authenticationConfiguration)
-         .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build()) //
-         // .proxyConfiguration(proxy) //
-         .build();
+            // Update the ACL with your User ID to see your thing in the Demo Web UI
+            updateACL();
 
-      LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
+            // Log full Thing info (as JSON)
+            LOGGER.info("Thing looks like this: {}", getThingById(THING_ID).toJson());
 
-      // Create a new integration client object to start interacting service
-      integrationClient = IntegrationClientImpl.newInstance(integrationClientConfiguration);
-
-      // Create a new thing integration object for working with things
-      thingIntegration = integrationClient.things();
-   }
-
-   /**
-    * Create a {@code Thing} with the counter {@code Feature}. Blocks until Thing has been created.
-    *
-    * @return a handle for the counter.
-    */
-   public FeatureHandle createThingWithCounter()
-   {
-      final Thing thing = Thing.newBuilder() //
-         .setId(THING_ID) //
-         .setFeature(Feature.newBuilder() //
-            .properties(JsonObject.newBuilder() //
-               .set(COUNTER_VALUE, 0) //
-               .build()) //
-            .withId(COUNTER) //
-            .build()) //
-         .build();
-
-      FeatureHandle featureHandle = null;
-
-      try
-      {
-         featureHandle = thingIntegration.create(thing) //
-            .thenApply(created -> thingIntegration.forFeature(THING_ID, COUNTER)) //
-            .get(TIMEOUT, TimeUnit.SECONDS);
-
-         LOGGER.info("Thing with ID '{}' created.", THING_ID);
-      }
-      catch (InterruptedException | ExecutionException | TimeoutException e)
-      {
-         LOGGER.error(e.getMessage());
-      }
-
-      return featureHandle;
-   }
-
-   /**
-    * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
-    */
-   public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException
-   {
-      return thingIntegration.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
-   }
-
-   /**
-    * Delete a Thing.
-    */
-   public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException
-   {
-      thingIntegration.delete(thingId) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID deleted: {}", thingId);
+            // Loop to update the attributes of the Thing
+            for (int i = 0; i <= 100; i++) {
+                updateCounter(counter, i);
+                Thread.sleep(2000);
             }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         }) //
-         .get(TIMEOUT, TimeUnit.SECONDS);
-   }
 
-   /**
-    * Update the ACL of a specified Thing. Blocks until ACL has been updated.
-    */
-   public void updateACL() throws InterruptedException, ExecutionException, TimeoutException
-   {
-      thingIntegration.forId(THING_ID) //
-         .retrieve() //
-         .thenCompose(thing -> {
-            final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(USER_ID), //
-               Permission.READ, //
-               Permission.WRITE, //
-               Permission.ADMINISTRATE);
+            // This step must always be concluded to terminate the Java client.
+            terminate();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
 
-            final Thing updated = thing.setAclEntry(aclEntry);
-            return thingIntegration.update(updated);
-         }) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID '{}' updated ACL entry!", THING_ID);
-            }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         }).get(TIMEOUT, TimeUnit.SECONDS);
-   }
+    /**
+     * Create a {@code Thing} with the counter {@code Feature}. Blocks until Thing has been created.
+     *
+     * @return a handle for the counter.
+     */
+    public FeatureHandle createThingWithCounter() {
+        final Thing thing = Thing.newBuilder() //
+                .setId(THING_ID) //
+                .setFeature(Feature.newBuilder() //
+                        .properties(JsonObject.newBuilder() //
+                                .set(COUNTER_VALUE, 0) //
+                                .build()) //
+                        .withId(COUNTER) //
+                        .build()) //
+                .build();
 
-   /**
-    * Update {@code counter} with {@code value}. Method does not block but returns as soon as the update has been
-    * triggered.
-    */
-   public void updateCounter(final FeatureHandle counter, final int value)
-   {
-      counter.putProperty(COUNTER_VALUE, value) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID '{}' updated with Counter={}!", counter.getThingId(), value);
-            }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         });
-   }
+        FeatureHandle featureHandle = null;
 
-   /**
-    * Destroys the client and waits for its graceful shutdown.
-    */
-   public void terminate()
-   {
-      // Gracefully shutdown the integrationClient
-      integrationClient.destroy();
-   }
+        try {
+            featureHandle = thingIntegration.create(thing) //
+                    .thenApply(created -> thingIntegration.forFeature(THING_ID, COUNTER)) //
+                    .get(TIMEOUT, TimeUnit.SECONDS);
+
+            LOGGER.info("Thing with ID '{}' created.", THING_ID);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOGGER.error(e.getMessage());
+        }
+
+        return featureHandle;
+    }
+
+    /**
+     * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
+     */
+    public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
+        return thingIntegration.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Delete a Thing.
+     */
+    public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
+        thingIntegration.delete(thingId) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID deleted: {}", thingId);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                }) //
+                .get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update the ACL of a specified Thing. Blocks until ACL has been updated.
+     */
+    public void updateACL() throws InterruptedException, ExecutionException, TimeoutException {
+        thingIntegration.forId(THING_ID) //
+                .retrieve() //
+                .thenCompose(thing -> {
+                    final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(USER_ID), //
+                            Permission.READ, //
+                            Permission.WRITE, //
+                            Permission.ADMINISTRATE);
+
+                    final Thing updated = thing.setAclEntry(aclEntry);
+                    return thingIntegration.update(updated);
+                }) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID '{}' updated ACL entry!", THING_ID);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                }).get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update {@code counter} with {@code value}. Method does not block but returns as soon as the update has been
+     * triggered.
+     */
+    public void updateCounter(final FeatureHandle counter, final int value) {
+        counter.putProperty(COUNTER_VALUE, value) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID '{}' updated with Counter={}!", counter.getThingId(), value);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Destroys the client and waits for its graceful shutdown.
+     */
+    public void terminate() {
+        // Gracefully shutdown the integrationClient
+        integrationClient.destroy();
+    }
 
 }

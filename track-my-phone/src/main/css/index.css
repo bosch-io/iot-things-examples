@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -85,9 +85,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 .loginmodal-container input[type=text]:hover, input[type=password]:hover {
     border: 1px solid #b9b9b9;
     border-top: 1px solid #a0a0a0;
-    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .loginmodal {
@@ -102,7 +102,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 .loginmodal-submit {
     border: 0px;
     color: #fff;
-    text-shadow: 0 1px rgba(0,0,0,0.1);
+    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
     background-color: #4d90fe;
     padding: 17px 0px;
     font-family: roboto;
@@ -111,7 +111,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 .loginmodal-submit:hover {
     border: 0px;
-    text-shadow: 0 1px rgba(0,0,0,0.3);
+    text-shadow: 0 1px rgba(0, 0, 0, 0.3);
     background-color: #357ae8;
 }
 
@@ -125,6 +125,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
     transition: opacity ease 0.5s;
 }
 
-.login-help{
+.login-help {
     font-size: 12px;
 }

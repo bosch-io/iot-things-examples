@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -51,116 +51,105 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Unit test to show Signature Authentication for authenticating technical clients at the RESTful interface 
+ * Unit test to show Signature Authentication for authenticating technical clients at the RESTful interface
  * of the Bosch IoT Things service
  *
  * @since 1.0.0
  */
-public class SignatureAuthenticationTest
-{
+public class SignatureAuthenticationTest {
 
-   private static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
-   private static final String CONTENT_TYPE_JSON = "application-json";
+    private static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_TYPE_JSON = "application-json";
 
-   private static final int HTTP_STATUS_CREATED = 201;
-   private static final int HTTP_STATUS_NO_CONTENT = 204;
+    private static final int HTTP_STATUS_CREATED = 201;
+    private static final int HTTP_STATUS_NO_CONTENT = 204;
 
-   private static String thingsServiceEndpointUrl;
-   private static AsyncHttpClient asyncHttpClient;
-   private static String thingId;
+    private static String thingsServiceEndpointUrl;
+    private static AsyncHttpClient asyncHttpClient;
+    private static String thingId;
 
-   /** */
-   @BeforeClass
-   public static void setUp() throws KeyManagementException, NoSuchAlgorithmException, IOException
-   {
-      final Properties props = new Properties(System.getProperties());
-      final FileReader r;
-      if (Files.exists(Paths.get("config.properties")))
-      {
-         r = new FileReader(Paths.get("config.properties").toFile());
-      }
-      else
-      {
-         r = new FileReader(
-            SignatureAuthenticationTest.class.getClassLoader().getResource("config.properties").getFile());
-      }
-      props.load(r);
-      r.close();
+    /** */
+    @BeforeClass
+    public static void setUp() throws KeyManagementException, NoSuchAlgorithmException, IOException {
+        final Properties props = new Properties(System.getProperties());
+        final FileReader r;
+        if (Files.exists(Paths.get("config.properties"))) {
+            r = new FileReader(Paths.get("config.properties").toFile());
+        } else {
+            r = new FileReader(
+                    SignatureAuthenticationTest.class.getClassLoader().getResource("config.properties").getFile());
+        }
+        props.load(r);
+        r.close();
 
-      thingsServiceEndpointUrl = props.getProperty("thingsServiceEndpointUrl", props.getProperty("centralRegistryEndpointUrl"));
+        thingsServiceEndpointUrl =
+                props.getProperty("thingsServiceEndpointUrl", props.getProperty("centralRegistryEndpointUrl"));
 
-      final String clientId = props.getProperty("clientId");
-      final String apiToken = props.getProperty("apiToken");
+        final String clientId = props.getProperty("clientId");
+        final String apiToken = props.getProperty("apiToken");
 
-      final URI keystoreUri = new File(props.getProperty("keystoreLocation")).toURI();
-      final String keyStorePassword = props.getProperty("keyStorePassword");
-      final String keyAlias = props.getProperty("keyAlias");
-      final String keyAliasPassword = props.getProperty("keyAliasPassword");
+        final URI keystoreUri = new File(props.getProperty("keystoreLocation")).toURI();
+        final String keyStorePassword = props.getProperty("keyStorePassword");
+        final String keyAlias = props.getProperty("keyAlias");
+        final String keyAliasPassword = props.getProperty("keyAliasPassword");
 
-      final SignatureFactory signatureFactory =
-         SignatureFactory.newInstance(keystoreUri, keyStorePassword, keyAlias, keyAliasPassword);
+        final SignatureFactory signatureFactory =
+                SignatureFactory.newInstance(keystoreUri, keyStorePassword, keyAlias, keyAliasPassword);
 
-      final DefaultAsyncHttpClientConfig.Builder builder = new DefaultAsyncHttpClientConfig.Builder();
-      builder.setAcceptAnyCertificate(true); // WORKAROUND: Trust self-signed certificate of BICS until there is a trusted one.
+        final DefaultAsyncHttpClientConfig.Builder builder = new DefaultAsyncHttpClientConfig.Builder();
+        builder.setAcceptAnyCertificate(
+                true); // WORKAROUND: Trust self-signed certificate of BICS until there is a trusted one.
 
-      final String proxyHost = props.getProperty("http.proxyHost");
-      final String proxyPort = props.getProperty("http.proxyPort");
-      final String proxyPrincipal = props.getProperty("http.proxyPrincipal");
-      final String proxyPassword = props.getProperty("http.proxyPassword");
-      if (proxyHost != null && proxyPort != null)
-      {
-         final ProxyServer.Builder proxyBuilder = new ProxyServer.Builder(proxyHost, Integer.valueOf(proxyPort));
-         if (proxyPrincipal != null && proxyPassword != null)
-         {
-            // proxy with authentication
-            proxyBuilder.setRealm(new Realm.Builder(proxyPrincipal, proxyPassword).setScheme(Realm.AuthScheme.BASIC).setUsePreemptiveAuth(true));
-         }
-         builder.setProxyServer(proxyBuilder);
-      }
+        final String proxyHost = props.getProperty("http.proxyHost");
+        final String proxyPort = props.getProperty("http.proxyPort");
+        final String proxyPrincipal = props.getProperty("http.proxyPrincipal");
+        final String proxyPassword = props.getProperty("http.proxyPassword");
+        if (proxyHost != null && proxyPort != null) {
+            final ProxyServer.Builder proxyBuilder = new ProxyServer.Builder(proxyHost, Integer.valueOf(proxyPort));
+            if (proxyPrincipal != null && proxyPassword != null) {
+                // proxy with authentication
+                proxyBuilder.setRealm(new Realm.Builder(proxyPrincipal, proxyPassword).setScheme(Realm.AuthScheme.BASIC)
+                        .setUsePreemptiveAuth(true));
+            }
+            builder.setProxyServer(proxyBuilder);
+        }
 
-      asyncHttpClient = new DefaultAsyncHttpClient(builder.build());
-      asyncHttpClient.setSignatureCalculator(new AsymmetricalSignatureCalculator(signatureFactory, clientId, apiToken));
+        asyncHttpClient = new DefaultAsyncHttpClient(builder.build());
+        asyncHttpClient.setSignatureCalculator(
+                new AsymmetricalSignatureCalculator(signatureFactory, clientId, apiToken));
 
-      thingId = "com.bosch.cr.example:myThing-" + UUID.randomUUID().toString();
-   }
+        thingId = "com.bosch.cr.example:myThing-" + UUID.randomUUID().toString();
+    }
 
-   /**
-    * PUT a Thing with CRS Authentication.
-    *
-    * @throws ExecutionException
-    * @throws InterruptedException
-    */
-   @Test
-   public void putThingWithCRS() throws ExecutionException, InterruptedException
-   {
-      final String thingJsonString = "{}";
-      final String path = "/api/1/things/" + thingId;
+    /**
+     * PUT a Thing with CRS Authentication.
+     */
+    @Test
+    public void putThingWithCRS() throws ExecutionException, InterruptedException {
+        final String thingJsonString = "{}";
+        final String path = "/api/1/things/" + thingId;
 
-      final ListenableFuture<Response> future = asyncHttpClient.preparePut(thingsServiceEndpointUrl + path) //
-         .addHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON) //
-         .setBody(thingJsonString) //
-         .execute();
+        final ListenableFuture<Response> future = asyncHttpClient.preparePut(thingsServiceEndpointUrl + path) //
+                .addHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON) //
+                .setBody(thingJsonString) //
+                .execute();
 
-      final Response response = future.get();
-      assertEquals(HTTP_STATUS_CREATED, response.getStatusCode());
-   }
+        final Response response = future.get();
+        assertEquals(HTTP_STATUS_CREATED, response.getStatusCode());
+    }
 
-   /**
-    * Delete a Thing with CRS Authentication.
-    *
-    * @throws ExecutionException
-    * @throws InterruptedException
-    */
-   @Test
-   public void deleteThingWithCRS() throws ExecutionException, InterruptedException
-   {
-      final String path = "/api/1/things/" + thingId;
+    /**
+     * Delete a Thing with CRS Authentication.
+     */
+    @Test
+    public void deleteThingWithCRS() throws ExecutionException, InterruptedException {
+        final String path = "/api/1/things/" + thingId;
 
-      final ListenableFuture<Response> future = asyncHttpClient.prepareDelete(thingsServiceEndpointUrl + path) //
-         .execute();
+        final ListenableFuture<Response> future = asyncHttpClient.prepareDelete(thingsServiceEndpointUrl + path) //
+                .execute();
 
-      final Response response = future.get();
-      assertEquals(HTTP_STATUS_NO_CONTENT, response.getStatusCode());
-   }
+        final Response response = future.get();
+        assertEquals(HTTP_STATUS_NO_CONTENT, response.getStatusCode());
+    }
 
 }

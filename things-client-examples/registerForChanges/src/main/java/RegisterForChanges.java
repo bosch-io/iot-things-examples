@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -47,101 +47,96 @@ import com.bosch.cr.json.JsonValue;
  * NOTE: Make sure to invoke {@code IntegrationClient.subscriptions().consume()} once after all handlers are
  * registered to start receiving events.
  */
-public final class RegisterForChanges extends ExamplesBase
-{
-   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForChanges.class);
+public final class RegisterForChanges extends ExamplesBase {
 
-   private static final String ALL_THINGS = "allThings";
-   private static final String MY_THING = "myThing";
-   private static final String ALL_THINGS_ATTRIBUTE_CHANGE = "allThings_attributeChanges";
-   private static final String ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE = "allThings_specificAttributeChanges";
-   private static final String MY_THING_ATTRIBUTE_CHANGE = "myThing_attributeChanges";
-   private static final String MY_THING_SPECIFIC_ATTRIBUTE_CHANGE = "myThing_specificAttributeChanges";
-   private static CountDownLatch countDownLatch;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForChanges.class);
 
-   /**
-    * Set up the count down latch to wait until the changes were received.
-    */
-   public void setUpCountDownLatch()
-   {
-      countDownLatch = new CountDownLatch(2);
-   }
+    private static final String ALL_THINGS = "allThings";
+    private static final String MY_THING = "myThing";
+    private static final String ALL_THINGS_ATTRIBUTE_CHANGE = "allThings_attributeChanges";
+    private static final String ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE = "allThings_specificAttributeChanges";
+    private static final String MY_THING_ATTRIBUTE_CHANGE = "myThing_attributeChanges";
+    private static final String MY_THING_SPECIFIC_ATTRIBUTE_CHANGE = "myThing_specificAttributeChanges";
+    private static CountDownLatch countDownLatch;
 
-   /**
-    * Register for {@code ThingChange}s.
-    */
-   public void registerForThingChanges()
-   {
+    /**
+     * Set up the count down latch to wait until the changes were received.
+     */
+    public void setUpCountDownLatch() {
+        countDownLatch = new CountDownLatch(2);
+    }
+
+    /**
+     * Register for {@code ThingChange}s.
+     */
+    public void registerForThingChanges() {
       /* Register for change events of *all* things */
-      client.things().registerForThingChanges(ALL_THINGS, change ->
-      {
-         LOGGER.info("For all things: ThingChange received: {}", change);
-         countDownLatch.countDown();
-      });
+        client.things().registerForThingChanges(ALL_THINGS, change ->
+        {
+            LOGGER.info("For all things: ThingChange received: {}", change);
+            countDownLatch.countDown();
+        });
 
       /* Register for *all* change events of a *specific* thing */
-      myThing.registerForThingChanges(MY_THING, change -> LOGGER.info("My Thing: ThingChange received: {}", change));
-   }
+        myThing.registerForThingChanges(MY_THING, change -> LOGGER.info("My Thing: ThingChange received: {}", change));
+    }
 
-   /**
-    * Register for {@code ImmutableThingAttributeChange}s.
-    */
-   public void registerForAttributeChanges()
-   {
+    /**
+     * Register for {@code ImmutableThingAttributeChange}s.
+     */
+    public void registerForAttributeChanges() {
       /* Register for *all* attribute changes of *all* things */
-      client.things().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
-         change -> LOGGER.info("For all things: Change received: {}", change));
+        client.things().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
+                change -> LOGGER.info("For all things: Change received: {}", change));
 
       /* Register for *specific* attribute changes of *all* things */
-      client.things()
-         .registerForAttributeChanges(ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE, JsonFactory.newPointer("address/city"),
-            change -> LOGGER.info("For all things with specific Attribute: Change received: {}", change));
+        client.things()
+                .registerForAttributeChanges(ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE,
+                        JsonFactory.newPointer("address/city"),
+                        change -> LOGGER.info("For all things with specific Attribute: Change received: {}", change));
 
       /* Register for *all* attribute changes of a *specific* thing */
-      myThing.registerForAttributesChanges(MY_THING_ATTRIBUTE_CHANGE, change ->
-      {
-         final Optional<JsonValue> value = change.getValue() //
-            .map(JsonValue::asObject) // "attributes" is a JsonObject
-            .flatMap(jsonObj -> jsonObj.getValue(change.getPath()));
-         LOGGER.info("My Thing: Change received: {} - value was: {}", change, value);
-      });
+        myThing.registerForAttributesChanges(MY_THING_ATTRIBUTE_CHANGE, change ->
+        {
+            final Optional<JsonValue> value = change.getValue() //
+                    .map(JsonValue::asObject) // "attributes" is a JsonObject
+                    .flatMap(jsonObj -> jsonObj.getValue(change.getPath()));
+            LOGGER.info("My Thing: Change received: {} - value was: {}", change, value);
+        });
 
       /* Register for *specific* attribute changes of a *specific* thing */
-      myThing.registerForAttributeChanges(MY_THING_SPECIFIC_ATTRIBUTE_CHANGE, JsonFactory.newPointer("address/city"),
-         change -> LOGGER.info("My Thing with specific Attribute: attributeChange received: {}", change));
-   }
+        myThing.registerForAttributeChanges(MY_THING_SPECIFIC_ATTRIBUTE_CHANGE, JsonFactory.newPointer("address/city"),
+                change -> LOGGER.info("My Thing with specific Attribute: attributeChange received: {}", change));
+    }
 
-   /**
-    * Register for {@code ThingChange}s and deregister after the created-event has been retrieved.
-    */
-   public void registerForThingChangesWithDeregistration()
-      throws InterruptedException, ExecutionException, TimeoutException
-   {
-      final String registrationId = UUID.randomUUID().toString();
-      final String thingId = "com.bosch.cr.example:" + UUID.randomUUID().toString();
-      final ThingHandle thingHandle = client.things().forId(thingId);
+    /**
+     * Register for {@code ThingChange}s and deregister after the created-event has been retrieved.
+     */
+    public void registerForThingChangesWithDeregistration()
+            throws InterruptedException, ExecutionException, TimeoutException {
+        final String registrationId = UUID.randomUUID().toString();
+        final String thingId = "com.bosch.cr.example:" + UUID.randomUUID().toString();
+        final ThingHandle thingHandle = client.things().forId(thingId);
 
       /* Register for *all* change events of a *specific* thing */
-      LOGGER.info("Register handler with id: {}", registrationId);
-      thingHandle.registerForThingChanges(registrationId, change ->
-      {
-         LOGGER.info("{}: ThingChange received: {}", thingId, change);
+        LOGGER.info("Register handler with id: {}", registrationId);
+        thingHandle.registerForThingChanges(registrationId, change ->
+        {
+            LOGGER.info("{}: ThingChange received: {}", thingId, change);
          /* Deregister when the created-event has been retrieved */
-         if (change.getAction() == ChangeAction.CREATED)
-         {
-            LOGGER.info("{}: Deregister handler with id: {}", thingId, registrationId);
-            thingHandle.deregister(registrationId);
-            countDownLatch.countDown();
-         }
-      });
+            if (change.getAction() == ChangeAction.CREATED) {
+                LOGGER.info("{}: Deregister handler with id: {}", thingId, registrationId);
+                thingHandle.deregister(registrationId);
+                countDownLatch.countDown();
+            }
+        });
 
-      client.things().create(thingId).get(10, TimeUnit.SECONDS);
-   }
+        client.things().create(thingId).get(10, TimeUnit.SECONDS);
+    }
 
-   public void destroy() throws InterruptedException
-   {
-      boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
-      LOGGER.info("All changes received: {}", allMessagesReceived);
-      client.destroy();
-   }
+    public void destroy() throws InterruptedException {
+        boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
+        LOGGER.info("All changes received: {}", allMessagesReceived);
+        client.destroy();
+    }
 }

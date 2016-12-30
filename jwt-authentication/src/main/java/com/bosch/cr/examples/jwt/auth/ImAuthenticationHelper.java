@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -33,51 +33,47 @@ import com.bosch.im.api2.dto.AuthorizationDto;
 /**
  * Helper class for requesting JSON Web Tokens at Bosch IoT Permissions.
  */
-final class ImAuthenticationHelper
-{
+final class ImAuthenticationHelper {
 
-   private final IClient client;
+    private final IClient client;
 
-   /**
-    * Constructor.
-    *
-    * @param client the API 2 client
-    */
-   public ImAuthenticationHelper(final IClient client)
-   {
-      this.client = client;
-   }
+    /**
+     * Constructor.
+     *
+     * @param client the API 2 client
+     */
+    public ImAuthenticationHelper(final IClient client) {
+        this.client = client;
+    }
 
-   /**
-    * Authenticate using the specified credentials.
-    *
-    * @return a DTO holding authentication info (jwt)
-    */
-   public AuthenticationDto authenticate(final String tenantIdOrName, final String userName, final String password)
-   {
-      return client.authenticate() //
-         .userTenantIdOrName(tenantIdOrName) //
-         .userName(userName) //
-         .password(password) //
-         .executeAndGet();
-   }
+    /**
+     * Authenticate using the specified credentials.
+     *
+     * @return a DTO holding authentication info (jwt)
+     */
+    public AuthenticationDto authenticate(final String tenantIdOrName, final String userName, final String password) {
+        return client.authenticate() //
+                .userTenantIdOrName(tenantIdOrName) //
+                .userName(userName) //
+                .password(password) //
+                .executeAndGet();
+    }
 
-   /**
-    * Authorize using the specified authentication info.
-    * <p>
-    * Note: the authorization token is scoped to contain only permissions and roles of IM3.
-    * </p>
-    *
-    * @param authenticationDto a DTO holding authentication info (jwt)
-    * @return a DTO holding authorization info (jwt)
-    */
-   public AuthorizationDto authorize(final AuthenticationDto authenticationDto)
-   {
-      return client.authorize() //
-         .userTenantId(authenticationDto.getUserTid()) //
-         .scopes(Scope.trid, Scope.gid) //
-         .idToken(authenticationDto.getIdToken()) //
-         .executeAndGet();
-   }
+    /**
+     * Authorize using the specified authentication info.
+     * <p>
+     * Note: the authorization token is scoped to contain only permissions and roles of IM3.
+     * </p>
+     *
+     * @param authenticationDto a DTO holding authentication info (jwt)
+     * @return a DTO holding authorization info (jwt)
+     */
+    public AuthorizationDto authorize(final AuthenticationDto authenticationDto) {
+        return client.authorize() //
+                .userTenantId(authenticationDto.getUserTid()) //
+                .scopes(Scope.trid, Scope.gid) //
+                .idToken(authenticationDto.getIdToken()) //
+                .executeAndGet();
+    }
 
 }

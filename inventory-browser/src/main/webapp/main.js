@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -77,7 +77,7 @@ $(document).ready(function () {
                     row.append(cell);
                     populateDetails(cell, value, historyBaseUrl, path + prop + ".", level + 1);
                 } else if (typeof value === "number" && typeof historyBaseUrl !== "undefined") {
-                    var link = $("<a>", { href: "#", text: value });
+                    var link = $("<a>", {href: "#", text: value});
                     link.click(function () {
                         openPopupHistory(historyBaseUrl + (path + prop).replace("\.", "/"));
                     });
@@ -121,7 +121,8 @@ $(document).ready(function () {
                             var cell = $("<td>");
                             row.append(cell);
                             populateDetails(cell, feature.properties,
-                                "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/");
+                                            "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/"
+                                            + thingId + "/features/" + featureId + "/properties/");
                         }
                     });
                 }
@@ -129,19 +130,19 @@ $(document).ready(function () {
                 $("#table-wrapper").removeClass("col-md-12").addClass("col-md-4");
                 $("#details").show();
             }).fail(function (jqxhr, status, error) {
-                $("#details").removeAttr("thingId");
-                $("#table-wrapper").removeClass("col-md-4").addClass("col-md-12");
-                $("#details").hide();
-                failHandler(jqxhr, status, error);
-            });
+            $("#details").removeAttr("thingId");
+            $("#table-wrapper").removeClass("col-md-4").addClass("col-md-12");
+            $("#details").hide();
+            failHandler(jqxhr, status, error);
+        });
     };
 
     // --- Click handler for refreshing list and map of things
     var refreshTable = function () {
 
         $.getJSON("api/1/search/things"
-            + "?fields=thingId,features/geolocation,features/orientation,features/xdk-sensors"
-            + "&option=limit(0,200),sort(%2BthingId)")
+                  + "?fields=thingId,features/geolocation,features/orientation,features/xdk-sensors"
+                  + "&option=limit(0,200),sort(%2BthingId)")
             .fail(failHandler)
             .done(function (data, status) {
 
@@ -166,47 +167,57 @@ $(document).ready(function () {
                     $("#tableBody").append(row);
 
                     // --- when thing has a "geolocation" feature with "geoposition" properties
-                    if ("features" in t && "geolocation" in t.features && "geoposition" in t.features.geolocation.properties) {
+                    if ("features" in t && "geolocation" in t.features && "geoposition"
+                                                                          in t.features.geolocation.properties) {
 
                         // --- if latitude and longitude are available and are numbers then ...
                         var latitude = t.features.geolocation.properties.geoposition.latitude;
                         var longitude = t.features.geolocation.properties.geoposition.longitude;
-                        if ((latitude - parseFloat(latitude) + 1 >= 0) && (longitude - parseFloat(longitude) + 1 >= 0)) {
+                        if ((latitude - parseFloat(latitude) + 1 >= 0) && (longitude - parseFloat(longitude) + 1
+                                                                           >= 0)) {
 
                             // --- add marker for thing on map; default marker (without "orientation")
                             var latlng = [t.features.geolocation.properties.geoposition.latitude,
-                                t.features.geolocation.properties.geoposition.longitude];
+                                          t.features.geolocation.properties.geoposition.longitude];
                             var marker = L.marker(latlng);
                             var defaultMarker = true;
 
                             var color = currentlySelected ? "#D06245" : "#4597D0";
-                            // --- if feature "xdk-sensors" with a value for "light" is available then use lightbulb icon
-                            if ("features" in t && "xdk-sensors" in t.features && "light" in t.features['xdk-sensors'].properties) {
+                            // --- if feature "xdk-sensors" with a value for "light" is available then use lightbulb
+                            // icon
+                            if ("features" in t && "xdk-sensors" in t.features && "light"
+                                                                                  in t.features['xdk-sensors'].properties) {
                                 var light = t.features['xdk-sensors'].properties.light;
                                 var lightNormalized = (Math.log10(light) / 5);
                                 var shadow = Math.floor(15 * lightNormalized);
                                 var shadowNormalized = shadow > 0 ? shadow : 0;
-                                var style = "font-size: 30px; color: " + color + "; box-shadow: 0px 0px 25px " + shadowNormalized + "px rgba(255,255,0,1);";
+                                var style = "font-size: 30px; color: " + color + "; box-shadow: 0px 0px 25px "
+                                            + shadowNormalized + "px rgba(255,255,0,1);";
                                 var icon = L.divIcon({
-                                    className: "",
-                                    iconSize: null,
-                                    html: '<span class="icon-lightbulb" style="' + style + '" />'
-                                });
-                                marker = L.marker(latlng, { icon: icon, zIndexOffset: currentlySelected ? 1000 : 0 });
+                                                         className: "",
+                                                         iconSize: null,
+                                                         html: '<span class="icon-lightbulb" style="' + style + '" />'
+                                                     });
+                                marker = L.marker(latlng, {icon: icon, zIndexOffset: currentlySelected ? 1000 : 0});
                                 defaultMarker = false;
                             }
 
-                            // --- if feature "orientation" is available and "direction" is a number then use rotated marker
-                            if ("features" in t && "orientation" in t.features && "z" in t.features.orientation.properties) {
+                            // --- if feature "orientation" is available and "direction" is a number then use rotated
+                            // marker
+                            if ("features" in t && "orientation" in t.features && "z"
+                                                                                  in t.features.orientation.properties) {
                                 var direction = t.features.orientation.properties.z;
                                 if (direction - parseFloat(direction) + 1 >= 0) {
-                                    var style = "font-size: 30px; text-shadow: 3px 3px 3px black; color: " + color + "; transform-origin: 50% 0; transform: translate(-50%,0) rotate(" + direction + "deg);"
+                                    var style = "font-size: 30px; text-shadow: 3px 3px 3px black; color: " + color
+                                                + "; transform-origin: 50% 0; transform: translate(-50%,0) rotate("
+                                                + direction + "deg);"
                                     var icon = L.divIcon({
-                                        className: "",
-                                        iconSize: null,
-                                        html: '<span class="glyphicon glyphicon-arrow-up" style="' + style + '" />'
-                                    });
-                                    marker = L.marker(latlng, { icon: icon, zIndexOffset: currentlySelected ? 1000 : 0 });
+                                                             className: "",
+                                                             iconSize: null,
+                                                             html: '<span class="glyphicon glyphicon-arrow-up" style="'
+                                                                   + style + '" />'
+                                                         });
+                                    marker = L.marker(latlng, {icon: icon, zIndexOffset: currentlySelected ? 1000 : 0});
                                     defaultMarker = false;
                                 }
                             }
@@ -239,39 +250,40 @@ $(document).ready(function () {
     // --- Click handler for creating new things
     var createThing = function () {
 
-        var created = function(thing, status) {
+        var created = function (thing, status) {
             // include WRITE ACL for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688)
             $.ajax("api/1/things/" + thing.thingId + "/acl/1d138250-49a8-11e6-826c-c2ae337e6688", {
                 method: "PUT",
                 data: JSON.stringify({
-                    READ: false,
-                    WRITE: true,
-                    ADMINISTRATE: false
-                })
+                                         READ: false,
+                                         WRITE: true,
+                                         ADMINISTRATE: false
+                                     })
             })
-            .fail(failHandler)
-            .done(function () {
-                $("#details").attr("thingId", thing.thingId);
-                refreshDetails();
-            });
+                .fail(failHandler)
+                .done(function () {
+                    $("#details").attr("thingId", thing.thingId);
+                    refreshDetails();
+                });
         };
 
-        var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
-            +"You will have full access rights and the device simulator will have write access.");
+        var thingId = window.prompt(
+            "Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
+            + "You will have full access rights and the device simulator will have write access.");
         if (thingId == "") {
             $.ajax("api/1/things", {
                 method: "POST",
                 data: JSON.stringify({})
             })
-            .fail(failHandler)
-            .done(created);
+                .fail(failHandler)
+                .done(created);
         } else if (thingId != null) {
             $.ajax("api/1/things/" + thingId, {
                 method: "PUT",
                 data: JSON.stringify({})
             })
-            .fail(failHandler)
-            .done(created);
+                .fail(failHandler)
+                .done(created);
         }
     };
     // --- Click handler for showing simulator popup

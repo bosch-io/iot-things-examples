@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -25,55 +25,66 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 #map {
-   height: 30vh;
+    height: 30vh;
 }
+
 #table-wrapper {
-   margin-bottom: 1vh;
+    margin-bottom: 1vh;
 }
+
 #details {
-   display: none;
+    display: none;
 }
+
 #detailsThingId {
-   word-wrap: break-word;
+    word-wrap: break-word;
 }
-.table .table th, .table .table td { 
-   border-top: none !important; 
-   padding-top: 0;
-   padding-bottom: 2;
+
+.table .table th, .table .table td {
+    border-top: none !important;
+    padding-top: 0;
+    padding-bottom: 2;
 }
+
 .table-condensed {
     margin-bottom: 0;
 }
+
 td {
-   word-break: break-all;
-   word-wrap: break-word;
+    word-break: break-all;
+    word-wrap: break-word;
 }
+
 .popupOverlay {
-   background: rgba(0,0,0, 0.5);
-   display: none;
-   position: fixed;
-   left: 0;
-   top: 0;
-   width: 100%;
-   height: 100%;
-   z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
 }
+
 .popupInner {
-   position: fixed;
-   top: 10%;
-   left: 10%;
-   width: 80%;
-   height: 80%;
-   z-index: 1001;
+    position: fixed;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    z-index: 1001;
 }
+
 .popupIframe {
-   width: 80vw; 
-   height: 60vh;
-   border: none;
+    width: 80vw;
+    height: 60vh;
+    border: none;
 }
+
 .btn .glyphicon {
     margin-right: 6px;
 }
-#simulateQr, #simulateLink { 
+
+#simulateQr, #simulateLink {
     text-align: center;
 }

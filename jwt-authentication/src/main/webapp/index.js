@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -74,19 +74,20 @@ $(document).ready(function () {
 
     // --- Click handler for creating new things
     var createThing = function () {
-        var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).");
+        var thingId = window.prompt(
+            "Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).");
         if (thingId === '') {
             $.ajax("api/1/things", {
-                    method: "POST",
-                    data: JSON.stringify({})
-                })
+                method: "POST",
+                data: JSON.stringify({})
+            })
                 .fail(failHandler)
                 .done(refreshTable);
         } else if (thingId != null) {
             $.ajax("api/1/things/" + thingId, {
-                    method: "PUT",
-                    data: JSON.stringify({})
-                })
+                method: "PUT",
+                data: JSON.stringify({})
+            })
                 .fail(failHandler)
                 .done(refreshTable);
         }
@@ -102,9 +103,9 @@ $(document).ready(function () {
 
     $('#logout').on('click', function () {
         $.ajax({
-                type: 'DELETE',
-                url: 'authentication'
-            })
+                   type: 'DELETE',
+                   url: 'authentication'
+               })
             .done(function onSuccess() {
                 window.location = 'login.html';
             });

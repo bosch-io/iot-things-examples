@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -38,43 +38,41 @@ import org.asynchttpclient.SignatureCalculator;
  *
  * @since 1.0.0
  */
-public class AsymmetricalSignatureCalculator implements SignatureCalculator
-{
-   private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
-   private static final String CRS_AUTH_PREFIX = "CRS ";
-   private static final String DELIMITER = ";";
+public class AsymmetricalSignatureCalculator implements SignatureCalculator {
 
-   private static final String HTTP_HEADER_HOST = "Host";
-   private static final String HTTP_HEADER_X_CR_DATE = "x-cr-date";
-   private static final String HTTP_HEADER_X_CR_API_TOKEN = "x-cr-api-token";
+    private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
+    private static final String CRS_AUTH_PREFIX = "CRS ";
+    private static final String DELIMITER = ";";
 
-   private final SignatureFactory signatureFactory;
-   private final String clientId;
-   private final String apiToken;
+    private static final String HTTP_HEADER_HOST = "Host";
+    private static final String HTTP_HEADER_X_CR_DATE = "x-cr-date";
+    private static final String HTTP_HEADER_X_CR_API_TOKEN = "x-cr-api-token";
 
-   public AsymmetricalSignatureCalculator(final SignatureFactory signatureFactory, final String clientId,
-      final String apiToken)
-   {
-      this.signatureFactory = signatureFactory;
-      this.clientId = clientId;
-      this.apiToken = apiToken;
-   }
+    private final SignatureFactory signatureFactory;
+    private final String clientId;
+    private final String apiToken;
 
-   @Override
-   public void calculateAndAddSignature(final Request request, final RequestBuilderBase<?> requestBuilderBase)
-   {
-      final String method = request.getMethod();
-      final String path = request.getUri().toRelativeUrl();
-      final String date = OffsetDateTime.now().toString();
-      final String host = request.getUri().getHost();
+    public AsymmetricalSignatureCalculator(final SignatureFactory signatureFactory, final String clientId,
+            final String apiToken) {
+        this.signatureFactory = signatureFactory;
+        this.clientId = clientId;
+        this.apiToken = apiToken;
+    }
 
-      final String signatureData = String.join(DELIMITER, method, host, path, date);
-      final String signature = signatureFactory.sign(signatureData);
+    @Override
+    public void calculateAndAddSignature(final Request request, final RequestBuilderBase<?> requestBuilderBase) {
+        final String method = request.getMethod();
+        final String path = request.getUri().toRelativeUrl();
+        final String date = OffsetDateTime.now().toString();
+        final String host = request.getUri().getHost();
 
-      requestBuilderBase.addHeader(HTTP_HEADER_HOST, host);
-      requestBuilderBase.addHeader(HTTP_HEADER_X_CR_DATE, date);
-      requestBuilderBase.addHeader(HTTP_HEADER_X_CR_API_TOKEN, apiToken);
-      requestBuilderBase.addHeader(HTTP_HEADER_AUTHORIZATION,
-         CRS_AUTH_PREFIX + clientId + DELIMITER + SignatureFactory.SIGNATURE_ALGORITHM + DELIMITER + signature);
-   }
+        final String signatureData = String.join(DELIMITER, method, host, path, date);
+        final String signature = signatureFactory.sign(signatureData);
+
+        requestBuilderBase.addHeader(HTTP_HEADER_HOST, host);
+        requestBuilderBase.addHeader(HTTP_HEADER_X_CR_DATE, date);
+        requestBuilderBase.addHeader(HTTP_HEADER_X_CR_API_TOKEN, apiToken);
+        requestBuilderBase.addHeader(HTTP_HEADER_AUTHORIZATION,
+                CRS_AUTH_PREFIX + clientId + DELIMITER + SignatureFactory.SIGNATURE_ALGORITHM + DELIMITER + signature);
+    }
 }

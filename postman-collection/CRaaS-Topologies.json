@@ -2,7 +2,7 @@
   "variables": [],
   "info": {
     "name": "CRaaS-Topologies",
-    "_postman_id": "34dfb9ee-0f03-5d55-3eb8-0f6a57246a5d",
+    "_postman_id": "394b4ef3-cb07-4b12-8194-e098914f59dc",
     "description": "",
     "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
   },
@@ -21,7 +21,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"query\":\"mutation{createTopology(topology:{campus:[{id:\\\"0bfe\\\",location:\\\"Chicago\\\",errorReport:{uri:\\\"error:\\/\\/0bfe\\\"},buildings:[{id:\\\"be93\\\",displayName:\\\"161 North Clark\\\",errorReport:{uri:\\\"error:\\/\\/be93\\\"},levels:50,base:3,roof:0,floors:[{id:\\\"b535\\\",displayName:\\\"Suite 3550\\\",errorReport:{uri:\\\"error:\\/\\/b535\\\"},floorPlan:{uri:\\\"floor:\\/\\/b535\\\"},rooms:[{id:\\\"ddd5\\\",displayName:\\\"Reception\\\",errorReport:{uri:\\\"error:\\/\\/ddd5\\\"},devices:[{id:\\\"7b37\\\",displayName:\\\"Reception desk\\\",deviceType:\\\"Desk\\\",errorReport:{uri:\\\"error:\\/\\/7b37\\\"},childDevices:[{id:\\\"73d7\\\",displayName:\\\"Panic button\\\",deviceType:\\\"Button\\\",errorReport:{uri:\\\"error:\\/\\/73d7\\\"},sensorData:{uri:\\\"sensor:\\/\\/73d7\\\"}}]}]}]}]}],groups:[{id:\\\"5ddd\\\",displayName:\\\"Reception\\\",members:[{id:\\\"73d7\\\"}]}]},{id:\\\"f10e\\\",location:\\\"Immenstaad\\\",errorReport:{uri:\\\"error:\\/\\/f10e\\\"},buildings:[{id:\\\"4e9c\\\",displayName:\\\"Ziegelei 7\\\",errorReport:{uri:\\\"error:\\/\\/4e9c\\\"},levels:3,base:1,roof:1,floors:[{id:\\\"0ecc\\\",displayName:\\\"H7\\/EG\\\",floorPlan:{uri:\\\"floor:\\/\\/0ecc\\\"},errorReport:{uri:\\\"error:\\/\\/0ecc\\\"},rooms:[{id:\\\"b9dd\\\",displayName:\\\"Resource IMB Room (8 Pers.)\\\",errorReport:{uri:\\\"error:\\/\\/b9dd\\\"},devices:[{id:\\\"2df2\\\",displayName:\\\"Comfortable chair\\\",deviceType:\\\"Chair\\\",errorReport:{uri:\\\"error:\\/\\/2df2\\\"}},{id:\\\"0ab3\\\",displayName:\\\"Video conference system\\\",deviceType:\\\"Multimedia\\\",errorReport:{uri:\\\"error:\\/\\/0ab3\\\"},sensorData:{uri:\\\"sensor:\\/\\/0ab3\\\"},childDevices:[{id:\\\"e43e\\\",displayName:\\\"Overhead projector\\\",deviceType:\\\"Projector\\\",errorReport:{uri:\\\"error:\\/\\/e43e\\\"},sensorData:{uri:\\\"sensor:\\/\\/e43e\\\"},childDevices:[{id:\\\"efc5\\\",displayName:\\\"Remote control\\\",deviceType:\\\"Remote\\\",errorReport:{uri:\\\"error:\\/\\/efc5\\\"},sensorData:{uri:\\\"sensor:\\/\\/efc5\\\"}},{id:\\\"2d1a\\\",displayName:\\\"Retractable projection screen\\\",deviceType:\\\"Curtain\\\",errorReport:{uri:\\\"error:\\/\\/2d1a\\\"},sensorData:{uri:\\\"sensor:\\/\\/2d1a\\\"}}]},{id:\\\"6684\\\",displayName:\\\"Tabletop microphone\\\",deviceType:\\\"Microphone\\\",errorReport:{uri:\\\"error:\\/\\/6684\\\"},sensorData:{uri:\\\"sensor:\\/\\/6684\\\"}}]}]},{id:\\\"8057\\\",displayName:\\\"Focus Room\\\",errorReport:{uri:\\\"error:\\/\\/8057\\\"},devices:[{id:\\\"dbd9\\\",displayName:\\\"Conference table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\/\\/dbd9\\\"}},{id:\\\"cfd1\\\",displayName:\\\"Television\\\",deviceType:\\\"Monitor\\\",errorReport:{uri:\\\"error:\\/\\/cfd1\\\"},sensorData:{uri:\\\"sensor:\\/\\/cfd1\\\"},childDevices:[{id:\\\"5593\\\",displayName:\\\"Remote control\\\",deviceType:\\\"Remote\\\",errorReport:{uri:\\\"error:\\/\\/5593\\\"},sensorData:{uri:\\\"sensor:\\/\\/5593\\\"}}]}]}]},{id:\\\"eab4\\\",displayName:\\\"H7\\/OG2\\\",floorPlan:{uri:\\\"floor:\\/\\/eab4\\\"},errorReport:{uri:\\\"error:\\/\\/eab4\\\"},rooms:[{id:\\\"9d38\\\",displayName:\\\"Training room\\\",errorReport:{uri:\\\"error:\\/\\/9d38\\\"},devices:[{id:\\\"c69c\\\",displayName:\\\"Gigantic table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\/\\/c69c\\\"}}]}]}]},{id:\\\"e6aa\\\",displayName:\\\"Ziegelei 5\\\",errorReport:{uri:\\\"error:\\/\\/4e9c\\\"},levels:3,base:1,roof:1,floors:[{id:\\\"10f0\\\",displayName:\\\"H5\\/OG1\\\",floorPlan:{uri:\\\"floor:\\/\\/10f0\\\"},errorReport:{uri:\\\"error:\\/\\/10f0\\\"},rooms:[{id:\\\"759d\\\",displayName:\\\"Resource IMB Room (14 Pers.)\\\",errorReport:{uri:\\\"error:\\/\\/759d\\\"},devices:[{id:\\\"96c0\\\",displayName:\\\"Round table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\/\\/96c0\\\"},childDevices:[{id:\\\"1538\\\",displayName:\\\"Tablecloth\\\",deviceType:\\\"Textile\\\",errorReport:{uri:\\\"error:\\/\\/1538\\\"}}]},{id:\\\"2d33\\\",displayName:\\\"Roller shade\\\",deviceType:\\\"Curtain\\\",errorReport:{uri:\\\"error:\\/\\/2d33\\\"},sensorData:{uri:\\\"sensor:\\/\\/2d33\\\"}}]}]}]}],groups:[{id:\\\"769b\\\",displayName:\\\"Floor management\\\",members:[{id:\\\"0ecc\\\"},{id:\\\"eab4\\\"},{id:\\\"10f0\\\"}]},{id:\\\"3182\\\",displayName:\\\"Appliances\\\",members:[{id:\\\"0ab3\\\"},{id:\\\"cfd1\\\"}]},{id:\\\"Table management\\\",members:[{id:\\\"dbd9\\\"},{id:\\\"c69c\\\"},{id:\\\"96c0\\\"}]}]}],version:\\\"6c57\\\"}){id}}\"}"
+          "raw": "{\"query\":\"mutation{createTopology(topology:{campus:[{id:\\\"0bfe\\\",location:\\\"Chicago\\\",errorReport:{uri:\\\"error:\\\/\\\/0bfe\\\"},buildings:[{id:\\\"be93\\\",displayName:\\\"161 North Clark\\\",errorReport:{uri:\\\"error:\\\/\\\/be93\\\"},levels:50,base:3,roof:0,floors:[{id:\\\"b535\\\",displayName:\\\"Suite 3550\\\",errorReport:{uri:\\\"error:\\\/\\\/b535\\\"},floorPlan:{uri:\\\"floor:\\\/\\\/b535\\\"},rooms:[{id:\\\"ddd5\\\",displayName:\\\"Reception\\\",errorReport:{uri:\\\"error:\\\/\\\/ddd5\\\"},devices:[{id:\\\"7b37\\\",displayName:\\\"Reception desk\\\",deviceType:\\\"Desk\\\",errorReport:{uri:\\\"error:\\\/\\\/7b37\\\"},childDevices:[{id:\\\"73d7\\\",displayName:\\\"Panic button\\\",deviceType:\\\"Button\\\",errorReport:{uri:\\\"error:\\\/\\\/73d7\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/73d7\\\"}}]}]}]}]}],groups:[{id:\\\"5ddd\\\",displayName:\\\"Reception\\\",members:[{id:\\\"73d7\\\"}]}]},{id:\\\"f10e\\\",location:\\\"Immenstaad\\\",errorReport:{uri:\\\"error:\\\/\\\/f10e\\\"},buildings:[{id:\\\"4e9c\\\",displayName:\\\"Ziegelei 7\\\",errorReport:{uri:\\\"error:\\\/\\\/4e9c\\\"},levels:3,base:1,roof:1,floors:[{id:\\\"0ecc\\\",displayName:\\\"H7\\\/EG\\\",floorPlan:{uri:\\\"floor:\\\/\\\/0ecc\\\"},errorReport:{uri:\\\"error:\\\/\\\/0ecc\\\"},rooms:[{id:\\\"b9dd\\\",displayName:\\\"Resource IMB Room (8 Pers.)\\\",errorReport:{uri:\\\"error:\\\/\\\/b9dd\\\"},devices:[{id:\\\"2df2\\\",displayName:\\\"Comfortable chair\\\",deviceType:\\\"Chair\\\",errorReport:{uri:\\\"error:\\\/\\\/2df2\\\"}},{id:\\\"0ab3\\\",displayName:\\\"Video conference system\\\",deviceType:\\\"Multimedia\\\",errorReport:{uri:\\\"error:\\\/\\\/0ab3\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/0ab3\\\"},childDevices:[{id:\\\"e43e\\\",displayName:\\\"Overhead projector\\\",deviceType:\\\"Projector\\\",errorReport:{uri:\\\"error:\\\/\\\/e43e\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/e43e\\\"},childDevices:[{id:\\\"efc5\\\",displayName:\\\"Remote control\\\",deviceType:\\\"Remote\\\",errorReport:{uri:\\\"error:\\\/\\\/efc5\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/efc5\\\"}},{id:\\\"2d1a\\\",displayName:\\\"Retractable projection screen\\\",deviceType:\\\"Curtain\\\",errorReport:{uri:\\\"error:\\\/\\\/2d1a\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/2d1a\\\"}}]},{id:\\\"6684\\\",displayName:\\\"Tabletop microphone\\\",deviceType:\\\"Microphone\\\",errorReport:{uri:\\\"error:\\\/\\\/6684\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/6684\\\"}}]}]},{id:\\\"8057\\\",displayName:\\\"Focus Room\\\",errorReport:{uri:\\\"error:\\\/\\\/8057\\\"},devices:[{id:\\\"dbd9\\\",displayName:\\\"Conference table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\\/\\\/dbd9\\\"}},{id:\\\"cfd1\\\",displayName:\\\"Television\\\",deviceType:\\\"Monitor\\\",errorReport:{uri:\\\"error:\\\/\\\/cfd1\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/cfd1\\\"},childDevices:[{id:\\\"5593\\\",displayName:\\\"Remote control\\\",deviceType:\\\"Remote\\\",errorReport:{uri:\\\"error:\\\/\\\/5593\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/5593\\\"}}]}]}]},{id:\\\"eab4\\\",displayName:\\\"H7\\\/OG2\\\",floorPlan:{uri:\\\"floor:\\\/\\\/eab4\\\"},errorReport:{uri:\\\"error:\\\/\\\/eab4\\\"},rooms:[{id:\\\"9d38\\\",displayName:\\\"Training room\\\",errorReport:{uri:\\\"error:\\\/\\\/9d38\\\"},devices:[{id:\\\"c69c\\\",displayName:\\\"Gigantic table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\\/\\\/c69c\\\"}}]}]}]},{id:\\\"e6aa\\\",displayName:\\\"Ziegelei 5\\\",errorReport:{uri:\\\"error:\\\/\\\/4e9c\\\"},levels:3,base:1,roof:1,floors:[{id:\\\"10f0\\\",displayName:\\\"H5\\\/OG1\\\",floorPlan:{uri:\\\"floor:\\\/\\\/10f0\\\"},errorReport:{uri:\\\"error:\\\/\\\/10f0\\\"},rooms:[{id:\\\"759d\\\",displayName:\\\"Resource IMB Room (14 Pers.)\\\",errorReport:{uri:\\\"error:\\\/\\\/759d\\\"},devices:[{id:\\\"96c0\\\",displayName:\\\"Round table\\\",deviceType:\\\"Table\\\",errorReport:{uri:\\\"error:\\\/\\\/96c0\\\"},childDevices:[{id:\\\"1538\\\",displayName:\\\"Tablecloth\\\",deviceType:\\\"Textile\\\",errorReport:{uri:\\\"error:\\\/\\\/1538\\\"}}]},{id:\\\"2d33\\\",displayName:\\\"Roller shade\\\",deviceType:\\\"Curtain\\\",errorReport:{uri:\\\"error:\\\/\\\/2d33\\\"},sensorData:{uri:\\\"sensor:\\\/\\\/2d33\\\"}}]}]}]}],groups:[{id:\\\"769b\\\",displayName:\\\"Floor management\\\",members:[{id:\\\"0ecc\\\"},{id:\\\"eab4\\\"},{id:\\\"10f0\\\"}]},{id:\\\"3182\\\",displayName:\\\"Appliances\\\",members:[{id:\\\"0ab3\\\"},{id:\\\"cfd1\\\"}]},{id:\\\"Table management\\\",members:[{id:\\\"dbd9\\\"},{id:\\\"c69c\\\"},{id:\\\"96c0\\\"}]}]}],version:\\\"6c57\\\"}){version}}\"}"
         },
         "description": ""
       },
@@ -41,7 +41,47 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"query\":\"{topology{campus{buildings{roof,floors{rooms{devices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,displayName,id},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,id,errorReport{uri}},displayName,floorPlan{uri},id,errorReport{uri}},displayName,id,levels,errorReport{uri},base},groups{displayName,members{id},id},location,id,errorReport{uri}},namespace,id,version}}\"}"
+          "raw": "{\"query\":\"{topology{campus{buildings{roof,floors{rooms{devices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,childDevices{deviceType,displayName,id},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,sensorData{uri},id,errorReport{uri}},displayName,id,errorReport{uri}},displayName,floorPlan{uri},id,errorReport{uri}},displayName,id,levels,errorReport{uri},base},groups{displayName,members{id},id},location,id,errorReport{uri}},version}}\"}"
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "Search: A Topology hierarchically",
+      "request": {
+        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"{topology{campus(location:\\\"Immenstaad\\\",id:\\\"f10e\\\"){buildings(roof:1,displayName:\\\"Ziegelei 7\\\",id:\\\"4e9c\\\",levels:3,base:1){floors(displayName:\\\"H7\\\/EG\\\",id:\\\"0ecc\\\"){rooms(displayName:\\\"Resource IMB Room (8 Pers.)\\\",id:\\\"b9dd\\\"){devices(deviceType:\\\"Multimedia\\\",displayName:\\\"Video conference system\\\",id:\\\"0ab3\\\"){childDevices(deviceType:\\\"Projector\\\",displayName:\\\"Overhead projector\\\",id:\\\"e43e\\\"){childDevices(deviceType:\\\"Curtain\\\",displayName:\\\"Retractable projection screen\\\",id:\\\"2d1a\\\"){deviceType,displayName,id}}}}}}}}}\"}"
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "Search: A Topology through Referenceable",
+      "request": {
+        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"{\\n  topology {\\n    campus(location: \\\"Immenstaad\\\") {\\n      groups(displayName: \\\"Appliances\\\") {\\n        members {\\n          ... on Device {\\n            displayName\\n            childDevices {\\n              displayName\\n            }\\n          }\\n        }\\n      }\\n    }\\n  }\\n}\\n\"}"
         },
         "description": ""
       },
@@ -61,7 +101,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"query\":\"mutation{updateTopology(topology:{campus:[{id:\\\"42fd\\\",location:\\\"Berlin\\\",errorReport:{uri:\\\"error:\\/\\/42fd\\\"},buildings:[{id:\\\"cffc\\\",displayName:\\\"Sch\\u00F6neberger Ufer 89-91\\\",errorReport:{uri:\\\"error:\\/\\/cffc\\\"},levels:7,base:1,roof:0,floors:[{id:\\\"d681\\\",displayName:\\\"EG\\\",errorReport:{uri:\\\"error:\\/\\/d681\\\"},floorPlan:{uri:\\\"floor:\\/\\/d681\\\"},rooms:[{id:\\\"2c11\\\",displayName:\\\"Entrance hall\\\",errorReport:{uri:\\\"error:\\/\\/2c11\\\"},devices:[{id:\\\"72b3\\\",displayName:\\\"Glass door\\\",deviceType:\\\"Door\\\",errorReport:{uri:\\\"error:\\/\\/72b3\\\"}}]}]}]}],groups:[{id:\\\"32a5\\\",displayName:\\\"Exits\\\",members:[{id:\\\"2c11\\\"}]}]}],version:\\\"708f\\\"}){id}}\"}"
+          "raw": "{\"query\":\"mutation{updateTopology(topology:{campus:[{id:\\\"42fd\\\",location:\\\"Berlin\\\",errorReport:{uri:\\\"error:\\\/\\\/42fd\\\"},buildings:[{id:\\\"cffc\\\",displayName:\\\"Sch\\u00F6neberger Ufer 89-91\\\",errorReport:{uri:\\\"error:\\\/\\\/cffc\\\"},levels:7,base:1,roof:0,floors:[{id:\\\"d681\\\",displayName:\\\"EG\\\",errorReport:{uri:\\\"error:\\\/\\\/d681\\\"},floorPlan:{uri:\\\"floor:\\\/\\\/d681\\\"},rooms:[{id:\\\"2c11\\\",displayName:\\\"Entrance hall\\\",errorReport:{uri:\\\"error:\\\/\\\/2c11\\\"},devices:[{id:\\\"72b3\\\",displayName:\\\"Glass door\\\",deviceType:\\\"Door\\\",errorReport:{uri:\\\"error:\\\/\\\/72b3\\\"}}]}]}]}],groups:[{id:\\\"32a5\\\",displayName:\\\"Exits\\\",members:[{id:\\\"2c11\\\"}]}]}],version:\\\"708f\\\"}){version}}\"}"
         },
         "description": ""
       },

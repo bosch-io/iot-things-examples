@@ -165,7 +165,7 @@ public class Collector implements Runnable
       LOGGER.trace("Store history: {}", h);
 
       // do combined update query: add newest value+timestamp to the array property and slice array if too long
-      String id = h.thingId + "/features/" + h.featureId + "/" + h.path;
+      String id = h.thingId + "/features/" + h.featureId + h.path;
       Update update = new Update()
               .push("values",
                       new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))

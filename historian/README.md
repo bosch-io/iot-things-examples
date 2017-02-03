@@ -76,7 +76,7 @@ mvn clean install
 Use the following command to run the example.
 
 ```
-mvn exec:java
+mvn exec:java -Dexec.mainClass=com.bosch.iot.things.example.historian.Application
 ```
 
 ## Add ACL for "historian" to your things

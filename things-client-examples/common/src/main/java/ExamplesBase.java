@@ -45,16 +45,19 @@ import org.slf4j.LoggerFactory;
 import model.ExampleUser;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.MessageSerializerConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
 import com.bosch.cr.integration.client.messages.MessageSerializerRegistry;
 import com.bosch.cr.integration.client.messages.MessageSerializers;
+import com.bosch.cr.integration.client.messaging.HubMessagingProviderConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.ThingHandle;
 import com.bosch.cr.integration.things.ThingIntegration;
+import com.bosch.cr.integration.twin.Twin;
 
 /**
  * Instantiates an {@link IntegrationClient} and connects to the Bosch IoT Things service. It also initializes
@@ -66,15 +69,24 @@ public abstract class ExamplesBase {
 
     private static final String SOLUTION_ID = "<your-solution-id>";
     protected static final String CLIENT_ID = SOLUTION_ID + ":example";
-    private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
+    private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
+    private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
     private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
+
+    private static final String USER_NAME = "<your-user-name";
+    private static final String PASSWORD = "<your-password>";
 
     private static final URL KEYSTORE_LOCATION = ExamplesBase.class.getResource("/CRClient.jks");
     private static final String ALIAS = "<your-key-alias>";
     private static final String KEYSTORE_PASSWORD = "<your-keystore-password";
     private static final String ALIAS_PASSWORD = "<your-alias-password>";
 
-    protected final IntegrationClient client;
+    // optionally configure a proxy server
+    // public static final String PROXY_HOST = "proxy.server.com";
+    // public static final int PROXY_PORT = 8080;
+
+    protected final IntegrationClient integrationClient;
+    protected final Twin twin;
     protected final String myThingId;
     protected final ThingHandle myThing;
 
@@ -82,50 +94,68 @@ public abstract class ExamplesBase {
      * Constructor.
      */
     public ExamplesBase() {
-        final AuthenticationConfiguration authenticationConfiguration =
-                PublicKeyAuthenticationConfiguration.newBuilder().clientId(CLIENT_ID) //
-                        .keyStoreLocation(KEYSTORE_LOCATION) //
-                        .keyStorePassword(KEYSTORE_PASSWORD) //
-                        .alias(ALIAS) //
-                        .aliasPassword(ALIAS_PASSWORD) //
+        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
+        // via its websocket channel
+        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(USER_NAME)
+                        .password(PASSWORD)
                         .build();
 
-      /* optionally configure a proxy server or a truststore */
-        // final ProxyConfiguration proxy = ProxyConfiguration.newBuilder()
-        // .proxyHost("some.proxy.server")
-        // .proxyPort(1234)
-        // .proxyUsername("some.proxy.username")
-        // .proxyPassword("some.proxy.password")
-        // .build();
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
 
-      /* optional example to setup custom MessageSerializerConfiguration */
-        final MessageSerializerConfiguration serializerConfiguration = MessageSerializerConfiguration.newInstance();
-        setupCustomMessageSerializer(serializerConfiguration);
+        // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
+        // over IoT Hub
+        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
+                PublicKeyAuthenticationConfiguration
+                        .newBuilder()
+                        .clientId(CLIENT_ID)
+                        .keyStoreLocation(KEYSTORE_LOCATION)
+                        .keyStorePassword(KEYSTORE_PASSWORD)
+                        .alias(ALIAS)
+                        .aliasPassword(ALIAS_PASSWORD)
+                        .build();
 
-      /* provide required configuration (authentication configuration),
-         optional configuration (proxy, truststore etc.) can be added when needed */
-        final IntegrationClientConfiguration integrationClientConfiguration =
-                IntegrationClientConfiguration.newBuilder()
-                        .apiToken(SOLUTION_API_TOKEN)
-                        .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
-                        .authenticationConfiguration(authenticationConfiguration)
-                        .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build())
-                        //.proxyConfiguration(proxy)
-                        .serializerConfiguration(serializerConfiguration).build();
+        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
+                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
+                .build();
 
-        LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
+        // Optionally configure a proxy server
+        /*final ProxyConfiguration proxyConfiguration = ProxyConfiguration.newBuilder()
+                .proxyHost(PROXY_HOST)
+                .proxyPort(PROXY_PORT)
+                .build();*/
 
-        this.client = IntegrationClientImpl.newInstance(integrationClientConfiguration);
+
+        final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
+                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                //.proxyConfiguration(proxyConfiguration)
+                .build();
+
+        LOGGER.info("Creating integration client ...");
+
+        // Create a new integration client object to start interacting with IoT Things service
+        integrationClient = ThingsClientFactory.newInstance(twinConfiguration);
+
+        // Create a new twin client for managing things
+        twin = integrationClient.twin();
 
         try {
             // and start consuming events
-            this.client.subscriptions().consume().get(10, TimeUnit.SECONDS);
+            twin.startConsumption().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Error creating Things Client.", e);
         }
 
         this.myThingId = ":myThing_" + UUID.randomUUID().toString();
-        this.myThing = client.things().forId(myThingId);
+        this.myThing = twin.forId(myThingId);
     }
 
     /**
@@ -173,6 +203,6 @@ public abstract class ExamplesBase {
      * Destroys the client and waits for its graceful shutdown.
      */
     public void terminate() {
-        client.destroy();
+        integrationClient.destroy();
     }
 }

@@ -35,13 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
+import com.bosch.cr.integration.client.messaging.HubMessagingProviderConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.FeatureHandle;
-import com.bosch.cr.integration.things.ThingIntegration;
+import com.bosch.cr.integration.twin.Twin;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.model.acl.AclEntry;
 import com.bosch.cr.model.acl.Permission;
@@ -57,19 +59,20 @@ public class HelloWorld {
     // Insert your Solution ID here
     private static final String SOLUTION_ID = "<your-solution-id>";
     private static final String CLIENT_ID = SOLUTION_ID + ":connector";
-    private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
+    private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
+    private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
     private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
     private static final String USER_ID = "<UUID-of-your-user>";
+
+    // Authentication credentials for Thing Websocket channel
+    private static final String USER_NAME = "<your-user-name";
+    private static final String PASSWORD = "<your-password>";
 
     // Insert your keystore passwords here
     private static final URL KEYSTORE_LOCATION = HelloWorld.class.getResource("/CRClient.jks");
     private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
     private static final String ALIAS = "CR";
     private static final String ALIAS_PASSWORD = "<your-alias-password>";
-
-    // optionally configure a proxy server
-    // public static final String PROXY_HOST = "proxy.server.com";
-    // public static final int PROXY_PORT = 8080;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorld.class);
 
@@ -79,48 +82,69 @@ public class HelloWorld {
     private static final String COUNTER = "counter";
     private static final String COUNTER_VALUE = "value";
 
+    // optionally configure a proxy server
+    // public static final String PROXY_HOST = "proxy.server.com";
+    // public static final int PROXY_PORT = 8080;
+
     final IntegrationClient integrationClient;
-    final ThingIntegration thingIntegration;
+    final Twin twin;
 
     /**
      * Client instantiation
      */
     public HelloWorld() {
-        // Build an authentication configuration
-        final AuthenticationConfiguration authenticationConfiguration =
-                PublicKeyAuthenticationConfiguration.newBuilder().clientId(CLIENT_ID) //
-                        .keyStoreLocation(KEYSTORE_LOCATION) //
-                        .keyStorePassword(KEYSTORE_PASSWORD) //
-                        .alias(ALIAS) //
-                        .aliasPassword(ALIAS_PASSWORD) //
+        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
+        // via its websocket channel
+        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(USER_NAME)
+                        .password(PASSWORD)
                         .build();
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
+
+        // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
+        // over IoT Hub
+        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
+                PublicKeyAuthenticationConfiguration
+                        .newBuilder()
+                        .clientId(CLIENT_ID)
+                        .keyStoreLocation(KEYSTORE_LOCATION)
+                        .keyStorePassword(KEYSTORE_PASSWORD)
+                        .alias(ALIAS)
+                        .aliasPassword(ALIAS_PASSWORD)
+                        .build();
+
+        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
+                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
+                .build();
 
         // Optionally configure a proxy server
-        // final ProxyConfiguration proxy = ProxyConfiguration.newBuilder() //
-        // .proxyHost(PROXY_HOST) //
-        // .proxyPort(PROXY_PORT) //
-        // .build();
+        /*final ProxyConfiguration proxyConfiguration = ProxyConfiguration.newBuilder()
+                .proxyHost(PROXY_HOST)
+                .proxyPort(PROXY_PORT)
+                .build();*/
 
-        /**
-         * Provide required configuration (authentication configuration), optional proxy configuration can be
-         * added when needed
-         */
-        final IntegrationClientConfiguration integrationClientConfiguration =
-                IntegrationClientConfiguration.newBuilder() //
-                        .apiToken(SOLUTION_API_TOKEN) //
-                        .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE) //
-                        .authenticationConfiguration(authenticationConfiguration)
-                        .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build()) //
-                        // .proxyConfiguration(proxy) //
-                        .build();
 
-        LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
+        final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
+                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                //.proxyConfiguration(proxyConfiguration)
+                .build();
 
-        // Create a new integration client object to start interacting service
-        integrationClient = IntegrationClientImpl.newInstance(integrationClientConfiguration);
+        LOGGER.info("Creating integration client ...");
 
-        // Create a new thing integration object for working with things
-        thingIntegration = integrationClient.things();
+        // Create a new integration client object to start interacting with IoT Things service
+        integrationClient = ThingsClientFactory.newInstance(twinConfiguration);
+
+        // Create a new twin client for managing things
+        twin = integrationClient.twin();
     }
 
     public static void main(final String... args) {
@@ -173,8 +197,8 @@ public class HelloWorld {
         FeatureHandle featureHandle = null;
 
         try {
-            featureHandle = thingIntegration.create(thing) //
-                    .thenApply(created -> thingIntegration.forFeature(THING_ID, COUNTER)) //
+            featureHandle = twin.create(thing) //
+                    .thenApply(created -> twin.forFeature(THING_ID, COUNTER)) //
                     .get(TIMEOUT, TimeUnit.SECONDS);
 
             LOGGER.info("Thing with ID '{}' created.", THING_ID);
@@ -189,14 +213,14 @@ public class HelloWorld {
      * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
      */
     public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        return thingIntegration.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
+        return twin.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
     }
 
     /**
      * Delete a Thing.
      */
     public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        thingIntegration.delete(thingId) //
+        twin.delete(thingId) //
                 .whenComplete((aVoid, throwable) -> {
                     if (null == throwable) {
                         LOGGER.info("Thing with ID deleted: {}", thingId);
@@ -211,7 +235,7 @@ public class HelloWorld {
      * Update the ACL of a specified Thing. Blocks until ACL has been updated.
      */
     public void updateACL() throws InterruptedException, ExecutionException, TimeoutException {
-        thingIntegration.forId(THING_ID) //
+        twin.forId(THING_ID) //
                 .retrieve() //
                 .thenCompose(thing -> {
                     final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(USER_ID), //
@@ -220,7 +244,7 @@ public class HelloWorld {
                             Permission.ADMINISTRATE);
 
                     final Thing updated = thing.setAclEntry(aclEntry);
-                    return thingIntegration.update(updated);
+                    return twin.update(updated);
                 }) //
                 .whenComplete((aVoid, throwable) -> {
                     if (null == throwable) {

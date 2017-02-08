@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -58,12 +57,12 @@ import org.springframework.stereotype.Component;
 import com.mongodb.BasicDBObject;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonArray;
 import com.bosch.cr.json.JsonObject;
@@ -155,9 +154,14 @@ public class Collector implements Runnable {
             throw new RuntimeException(ex);
         }
 
-        String clientId = props.getProperty("clientId");
         String apiToken = props.getProperty("apiToken");
+        String userName = props.getProperty("userName");
+        String password = props.getProperty("password");
         String defaultNamespace = props.getProperty("defaultNamespace");
+
+        String proxyHost = props.getProperty("http.proxyHost");
+        String proxyPort = props.getProperty("http.proxyPort");
+
         URI keystoreUri;
         try {
             keystoreUri = Collector.class.getResource("/CRClient.jks").toURI();
@@ -165,43 +169,32 @@ public class Collector implements Runnable {
             throw new RuntimeException(ex);
         }
 
-        String keystorePassword = props.getProperty("keyStorePassword");
-        String keyAlias = props.getProperty("keyAlias");
-        String keyAliasPassword = props.getProperty("keyAliasPassword");
-        String proxyHost = props.getProperty("http.proxyHost");
-        String proxyPort = props.getProperty("http.proxyPort");
+        CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(userName)
+                        .password(password)
+                        .build();
 
-        AuthenticationConfiguration authenticationConfiguration;
-        try {
-            authenticationConfiguration = PublicKeyAuthenticationConfiguration.newBuilder()
-                    .clientId(clientId)
-                    .keyStoreLocation(keystoreUri.toURL())
-                    .keyStorePassword(keystorePassword)
-                    .alias(keyAlias)
-                    .aliasPassword(keyAliasPassword)
-                    .build();
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
-        }
+        ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
 
-        IntegrationClientConfiguration.OptionalConfigSettable configSettable =
-                IntegrationClientConfiguration.newBuilder()
-                        .apiToken(apiToken)
-                        .defaultNamespace(defaultNamespace)
-                        .authenticationConfiguration(authenticationConfiguration)
-                        .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
+        TwinConfiguration.OptionalTwinConfigurationStep configurationStep = ThingsClientFactory
+                .twinConfigurationBuilder()
+                .apiToken(apiToken)
+                .defaultNamespace(defaultNamespace)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration);
 
         if (proxyHost != null && proxyPort != null) {
-            configSettable = configSettable.proxyConfiguration(
-                    ProxyConfiguration.newBuilder()
-                            .proxyHost(proxyHost)
-                            .proxyPort(Integer.parseInt(proxyPort))
-                            .build());
+            configurationStep = configurationStep.proxyConfiguration(ProxyConfiguration.newBuilder()
+                    .proxyHost(proxyHost)
+                    .proxyPort(Integer.parseInt(proxyPort))
+                    .build());
         }
 
-        IntegrationClient client = IntegrationClientImpl.newInstance(configSettable.build());
-
-        return client;
+        return ThingsClientFactory.newInstance(configurationStep.build());
     }
 
     @PostConstruct
@@ -239,7 +232,7 @@ public class Collector implements Runnable {
 
         // start consuming changes
         try {
-            client.subscriptions().consume().get(10, TimeUnit.SECONDS);
+            client.twin().startConsumption().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             throw new RuntimeException(ex);
         }

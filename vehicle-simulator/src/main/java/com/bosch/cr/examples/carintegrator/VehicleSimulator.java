@@ -33,7 +33,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,12 +46,12 @@ import java.util.concurrent.TimeoutException;
 import io.netty.util.internal.ThreadLocalRandom;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonObject;
@@ -82,43 +81,40 @@ public class VehicleSimulator {
             throw new RuntimeException(ex);
         }
 
-        String clientId = props.getProperty("clientId");
         String apiToken = props.getProperty("apiToken");
+        String userName = props.getProperty("userName");
+        String password = props.getProperty("password");
         String defaultNamespace = props.getProperty("defaultNamespace");
-
-        URI keystoreUri = new File("CRClient.jks").toURI();
-        String keystorePassword = props.getProperty("keyStorePassword");
-        String keyAlias = props.getProperty("keyAlias");
-        String keyAliasPassword = props.getProperty("keyAliasPassword");
 
         String proxyHost = props.getProperty("http.proxyHost");
         String proxyPort = props.getProperty("http.proxyPort");
 
-        AuthenticationConfiguration authenticationConfiguration =
-                PublicKeyAuthenticationConfiguration.newBuilder()
-                        .clientId(clientId)
-                        .keyStoreLocation(keystoreUri.toURL())
-                        .keyStorePassword(keystorePassword)
-                        .alias(keyAlias)
-                        .aliasPassword(keyAliasPassword)
+        CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(userName)
+                        .password(password)
                         .build();
 
+        ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
 
-        IntegrationClientConfiguration.OptionalConfigSettable configSettable =
-                IntegrationClientConfiguration.newBuilder()
-                        .apiToken(apiToken)
-                        .defaultNamespace(defaultNamespace)
-                        .authenticationConfiguration(authenticationConfiguration)
-                        .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
+        TwinConfiguration.OptionalTwinConfigurationStep configurationStep = ThingsClientFactory
+                .twinConfigurationBuilder()
+                .apiToken(apiToken)
+                .defaultNamespace(defaultNamespace)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration);
+
         if (proxyHost != null && proxyPort != null) {
-            configSettable = configSettable.proxyConfiguration(
-                    ProxyConfiguration.newBuilder()
-                            .proxyHost(proxyHost)
-                            .proxyPort(Integer.parseInt(proxyPort))
-                            .build());
+            configurationStep = configurationStep.proxyConfiguration(ProxyConfiguration.newBuilder()
+                    .proxyHost(proxyHost)
+                    .proxyPort(Integer.parseInt(proxyPort))
+                    .build());
         }
 
-        IntegrationClient client = IntegrationClientImpl.newInstance(configSettable.build());
+        IntegrationClient client = ThingsClientFactory.newInstance(configurationStep.build());
 
 
         TreeSet<String> activeThings = new TreeSet<>();
@@ -136,7 +132,7 @@ public class VehicleSimulator {
             }
         });
 
-        client.subscriptions().consume().get(10, TimeUnit.SECONDS);
+        client.twin().startConsumption().get(10, TimeUnit.SECONDS);
 
         Thread thread = new Thread(() -> {
             Random random = ThreadLocalRandom.current();

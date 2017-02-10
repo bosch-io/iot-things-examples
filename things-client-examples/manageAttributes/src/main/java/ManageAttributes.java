@@ -36,7 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bosch.cr.integration.things.ThingHandle;
-import com.bosch.cr.integration.things.ThingIntegration;
+import com.bosch.cr.integration.twin.Twin;
+import com.bosch.cr.integration.twin.TwinThingHandle;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
@@ -71,9 +72,9 @@ public class ManageAttributes extends ExamplesBase {
                 .setAttribute(ATTRIBUTE_JSON_POINTER2, ATTRIBUTE_JSON_VALUE2) //
                 .build();
 
-        final ThingIntegration thingIntegration = client.things();
+        final Twin thingIntegration = client.twin();
         thingIntegration.create(thing).get(TIMEOUT, SECONDS);
-        final ThingHandle thingHandle = thingIntegration.forId(thingId);
+        final TwinThingHandle thingHandle = thingIntegration.forId(thingId);
 
 
         thingHandle.putAttribute(ATTRIBUTE_JSON_POINTER1, NEW_ATTRIBUTE_JSON_VALUE) //

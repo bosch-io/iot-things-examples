@@ -71,7 +71,7 @@ public final class RegisterForChanges extends ExamplesBase {
      */
     public void registerForThingChanges() {
       /* Register for change events of *all* things */
-        client.things().registerForThingChanges(ALL_THINGS, change ->
+        client.twin().registerForThingChanges(ALL_THINGS, change ->
         {
             LOGGER.info("For all things: ThingChange received: {}", change);
             countDownLatch.countDown();
@@ -86,11 +86,11 @@ public final class RegisterForChanges extends ExamplesBase {
      */
     public void registerForAttributeChanges() {
       /* Register for *all* attribute changes of *all* things */
-        client.things().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
+        client.twin().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
                 change -> LOGGER.info("For all things: Change received: {}", change));
 
       /* Register for *specific* attribute changes of *all* things */
-        client.things()
+        client.twin()
                 .registerForAttributeChanges(ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE,
                         JsonFactory.newPointer("address/city"),
                         change -> LOGGER.info("For all things with specific Attribute: Change received: {}", change));
@@ -116,7 +116,7 @@ public final class RegisterForChanges extends ExamplesBase {
             throws InterruptedException, ExecutionException, TimeoutException {
         final String registrationId = UUID.randomUUID().toString();
         final String thingId = "com.bosch.cr.example:" + UUID.randomUUID().toString();
-        final ThingHandle thingHandle = client.things().forId(thingId);
+        final ThingHandle thingHandle = client.twin().forId(thingId);
 
       /* Register for *all* change events of a *specific* thing */
         LOGGER.info("Register handler with id: {}", registrationId);
@@ -131,7 +131,7 @@ public final class RegisterForChanges extends ExamplesBase {
             }
         });
 
-        client.things().create(thingId).get(10, TimeUnit.SECONDS);
+        client.twin().create(thingId).get(10, TimeUnit.SECONDS);
     }
 
     public void destroy() throws InterruptedException {

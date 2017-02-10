@@ -34,8 +34,8 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bosch.cr.integration.live.LiveThingHandle;
 import com.bosch.cr.integration.messages.RepliableMessage;
-import com.bosch.cr.integration.things.ThingHandle;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.model.acl.AccessControlListModelFactory;
 import com.bosch.cr.model.acl.AclEntry;
@@ -77,7 +77,7 @@ public final class RegisterForClaimMessages extends ExamplesBase {
         prepareClaimableThing() //
                 .thenAccept(thingHandle ->
                 {
-                    client.things().registerForClaimMessage(registrationIdAllClaimMessages, this::handleMessage);
+                    client.live().registerForClaimMessage(registrationIdAllClaimMessages, this::handleMessage);
                     LOGGER.info("Thing '{}' ready to be claimed", thingHandle.getThingId());
                 });
     }
@@ -96,7 +96,7 @@ public final class RegisterForClaimMessages extends ExamplesBase {
                 });
     }
 
-    private CompletableFuture<ThingHandle> prepareClaimableThing() {
+    private CompletableFuture<LiveThingHandle> prepareClaimableThing() {
         final String thingId = NAMESPACE + UUID.randomUUID().toString();
         final Thing thing = ThingsModelFactory.newThingBuilder() //
                 .setId(thingId) //
@@ -104,7 +104,7 @@ public final class RegisterForClaimMessages extends ExamplesBase {
                         AccessControlListModelFactory.allPermissions()) //
                 .build();
 
-        return client.things().create(thing).thenApply(created -> client.things().forId(thingId));
+        return client.live().create(thing).thenApply(created -> client.live().forId(thingId));
     }
 
     private void handleMessage(final RepliableMessage<ByteBuffer, Object> message) {
@@ -116,9 +116,9 @@ public final class RegisterForClaimMessages extends ExamplesBase {
             final AclEntry aclEntry = AccessControlListModelFactory
                     .newAclEntry(authorizationSubject, AccessControlListModelFactory.allPermissions());
 
-            client.things().forId(thingId) //
+            client.live().forId(thingId) //
                     .retrieve() //
-                    .thenCompose(thing -> client.things().update(thing.setAclEntry(aclEntry))) //
+                    .thenCompose(thing -> client.live().update(thing.setAclEntry(aclEntry))) //
                     .whenComplete((aVoid, throwable) ->
                     {
                         if (null != throwable) {

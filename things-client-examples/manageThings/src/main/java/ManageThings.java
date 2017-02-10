@@ -75,7 +75,7 @@ public class ManageThings extends ExamplesBase {
      * @throws InterruptedException if the executing thread is interrupted while waiting for a response.
      */
     public void createReadUpdateDelete() throws InterruptedException, ExecutionException, TimeoutException {
-        client.things().create(myThingId)
+        client.twin().create(myThingId)
                 .thenCompose(createdThing -> myThing.putAttribute(JsonFactory.newPointer("address/city"), "Berlin"))
                 .thenCompose(changedSuccessfully -> myThing.retrieve()).thenCompose(retrievedThing ->
         {
@@ -104,7 +104,7 @@ public class ManageThings extends ExamplesBase {
                 .setFeatureProperty("featureId", JsonFactory.newPointer("propertyName"), JsonFactory.newValue("value"))
                 .setAttribute(JsonFactory.newPointer("attributeName"), JsonFactory.newValue("value")).build();
 
-        client.things().create(complexThing).whenComplete((thing, throwable) ->
+        client.twin().create(complexThing).whenComplete((thing, throwable) ->
         {
             if (throwable == null) {
                 LOGGER.info("Thing created: {}", thing);
@@ -127,11 +127,11 @@ public class ManageThings extends ExamplesBase {
      */
     public void retrieveThings() throws InterruptedException, ExecutionException, TimeoutException {
       /* Retrieve a Single Thing*/
-        client.things().forId(complexThingId).retrieve().thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
+        client.twin().forId(complexThingId).retrieve().thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
                 .get(1, TimeUnit.SECONDS);
 
       /* Retrieve a List of Things */
-        client.things().retrieve(myThingId, complexThingId).thenAccept(things ->
+        client.twin().retrieve(myThingId, complexThingId).thenAccept(things ->
         {
             if (things.size() == 0) {
                 LOGGER.info(
@@ -142,7 +142,7 @@ public class ManageThings extends ExamplesBase {
         }).get(1, TimeUnit.SECONDS);
 
       /* Retrieve a List of Things with field selectors */
-        client.things().retrieve(JsonFieldSelector.newInstance("attributes"), myThingId, complexThingId)
+        client.twin().retrieve(JsonFieldSelector.newInstance("attributes"), myThingId, complexThingId)
                 .thenAccept(things ->
                 {
                     if (things.size() == 0) {
@@ -165,13 +165,13 @@ public class ManageThings extends ExamplesBase {
                 .setAttribute(attributeJsonPointer, attributeJsonValue) //
                 .build();
 
-        client.things().forId(thingId).registerForThingChanges(UUID.randomUUID().toString(), change ->
+        client.twin().forId(thingId).registerForThingChanges(UUID.randomUUID().toString(), change ->
         {
             LOGGER.info("Received Event: {} -> {}", change.getAction(), change.getValue());
             countDownLatch.countDown();
         });
 
-        client.things().create(thing) //
+        client.twin().create(thing) //
                 .thenCompose(created ->
                 {
                     final Feature feature = ThingsModelFactory.newFeature("myFeature");
@@ -180,7 +180,7 @@ public class ManageThings extends ExamplesBase {
                             .setFeature(feature) //
                             .build();
 
-                    return client.things().update(updated);
+                    return client.twin().update(updated);
                 }) //
                 .whenComplete((aVoid, throwable) ->
                 {

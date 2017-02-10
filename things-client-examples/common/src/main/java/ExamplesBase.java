@@ -85,7 +85,7 @@ public abstract class ExamplesBase {
     // public static final String PROXY_HOST = "proxy.server.com";
     // public static final int PROXY_PORT = 8080;
 
-    protected final IntegrationClient integrationClient;
+    protected final IntegrationClient client;
     protected final Twin twin;
     protected final String myThingId;
     protected final ThingHandle myThing;
@@ -142,10 +142,10 @@ public abstract class ExamplesBase {
         LOGGER.info("Creating integration client ...");
 
         // Create a new integration client object to start interacting with IoT Things service
-        integrationClient = ThingsClientFactory.newInstance(twinConfiguration);
+        client = ThingsClientFactory.newInstance(twinConfiguration);
 
         // Create a new twin client for managing things
-        twin = integrationClient.twin();
+        twin = client.twin();
 
         try {
             // and start consuming events
@@ -203,6 +203,6 @@ public abstract class ExamplesBase {
      * Destroys the client and waits for its graceful shutdown.
      */
     public void terminate() {
-        integrationClient.destroy();
+        client.destroy();
     }
 }

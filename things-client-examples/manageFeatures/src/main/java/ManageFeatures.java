@@ -37,7 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import com.bosch.cr.integration.things.FeatureHandle;
 import com.bosch.cr.integration.things.ThingHandle;
-import com.bosch.cr.integration.things.ThingIntegration;
+import com.bosch.cr.integration.twin.Twin;
+import com.bosch.cr.integration.twin.TwinThingHandle;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
@@ -72,7 +73,7 @@ public class ManageFeatures extends ExamplesBase {
                         ThingsModelFactory.newFeatureProperties(JsonFactory.newObjectBuilder().set("foo", 1).build())))
                 .build();
 
-        client.things().registerForFeatureChanges(UUID.randomUUID().toString(), featureChange ->
+        client.twin().registerForFeatureChanges(UUID.randomUUID().toString(), featureChange ->
         {
             final String featureId = featureChange.getFeature().getId();
             final JsonPointer path = featureChange.getPath();
@@ -82,9 +83,9 @@ public class ManageFeatures extends ExamplesBase {
             LOGGER.info("FeatureChange for featureId {} received on path {} - value was: {}", featureId, path, value);
         });
 
-        client.things().create(thing).get(TIMEOUT, SECONDS);
+        client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final ThingHandle thingHandle = client.things().forId(thingId);
+        final ThingHandle thingHandle = client.twin().forId(thingId);
 
         thingHandle.registerForFeatureChanges(UUID.randomUUID().toString(),
                 featureChange -> LOGGER.info("{} Feature '{}'", featureChange.getAction(), featureChange.getFeature()));
@@ -109,16 +110,16 @@ public class ManageFeatures extends ExamplesBase {
                 .setFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
                 .build();
 
-        client.things().create(thing).get(TIMEOUT, SECONDS);
+        client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final FeatureHandle featureHandle = client.things().forFeature(thingId, FEATURE_ID);
+        final FeatureHandle featureHandle = client.twin().forFeature(thingId, FEATURE_ID);
 
-        client.things().registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID,
+        client.twin().registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID,
                 featurePropertyChange -> LOGGER
                         .info("Integration handler: {} Property '{}:{}'", featurePropertyChange.getAction(),
                                 featurePropertyChange.getPath(), featurePropertyChange.getValue()));
 
-        client.things()
+        client.twin()
                 .registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID, PROPERTY_JSON_POINTER,
                         featurePropertyChange -> LOGGER
                                 .info("Integration handler for property {}: {} Property '{}:{}'", PROPERTY_JSON_POINTER,
@@ -150,9 +151,9 @@ public class ManageFeatures extends ExamplesBase {
                 .setFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
                 .build();
 
-        client.things().create(thing).get(TIMEOUT, SECONDS);
+        client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final FeatureHandle featureHandle = client.things().forFeature(thingId, FEATURE_ID);
+        final FeatureHandle featureHandle = client.twin().forFeature(thingId, FEATURE_ID);
 
         featureHandle.registerForPropertyChanges(UUID.randomUUID().toString(), featurePropertyChange -> LOGGER
                 .info("{} Properties '{}:{}'", featurePropertyChange.getAction(), featurePropertyChange.getPath(),
@@ -183,11 +184,11 @@ public class ManageFeatures extends ExamplesBase {
                 .setFeature(ThingsModelFactory.newFeature(FEATURE_ID2)) //
                 .build();
 
-        final ThingIntegration thingIntegration = client.things();
+        final Twin thingIntegration = client.twin();
 
         thingIntegration.create(thing).get(TIMEOUT, SECONDS);
 
-        final ThingHandle thingHandle = thingIntegration.forId(thingId);
+        final TwinThingHandle thingHandle = thingIntegration.forId(thingId);
 
         thingHandle.registerForFeaturesChanges(UUID.randomUUID().toString(), featuresChange -> LOGGER
                 .info("{} Features '{}:{}'", featuresChange.getAction(), featuresChange.getPath(),

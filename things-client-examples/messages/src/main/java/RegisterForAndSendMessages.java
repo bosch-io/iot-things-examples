@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import model.ExampleUser;
 
-import com.bosch.cr.integration.things.FeatureHandle;
-import com.bosch.cr.integration.things.ThingHandle;
+import com.bosch.cr.integration.live.LiveFeatureHandle;
+import com.bosch.cr.integration.live.LiveThingHandle;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonValue;
 
@@ -66,9 +66,9 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
 
     public RegisterForAndSendMessages() throws Exception {
         fromThingId = ":fromThingId_" + UUID.randomUUID().toString();
-        client.things().create(fromThingId).get(10, TimeUnit.SECONDS);
+        client.live().create(fromThingId).get(10, TimeUnit.SECONDS);
         toThingId = ":toThingId_" + UUID.randomUUID().toString();
-        client.things().create(toThingId).get(10, TimeUnit.SECONDS);
+        client.live().create(toThingId).get(10, TimeUnit.SECONDS);
         countDownLatch = new CountDownLatch(17);
     }
 
@@ -77,7 +77,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
      */
     public void registerForMessages() {
       /* Register for *all* messages of *all* things and provide payload as String */ /**/
-        client.things().registerForMessage(ALL_THINGS_STRING_MESSAGE, "*", String.class, message ->
+        client.live().registerForMessage(ALL_THINGS_STRING_MESSAGE, "*", String.class, message ->
         {
             String subject = message.getSubject();
             String payload = message.getPayload().get();
@@ -86,7 +86,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         });
 
       /* Register for *all* messages with subject *jsonMessage* of *all* things and provide payload as JsonValue */
-        client.things().registerForMessage(ALL_THINGS_JSON_MESSAGE, "jsonMessage", JsonValue.class, message ->
+        client.live().registerForMessage(ALL_THINGS_JSON_MESSAGE, "jsonMessage", JsonValue.class, message ->
         {
             String subject = message.getSubject();
             JsonValue payload = message.getPayload().get();
@@ -95,7 +95,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         });
 
       /* Register for messages with subject *rawMessage* of *all* things and provide payload as raw ByteBuffer */ /***/
-        client.things().registerForMessage(ALL_THINGS_RAW_MESSAGE, "rawMessage", message ->
+        client.live().registerForMessage(ALL_THINGS_RAW_MESSAGE, "rawMessage", message ->
         {
             String subject = message.getSubject();
             ByteBuffer payload = message.getRawPayload().get();
@@ -105,7 +105,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         });
 
 
-        final ThingHandle fromThingHandle = client.things().forId(fromThingId);
+        final LiveThingHandle fromThingHandle = client.live().forId(fromThingId);
 
       /* Register for *all* messages of a *specific* thing and provide payload as String */ /***/
         fromThingHandle.registerForMessage(MY_THING_STRING_MESSAGE, "*", String.class, message ->
@@ -146,7 +146,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
        */
 
       /* Register for messages with subject *example.user.created* of *all* things and provide payload as custom type ExampleUser */
-        client.things()
+        client.live()
                 .registerForMessage(CUSTOM_SERIALIZER_EXAMPLE_USER_MESSAGE, "example.user.created", ExampleUser.class,
                         message ->
                         {
@@ -164,14 +164,14 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
      */
     public void sendMessages() {
       /* Send a message *from* a thing with the given subject but without any payload */
-        client.things().message() //
+        client.live().message() //
                 .from(fromThingId) //
                 .subject("some.arbitrary.subject") //
                 .send();
 
       /* Send a message *from* a feature with the given subject but without any payload */
         //does not arrive
-        client.things().message() //
+        client.live().message() //
                 .from(fromThingId) //
                 .featureId("sendFromThisFeature") //
                 .subject("justWantToLetYouKnow") //
@@ -179,7 +179,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
 
       /* Send a message *to* a thing with the given subject and text payload */
       /* We won't receive this message because we send it to another Thing Client.*/
-        client.things().message() //
+        client.live().message() //
                 .to(toThingId) //
                 .subject("monitoring.building.fireAlert") //
                 .payload("Roof is on fire") //
@@ -187,7 +187,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
                 .send();
 
       /* Send a message *from* a feature with the given subject and json payload */
-        client.things().message() //
+        client.live().message() //
                 .from(toThingId) //
                 .featureId("smokeDetector") //
                 .subject("jsonMessage") //
@@ -196,7 +196,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
                 .send();
 
       /* Send a message *to* a feature with the given subject and raw payload */
-        client.things().message() //
+        client.live().message() //
                 .from(fromThingId) //
                 .featureId("smokeDetector") //
                 .subject("rawMessage") //
@@ -204,14 +204,14 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
                 .contentType("application/octet-stream") //
                 .send();
 
-        final ThingHandle thingHandle = client.things().forId(toThingId);
+        final LiveThingHandle thingHandle = client.live().forId(toThingId);
       /* Send a message *to* a thing (id already defined by the ThingHandle) with the given subject but without any payload */
         thingHandle.message() //
                 .to() //
                 .subject("somesubject") //
                 .send();
 
-        final FeatureHandle featureHandle = client.things().forFeature(fromThingId, "smokeDetector");
+        final LiveFeatureHandle featureHandle = client.live().forFeature(fromThingId, "smokeDetector");
       /* Send a message *from* a feature with the given subject and text payload */
         featureHandle.message() //
                 .from() //
@@ -224,7 +224,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
        * Custom Message serializer usage:
        */
       /* Send a message *from* a thing with the given subject and a custom payload type */
-        client.things()
+        client.live()
                 .message() //
                 .from(fromThingId) //
                 .subject("example.user.created") //

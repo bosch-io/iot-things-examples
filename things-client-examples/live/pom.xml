@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!--
@@ -36,14 +37,16 @@
         <version>0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>messages</artifactId>
-    <name>Bosch IoT Things :: Java Client Examples :: Messages</name>
+    <artifactId>live</artifactId>
+    <name>Bosch IoT Things :: Java Client Examples :: Live Client Integration</name>
 
-        <dependencies>
-            <dependency>
-                <groupId>com.bosch.iot.things.examples</groupId>
-                <artifactId>common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.bosch.iot.things.examples</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    
 </project>

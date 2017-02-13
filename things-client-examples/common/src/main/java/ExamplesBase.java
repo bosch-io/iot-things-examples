@@ -47,6 +47,7 @@ import model.ExampleUser;
 import com.bosch.cr.integration.IntegrationClient;
 import com.bosch.cr.integration.client.ThingsClientFactory;
 import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.LiveConfiguration;
 import com.bosch.cr.integration.client.configuration.MessageSerializerConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.TwinConfiguration;
@@ -68,13 +69,19 @@ public abstract class ExamplesBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExamplesBase.class);
 
     private static final String SOLUTION_ID = "<your-solution-id>";
+    protected static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
+
     protected static final String CLIENT_ID = SOLUTION_ID + ":example";
+    protected static final String CLIENT_ID2 = SOLUTION_ID + ":example2";
+
     private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
     private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
-    private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
 
     private static final String USER_NAME = "<your-user-name";
     private static final String PASSWORD = "<your-password>";
+
+    private static final String USER_NAME2 = "<another-user-name";
+    private static final String PASSWORD2 = "<another-password>";
 
     private static final URL KEYSTORE_LOCATION = ExamplesBase.class.getResource("/CRClient.jks");
     private static final String ALIAS = "<your-key-alias>";
@@ -85,7 +92,13 @@ public abstract class ExamplesBase {
     // public static final String PROXY_HOST = "proxy.server.com";
     // public static final int PROXY_PORT = 8080;
 
+    //private final ProxyConfiguration proxyConfiguration = ProxyConfiguration.newBuilder()
+    //    .proxyHost(PROXY_HOST)
+    //    .proxyPort(PROXY_PORT)
+    //    .build();
+
     protected final IntegrationClient client;
+    protected final IntegrationClient client2;
     protected final Twin twin;
     protected final String myThingId;
     protected final ThingHandle myThing;
@@ -94,55 +107,17 @@ public abstract class ExamplesBase {
      * Constructor.
      */
     public ExamplesBase() {
-        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
-        // via its websocket channel
-        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
-                CredentialsAuthenticationConfiguration
-                        .newBuilder()
-                        .username(USER_NAME)
-                        .password(PASSWORD)
-                        .build();
+        final TwinConfiguration twinConfiguration = createTwinConfiguration(USER_NAME, PASSWORD);
+        final TwinConfiguration twinConfiguration2 = createTwinConfiguration(USER_NAME2, PASSWORD2);
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .build();
-
-        // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
-        // over IoT Hub
-        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
-                PublicKeyAuthenticationConfiguration
-                        .newBuilder()
-                        .clientId(CLIENT_ID)
-                        .keyStoreLocation(KEYSTORE_LOCATION)
-                        .keyStorePassword(KEYSTORE_PASSWORD)
-                        .alias(ALIAS)
-                        .aliasPassword(ALIAS_PASSWORD)
-                        .build();
-
-        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
-                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
-                .build();
-
-        // Optionally configure a proxy server
-        /*final ProxyConfiguration proxyConfiguration = ProxyConfiguration.newBuilder()
-                .proxyHost(PROXY_HOST)
-                .proxyPort(PROXY_PORT)
-                .build();*/
-
-
-        final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
-                .apiToken(SOLUTION_API_TOKEN_THINGS)
-                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
-                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
-                //.proxyConfiguration(proxyConfiguration)
-                .build();
+        final LiveConfiguration liveConfiguration = createLiveConfiguration(CLIENT_ID);
+        final LiveConfiguration liveConfiguration2 = createLiveConfiguration(CLIENT_ID2);
 
         LOGGER.info("Creating integration client ...");
 
         // Create a new integration client object to start interacting with IoT Things service
-        client = ThingsClientFactory.newInstance(twinConfiguration);
+        client = ThingsClientFactory.newInstance(twinConfiguration, liveConfiguration);
+        client2 = ThingsClientFactory.newInstance(twinConfiguration2, liveConfiguration2);
 
         // Create a new twin client for managing things
         twin = client.twin();
@@ -156,6 +131,56 @@ public abstract class ExamplesBase {
 
         this.myThingId = ":myThing_" + UUID.randomUUID().toString();
         this.myThing = twin.forId(myThingId);
+    }
+
+    private TwinConfiguration createTwinConfiguration(final String userName, final String password) {
+
+        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
+        // via its websocket channel.
+        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(userName)
+                        .password(password)
+                        .build();
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
+
+        return ThingsClientFactory.twinConfigurationBuilder()
+                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                //.proxyConfiguration(proxyConfiguration)
+                .build();
+    }
+
+    private LiveConfiguration createLiveConfiguration(final String clientId) {
+
+        // Build a key-based authentication configuration for communicating with IoT Things service and with live
+        // clients over IoT Hub
+        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
+                PublicKeyAuthenticationConfiguration.newBuilder()
+                        .clientId(clientId)
+                        .keyStoreLocation(KEYSTORE_LOCATION)
+                        .keyStorePassword(KEYSTORE_PASSWORD)
+                        .alias(ALIAS)
+                        .aliasPassword(ALIAS_PASSWORD)
+                        .build();
+
+        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
+                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
+                .build();
+
+        return ThingsClientFactory.liveConfigurationBuilder()
+                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
+                .providerConfiguration(hubMessagingProviderConfiguration)
+                //.proxyConfiguration(proxyConfiguration)
+                .build();
+
     }
 
     /**

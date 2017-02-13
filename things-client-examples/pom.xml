@@ -51,6 +51,7 @@
         <module>manageFeatures</module>
         <module>registerForClaimMessages</module>
         <module>manageAttributes</module>
+        <module>live</module>
     </modules>
 
 </project>

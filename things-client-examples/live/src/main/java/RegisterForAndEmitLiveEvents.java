@@ -25,6 +25,10 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +40,7 @@ import com.bosch.cr.json.JsonValue;
  * This example shows how the {@link com.bosch.cr.integration.live.Live Live} client can be used to register for and
  * emit live changes.
  */
-public class RegisterForAndEmitLiveEvents extends ExamplesBase{
+public class RegisterForAndEmitLiveEvents extends ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForAndEmitLiveEvents.class);
 
@@ -66,6 +70,12 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase{
                     LOGGER.info("[AT BACKEND] Received change of Feature 'lamp' property '{}': {}", change.getPath(),
                             change.getValue().orElse(null));
                 });
+
+        try {
+            backendClient.live().startConsumption().get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new IllegalStateException("Error creating Things Client.", e);
+        }
 
         LOGGER.info("[AT DEVICE] Emitting LIVE event AttributeModified for attribute 'location'..");
         clientAtDevice.live()

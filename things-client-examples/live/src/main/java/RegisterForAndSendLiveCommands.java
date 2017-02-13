@@ -25,6 +25,10 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,12 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
                             .withResponse(ModifyFeaturePropertyLiveCommandAnswerBuilder.ResponseFactory::modified)
                             .withEvent(ModifyFeaturePropertyLiveCommandAnswerBuilder.EventFactory::modified);
                 });
+
+        try {
+            clientAtDevice.live().startConsumption().get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new IllegalStateException("Error creating Things Client.", e);
+        }
 
         LOGGER.info("[AT BACKEND] create a new LIVE Thing..");
         backendClient.live()

@@ -229,5 +229,6 @@ public abstract class ExamplesBase {
      */
     public void terminate() {
         client.destroy();
+        client2.destroy();
     }
 }

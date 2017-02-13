@@ -25,6 +25,7 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -44,17 +45,22 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForAndEmitLiveEvents.class);
 
+    private final String thingId = SOLUTION_DEFAULT_NAMESPACE + ":live1";
+    private final String featureId = "temp-sensor";
+
     private final IntegrationClient backendClient;
     private final IntegrationClient clientAtDevice;
 
-    private final String thingId = SOLUTION_DEFAULT_NAMESPACE + ":live1";
+    private final CountDownLatch latch;
 
     public RegisterForAndSendLiveCommands() throws Exception {
         backendClient = client;
         clientAtDevice = client2;
+
+        latch = new CountDownLatch(2);
     }
 
-    public void registerForAndEmitLiveCommands() {
+    public void registerForAndEmitLiveCommands() throws InterruptedException {
 
         LOGGER.info("[AT DEVICE] register handler for 'CreateThing' LIVE commands..");
         clientAtDevice.live()
@@ -62,6 +68,7 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
                     LOGGER.info("[AT DEVICE] Received live command: {}", command.getType());
                     LOGGER.info("[AT DEVICE] Thing to create: {}", command.getThing());
                     LOGGER.info("[AT DEVICE] Answering ...");
+
                     return command.answer()
                             .withResponse(CreateThingLiveCommandAnswerBuilder.ResponseFactory::created)
                             .withEvent(CreateThingLiveCommandAnswerBuilder.EventFactory::created);
@@ -70,12 +77,13 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
         LOGGER.info("[AT DEVICE] register handler for 'ModifyFeatureProperty' LIVE commands..");
         clientAtDevice.live()
                 .forId(thingId)
-                .forFeature("temp-sensor")
+                .forFeature(featureId)
                 .handleModifyFeaturePropertyCommands(command -> {
                     LOGGER.info("[AT DEVICE] Received live command: {}", command.getType());
                     LOGGER.info("[AT DEVICE] Property to modify: '{}' to value: '{}'", command.getPropertyPointer(),
                             command.getPropertyValue());
                     LOGGER.info("[AT DEVICE] Answering ...");
+
                     return command.answer()
                             .withResponse(ModifyFeaturePropertyLiveCommandAnswerBuilder.ResponseFactory::modified)
                             .withEvent(ModifyFeaturePropertyLiveCommandAnswerBuilder.EventFactory::modified);
@@ -98,6 +106,7 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
                     } else {
                         LOGGER.warn("[AT BACKEND] Received unexpected thing {}.", thing);
                     }
+                    latch.countDown();
                 }));
 
         LOGGER.info("[AT BACKEND] put 'temperature' property of 'temp-sensor' LIVE Feature..");
@@ -111,7 +120,11 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
                     } else {
                         LOGGER.info("[AT BACKEND] Putting the property succeeded");
                     }
+                    latch.countDown();
                 }));
+
+        latch.await(10, TimeUnit.SECONDS);
+        terminate();
     }
 
 }

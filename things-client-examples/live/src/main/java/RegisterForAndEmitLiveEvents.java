@@ -25,6 +25,7 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -44,31 +45,40 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForAndEmitLiveEvents.class);
 
+    private final String thingId = SOLUTION_DEFAULT_NAMESPACE + ":live1";
+    private final String featureId = "location";
+
     private final IntegrationClient backendClient;
     private final IntegrationClient clientAtDevice;
 
-    private final String thingId = SOLUTION_DEFAULT_NAMESPACE + ":live1";
+    private final CountDownLatch latch;
 
     public RegisterForAndEmitLiveEvents() throws Exception {
         backendClient = client;
         clientAtDevice = client2;
+
+        latch = new CountDownLatch(2);
     }
 
-    public void registerForAndEmitLiveEvents() {
+    public void registerForAndEmitLiveEvents() throws InterruptedException {
 
         LOGGER.info("[AT BACKEND] register for LIVE attribute changes of attribute 'location'..");
         backendClient.live()
-                .registerForAttributeChanges("locationHandler", "location", change -> {
-                    change.getThingId();
-                    LOGGER.info("[AT BACKEND] Received change of attribute 'location': {}",
-                            change.getValue().orElse(null));
+                .registerForAttributeChanges("locationHandler", "location", change ->
+                {
+                    final String thingId = change.getThingId();
+                    LOGGER.info("[AT BACKEND] Received change of attribute 'location' {} for thing {}.",
+                            change.getValue().orElse(null), thingId);
+                    latch.countDown();
                 });
+
         LOGGER.info("[AT BACKEND] register for LIVE feature property changes of feature 'lamp'..");
         backendClient.live()
-                .forFeature(thingId, "lamp")
+                .forFeature(featureId, "lamp")
                 .registerForPropertyChanges("lampPropertiesHandler", change -> {
                     LOGGER.info("[AT BACKEND] Received change of Feature 'lamp' property '{}': {}", change.getPath(),
                             change.getValue().orElse(null));
+                    latch.countDown();
                 });
 
         try {
@@ -98,6 +108,9 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
                                 JsonValue.newInstance(true)
                         )
                 );
+
+        latch.await(10, TimeUnit.SECONDS);
+        terminate();
     }
 
 }

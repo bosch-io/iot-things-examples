@@ -2,6 +2,36 @@
 
 This repository contains examples for using the Bosch IoT Things in the cloud.
 
+The Bosch IoT Things service is part of the Bosch IoT Suite which is the cloud-based IoT platform provided by Bosch Software Innovations as part of the Bosch Group.
+
+Background information can be found here:
+- [Bosch IoT Suite](https://www.bosch-si.com/products/bosch-iot-suite/platform-as-service/paas.html)
+- [Bosch IoT Things](https://things.apps.bosch-iot-cloud.com/)
+
+## Examples
+
+Inspire yourself for using the Bosch IoT Things service by looking at the following Examples.
+
+The examples currently on cover some selected aspects of the functionality and do not provide a full overview of the possibilites. If you want to learn more please look at the provided background information or get in contact with us.
+
+### Example "inventory-browser"
+
+This example shows how to create a simple user interface to list things and their details and show the things on a map.
+
+### Example "postman-collection"
+
+This is a list of prepared REST call examples to demonstrate typical usages of the REST APIs.
+
+The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
+
+### Example "things-client-examples"
+
+This example shows how to use the CR-Integration Client for Java.
+
+### Example "things-rest-angular""
+
+Implements a simple web application with angular.js and bootstrap to show how to use the Bosch IoT Things REST API with JavaScript.
+
 ## Preparation for Java Developers
 
 ### Maven Repository
@@ -50,29 +80,6 @@ We also provide an OSGi-bundle:
    <version>3.0.0.RC6</version>
 </dependency>
 ```
-
-
-Afterwards, inspire yourself by looking at the Examples:
-
-## Examples
-
-### Example "inventory-browser"
-
-This example shows how to create a simple user interface to list things and their details and show the things on a map.
-
-### Example "postman-collection"
-
-This is a list of prepared REST call examples to demonstrate typical usages of the REST APIs.
-
-The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
-
-### Example "things-client-examples"
-
-This example shows how to use the CR-Integration Client for Java.
-
-### Example "things-rest-angular""
-
-Implements a simple web application with angular.js and bootstrap to show how to use the Bosch IoT Things REST API with JavaScript.
 
 ## License
 

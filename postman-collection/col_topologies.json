@@ -1,7 +1,7 @@
 {
   "variables": [],
   "info": {
-    "name": "CRaaS-Topologies",
+    "name": "IoT-Things-Topologies",
     "_postman_id": "394b4ef3-cb07-4b12-8194-e098914f59dc",
     "description": "",
     "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
@@ -10,7 +10,7 @@
     {
       "name": "Create: A Topology",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {
@@ -30,7 +30,7 @@
     {
       "name": "Query: A Topology",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {
@@ -50,7 +50,7 @@
     {
       "name": "Search: A Topology hierarchically",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {
@@ -70,7 +70,7 @@
     {
       "name": "Search: A Topology through Referenceable",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {
@@ -90,7 +90,7 @@
     {
       "name": "Update: A Topology",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {
@@ -110,7 +110,7 @@
     {
       "name": "Delete: A Topology",
       "request": {
-        "url": "{{craas.baseurl}}/api/1/topologies/{{namespace}}:Topology",
+        "url": "{{base.protocol}}{{base.url}}/api/1/topologies/{{namespace}}:Topology",
         "method": "POST",
         "header": [
           {

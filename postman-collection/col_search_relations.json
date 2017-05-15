@@ -1,6 +1,6 @@
 {
   "id": "e7e2b0a8-17fb-2074-b071-bf7b196475a6",
-  "name": "CRaaS-Search-Relations",
+  "name": "IoT-Things-Search-Relations",
   "description": "",
   "order": [],
   "folders": [
@@ -21,7 +21,7 @@
       ],
       "collection": "e7e2b0a8-17fb-2074-b071-bf7b196475a6",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Relations",
+      "collection_name": "IoT-Things-Search-Relations",
       "collection_owner": 0,
       "collection_id": "e7e2b0a8-17fb-2074-b071-bf7b196475a6",
       "collectionId": "e7e2b0a8-17fb-2074-b071-bf7b196475a6"
@@ -38,7 +38,7 @@
       ],
       "collection": "e7e2b0a8-17fb-2074-b071-bf7b196475a6",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Relations",
+      "collection_name": "IoT-Things-Search-Relations",
       "collection_owner": 0,
       "collection_id": "e7e2b0a8-17fb-2074-b071-bf7b196475a6"
     },
@@ -54,7 +54,7 @@
       ],
       "collection": "e7e2b0a8-17fb-2074-b071-bf7b196475a6",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Relations",
+      "collection_name": "IoT-Things-Search-Relations",
       "collection_owner": 0,
       "collection_id": "e7e2b0a8-17fb-2074-b071-bf7b196475a6"
     }
@@ -67,7 +67,7 @@
     {
       "id": "033b8e7b-dbbd-4068-5924-3730ef263582",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=ge(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=ge(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -86,7 +86,7 @@
     {
       "id": "37404125-2b19-6caa-38e7-bb2724698e9b",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=le(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=le(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -105,7 +105,7 @@
     {
       "id": "400fc371-f22d-931a-93cc-7220f269fe83",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -124,7 +124,7 @@
     {
       "id": "46016418-a592-2c45-1133-6218bb0b7bb6",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=gt(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=gt(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -143,7 +143,7 @@
     {
       "id": "52075f1d-e307-912c-a75d-7fe606df1102",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=in(relationId,\"<relationId>,<relationId2>,<relationdId3>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=in(relationId,\"<relationId>,<relationId2>,<relationdId3>\")",
       "pathVariables": {},
       "preRequestScript": "",
       "method": "GET",
@@ -164,7 +164,7 @@
     {
       "id": "7cc596b1-4861-c923-12f3-cdc0edb620ce",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -183,7 +183,7 @@
     {
       "id": "7e085b13-76d6-ad02-038d-442f272cefaa",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=eq(relationId,\"<relationId>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=eq(relationId,\"<relationId>\")",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -203,7 +203,7 @@
     {
       "id": "a02e8120-67d1-e554-9ea7-14d976e473b4",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=like(relationId,\"<likePredicate>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=like(relationId,\"<likePredicate>\")",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -222,7 +222,7 @@
     {
       "id": "b1e536e7-f233-1304-865a-5be7cc382958",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=lt(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=lt(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -241,7 +241,7 @@
     {
       "id": "bdf9e03a-692f-49e2-a80c-917b5315990c",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=ne(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=ne(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -260,7 +260,7 @@
     {
       "id": "c11342b6-a352-ab96-eb62-1f5095226939",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -279,7 +279,7 @@
     {
       "id": "c2a1ab23-5095-8d1b-19c5-1778eca76036",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -298,7 +298,7 @@
     {
       "id": "d093090f-37d4-f796-75cf-7d0ff6db1681",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=not(gt(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=not(gt(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -317,7 +317,7 @@
     {
       "id": "e3d6b003-b1f8-78fc-153e-35edffae7f99",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/relations?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/relations?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",

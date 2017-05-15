@@ -1,6 +1,6 @@
 {
   "id": "897390df-5fa2-8b77-9171-8aec616b4432",
-  "name": "CRaaS-Search-Things",
+  "name": "IoT-Things-Search-Things",
   "description": "",
   "order": [],
   "folders": [
@@ -21,7 +21,7 @@
       ],
       "collection": "897390df-5fa2-8b77-9171-8aec616b4432",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Things",
+      "collection_name": "IoT-Things-Search-Things",
       "collection_owner": 0,
       "collection_id": "897390df-5fa2-8b77-9171-8aec616b4432"
     },
@@ -37,7 +37,7 @@
       ],
       "collection": "897390df-5fa2-8b77-9171-8aec616b4432",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Things",
+      "collection_name": "IoT-Things-Search-Things",
       "collection_owner": 0,
       "collection_id": "897390df-5fa2-8b77-9171-8aec616b4432"
     },
@@ -53,7 +53,7 @@
       ],
       "collection": "897390df-5fa2-8b77-9171-8aec616b4432",
       "owner": 0,
-      "collection_name": "CRaaS-Search-Things",
+      "collection_name": "IoT-Things-Search-Things",
       "collection_owner": 0,
       "collection_id": "897390df-5fa2-8b77-9171-8aec616b4432"
     }
@@ -66,7 +66,7 @@
     {
       "id": "09cbbd11-e5ff-c195-2b4c-97ea4e75de11",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=ne(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ne(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -85,7 +85,7 @@
     {
       "id": "1449c021-99c2-5237-87ef-d95065c5d46f",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=eq(thingId,\"<thingId>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=eq(thingId,\"<thingId>\")",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -107,7 +107,7 @@
     {
       "id": "1d9eff2b-6e9f-4885-a595-f7f9d08be1f2",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=in(thingId,\"<thingId>,<thingId2>,<thingId3>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=in(thingId,\"<thingId>,<thingId2>,<thingId3>\")",
       "pathVariables": {},
       "preRequestScript": "",
       "method": "GET",
@@ -128,7 +128,7 @@
     {
       "id": "2d772639-0f00-7c84-9cd8-9711ba74ff67",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -147,7 +147,7 @@
     {
       "id": "3890e4e8-db3f-ae0b-070b-389cfcf89222",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=not(gt(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=not(gt(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -166,7 +166,7 @@
     {
       "id": "841f7483-06a3-8c18-c423-ff947f8da2e6",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -185,7 +185,7 @@
     {
       "id": "870872a0-25e6-4c5d-4863-418c861299c4",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=gt(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=gt(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -204,7 +204,7 @@
     {
       "id": "8b9d0d34-0ac1-6890-50d5-164ae60953ff",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=like(thingId,\"<thingId>\")",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=like(thingId,\"<thingId>\")",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -223,7 +223,7 @@
     {
       "id": "98e16309-2ded-a515-b9a8-e39a1b3f2db0",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -242,7 +242,7 @@
     {
       "id": "aab08df8-ff85-5034-f4a4-0c88d5becf16",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=le(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=le(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -261,7 +261,7 @@
     {
       "id": "cad3fa06-4a60-7a09-fa54-a9aaa7ea5139",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=lt(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=lt(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -280,7 +280,7 @@
     {
       "id": "cf1a4379-4cf8-f520-28ec-60d8b8121e60",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=ge(attributes/<attribute>,<attributeValue>)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<attribute>,<attributeValue>)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -299,7 +299,7 @@
     {
       "id": "d50511c7-481d-ef5a-8882-75b53754de7a",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -318,7 +318,7 @@
     {
       "id": "d8d45f2b-e221-4a5c-59be-9819496ecb1c",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/search/things?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/search/things?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",

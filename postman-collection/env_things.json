@@ -1,0 +1,22 @@
+{
+  "id": "66b9bdc2-b19e-ba18-b72d-3688d0d50886",
+  "name": "iot-things",
+  "values": [
+    {
+	  "key": "base.protocol",
+	  "value": "https://",
+	  "type": "text"
+	},
+    {
+      "key": "base.url",
+      "value": "things.apps.bosch-iot-cloud.com",
+      "type": "text"
+    },
+    {
+      "key": "namespace",
+      "value": "com.bosch.iot.things.test",
+      "type": "text"
+    }
+  ],
+  "timestamp": 1440653923186
+}

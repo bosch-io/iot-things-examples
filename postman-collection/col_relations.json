@@ -1,6 +1,6 @@
 {
   "id": "81d2762b-ac31-8390-173f-5b44d59dd091",
-  "name": "CRaaS-Relations",
+  "name": "IoT-Things-Relations",
   "description": "",
   "order": [],
   "folders": [
@@ -17,7 +17,7 @@
       ],
       "collection": "81d2762b-ac31-8390-173f-5b44d59dd091",
       "owner": 0,
-      "collection_name": "CRaaS-Relations",
+      "collection_name": "IoT-Things-Relations",
       "collection_owner": 0,
       "collection_id": "81d2762b-ac31-8390-173f-5b44d59dd091"
     },
@@ -32,7 +32,7 @@
       ],
       "collection": "81d2762b-ac31-8390-173f-5b44d59dd091",
       "owner": 0,
-      "collection_name": "CRaaS-Relations",
+      "collection_name": "IoT-Things-Relations",
       "collection_owner": 0,
       "collection_id": "81d2762b-ac31-8390-173f-5b44d59dd091"
     },
@@ -52,7 +52,7 @@
       ],
       "collection": "81d2762b-ac31-8390-173f-5b44d59dd091",
       "owner": 0,
-      "collection_name": "CRaaS-Relations",
+      "collection_name": "IoT-Things-Relations",
       "collection_owner": 0,
       "collection_id": "81d2762b-ac31-8390-173f-5b44d59dd091",
       "collectionId": "81d2762b-ac31-8390-173f-5b44d59dd091"
@@ -68,7 +68,7 @@
       ],
       "collection": "81d2762b-ac31-8390-173f-5b44d59dd091",
       "owner": 0,
-      "collection_name": "CRaaS-Relations",
+      "collection_name": "IoT-Things-Relations",
       "collection_owner": 0,
       "collection_id": "81d2762b-ac31-8390-173f-5b44d59dd091"
     }
@@ -81,7 +81,7 @@
     {
       "id": "0c8ccdbb-8bcd-58af-1ba8-ea96d80f30fb",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation?fields=relationId,source,target",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=relationId,source,target",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -101,7 +101,7 @@
     {
       "id": "0f4c7df0-c155-732b-73aa-4ebb162ca491",
       "headers": "Content-Type: application/json\nAuthorization: Basic Q1JhYVMtVXNlcjpDUmFhUy1Vc2VyUHcxIQ==\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "DELETE",
@@ -122,7 +122,7 @@
     {
       "id": "29e2f643-2e4f-c3b2-cf39-d654491ac023",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>&fields=relationId,source,target",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>&fields=relationId,source,target",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -142,7 +142,7 @@
     {
       "id": "33bca8c2-9d97-2f4f-194d-fa1a9a2184fc",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<attributeObject>(<attribute1>,<attribute2>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<attributeObject>(<attribute1>,<attribute2>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -162,7 +162,7 @@
     {
       "id": "384aa770-a19c-4718-48c6-7ca3340f9abc",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation/attributes/<new-attribute>",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<new-attribute>",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "PUT",
@@ -183,7 +183,7 @@
     {
       "id": "7923c5ed-fb29-5811-c267-ca7c1ec3c17f",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "PUT",
@@ -204,7 +204,7 @@
     {
       "id": "7f12bf1d-2f6b-d68e-120f-177930f65429",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "POST",
@@ -225,7 +225,7 @@
     {
       "id": "baff4151-6a40-3978-9ecb-cd09bb8d5cfe",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -245,7 +245,7 @@
     {
       "id": "c13c7963-6fb3-124f-96ad-115f9a4672db",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "POST",
@@ -266,7 +266,7 @@
     {
       "id": "ce54bdfb-7c9d-adba-a434-f6238236faeb",
       "headers": "",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<topAttributeObject>(<nestedAttributeObject>/<attribute>))",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<topAttributeObject>(<nestedAttributeObject>/<attribute>))",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -286,7 +286,7 @@
     {
       "id": "daae9899-a3e7-c13d-e34d-ee3fd79a01b7",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation/attributes",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -306,7 +306,7 @@
     {
       "id": "e0bfd12e-b398-f4dc-8ff0-bc7d534f99cd",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "PUT",
@@ -327,7 +327,7 @@
     {
       "id": "e94bcdb3-9518-d8e7-8646-11c04571c170",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "GET",
@@ -347,7 +347,7 @@
     {
       "id": "f081e104-09e2-4904-7a70-50365ce3119b",
       "headers": "Content-Type: application/json\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "PUT",
@@ -368,7 +368,7 @@
     {
       "id": "fe678317-e3df-07e2-6dcd-3e41a4232a2a",
       "headers": "Content-Type: application/json\nAuthorization: Basic Q1JhYVMtVXNlcjpDUmFhUy1Vc2VyUHcxIQ==\n",
-      "url": "{{craas.baseurl}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
+      "url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
       "preRequestScript": "",
       "pathVariables": {},
       "method": "DELETE",

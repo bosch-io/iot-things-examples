@@ -118,17 +118,6 @@
 						"description": ""
 					},
 					"response": []
-				},
-				{
-					"name": "Messages Service status",
-					"request": {
-						"url": "{{base.protocol}}{{base.url}}/status/messages",
-						"method": "GET",
-						"header": [],
-						"body": {},
-						"description": ""
-					},
-					"response": []
 				}
 			]
 		},

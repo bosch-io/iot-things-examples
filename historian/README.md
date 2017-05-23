@@ -51,8 +51,8 @@ Create file "config.properties" in folder "src/main/resources". _Please change t
 
 ```
 thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
-clientId=###your solution id ###:historian
-apiToken=###your solution API token###
+clientId=###your historian solution id ###
+apiToken=###your historian solution API token###
 defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
 keyStorePassword=#### your key password ###
@@ -60,6 +60,12 @@ keyAliasPassword=#### your key alias password ###
 http.proxyHost=#### your http proxy host, if you need one ###
 http.proxyPort=#### your http proxy host, if you need one ###
 ```
+
+Normally you should use
+```
+clientId=###your solution id ###\:historian
+```
+but this does not work due to a open bug (CR-4237) in the Things Client 3.0.0-RC9.
 
 ## Install and start a local MongoDB
 
@@ -88,7 +94,7 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
    ...
    "acl": {
       ...
-      "###your solution id ###:historian": {
+      "###your historian solution id ###": {
          "READ": true,
          "WRITE": false,
          "ADMINISTRATE": false

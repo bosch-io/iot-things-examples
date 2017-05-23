@@ -58,17 +58,21 @@ import org.springframework.stereotype.Component;
 import com.mongodb.BasicDBObject;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
+import com.bosch.cr.integration.client.ThingsClientFactory;
 import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.ProviderConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
+import com.bosch.cr.integration.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonArray;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
+import com.bosch.cr.model.things.Thing;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -134,7 +138,14 @@ public class Collector implements Runnable
    {
       IntegrationClient client = setupClient();
 
-      client.things().registerForFeatureChanges("changes", change -> {
+      try {
+         Thing t = client.twin().retrieve("demo:dev20170523").get(10, TimeUnit.SECONDS).get(0);
+         LOGGER.info("Thing: {}", t);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+
+      client.twin().registerForFeatureChanges("changes", change -> {
          final ChangeAction action = change.getAction();
          if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
             LOGGER.debug("Change: {}", change);
@@ -150,11 +161,7 @@ public class Collector implements Runnable
       });
 
       // start consuming changes
-      try {
-         client.subscriptions().consume().get(10, TimeUnit.SECONDS);
-      } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-         throw new RuntimeException(ex);
-      }
+      client.twin().startConsumption();
    }
 
    /**
@@ -245,11 +252,12 @@ public class Collector implements Runnable
             props.load(i);
             i.close();
          }
-         LOGGER.info("Used integration client config: {}", props);
+         LOGGER.info("Used config: {}", props);
       } catch (IOException ex) {
          throw new RuntimeException(ex);
       }
 
+      String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
       String clientId = props.getProperty("clientId");
       String apiToken = props.getProperty("apiToken");
       String defaultNamespace = props.getProperty("defaultNamespace");
@@ -266,7 +274,7 @@ public class Collector implements Runnable
       String proxyHost = props.getProperty("http.proxyHost");
       String proxyPort = props.getProperty("http.proxyPort");
 
-      AuthenticationConfiguration authenticationConfiguration;
+      PublicKeyAuthenticationConfiguration authenticationConfiguration;
       try {
          authenticationConfiguration = PublicKeyAuthenticationConfiguration.newBuilder().clientId(clientId).keyStoreLocation(keystoreUri.toURL())
                  .keyStorePassword(keystorePassword).alias(keyAlias).aliasPassword(keyAliasPassword).build();
@@ -274,19 +282,22 @@ public class Collector implements Runnable
          throw new RuntimeException(ex);
       }
 
-      IntegrationClientConfiguration.OptionalConfigSettable configSettable =
-         IntegrationClientConfiguration.newBuilder()
+      ProviderConfiguration providerConfig = ThingsWsMessagingProviderConfigurationImpl.newBuilder()
+              .endpoint(thingsMessagingEndpointUrl)
+              .authenticationConfiguration(authenticationConfiguration)
+              .build();
+
+      TwinConfiguration.OptionalTwinConfigurationStep configSettable = TwinConfiguration.newBuilder()
             .apiToken(apiToken)
             .defaultNamespace(defaultNamespace)
-            .authenticationConfiguration(authenticationConfiguration)
-            .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
+            .providerConfiguration(providerConfig);
 
       if (proxyHost != null && proxyPort != null) {
          configSettable = configSettable.proxyConfiguration(
                  ProxyConfiguration.newBuilder().proxyHost(proxyHost).proxyPort(Integer.parseInt(proxyPort)).build());
       }
 
-      IntegrationClient client = IntegrationClientImpl.newInstance(configSettable.build());
+      IntegrationClient client = ThingsClientFactory.newInstance(configSettable.build());
 
       return client;
    }

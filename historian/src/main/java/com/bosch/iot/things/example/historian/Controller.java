@@ -292,7 +292,7 @@ public class Controller
                theConfig.load(i);
                i.close();
             }
-            LOGGER.info("Used integration client config: {}", theConfig);
+            LOGGER.info("Used config: {}", theConfig);
          } catch (IOException ex) {
             throw new RuntimeException(ex);
          }

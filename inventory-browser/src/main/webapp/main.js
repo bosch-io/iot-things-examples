@@ -140,7 +140,7 @@ $(document).ready(function () {
     var refreshTable = function () {
 
         $.getJSON("api/1/search/things"
-            + "?fields=thingId,features/geolocation,features/orientation,features/xdk-sensors"
+            + "?fields=thingId,features/description,features/geolocation,features/orientation,features/xdk-sensors"
             + "&option=limit(0,200),sort(%2BthingId)")
             .fail(failHandler)
             .done(function (data, status) {
@@ -162,7 +162,14 @@ $(document).ready(function () {
                     // --- add heading data to table
                     var row = $("<tr>");
                     row.attr("thingId", t.thingId);
-                    row.append($("<td>").text(t.thingId));
+                    if ("features" in t && "description" in t.features && "properties" in t.features.description && "displayName" in t.features.description.properties) {
+                        var td = $("<td>");
+                        td.text(t.features.description.properties.displayName);
+                        td.append($("<span class='idInfo'>").text("(" + t.thingId + ")"));
+                        row.append(td);
+                    } else {
+                        row.append($("<td>").text(t.thingId));
+                    }
                     $("#tableBody").append(row);
 
                     // --- when thing has a "geolocation" feature with "geoposition" properties

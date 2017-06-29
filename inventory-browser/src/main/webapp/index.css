@@ -48,6 +48,10 @@ td {
    word-break: break-all;
    word-wrap: break-word;
 }
+.idInfo {
+   color: lightgray;
+   margin-left: 0.5em;
+}
 .popupOverlay {
    background: rgba(0,0,0, 0.5);
    display: none;

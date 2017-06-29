@@ -64,7 +64,7 @@ $(document).ready(function () {
         var tbody = table.append($("<tbody>"));
 
         if (obj != null) {
-            var propNames = Object.getOwnPropertyNames(obj);
+            var propNames = Object.getOwnPropertyNames(obj).sort();
             propNames.forEach(function (prop) {
                 var value = obj[prop];
                 var row = $("<tr>");
@@ -93,13 +93,19 @@ $(document).ready(function () {
     // --- Click handler for refreshing details
     var refreshDetails = function () {
         var thingId = $("#details").attr("thingId");
-        $.getJSON("api/1/things/" + thingId)
+        $.getJSON("api/1/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified")
             .done(function (thing, status) {
 
                 // --- clear table content and remember thingId
                 $("#detailsThingId").text(thingId);
                 var tablebody = $("#detailsTableBody");
                 tablebody.empty();
+
+                // --- last modified
+                var row = $("<tr>");
+                tablebody.append(row);
+                row.append($("<td>").text("Last modified"));
+                row.append($("<td>").text(thing._modified));
 
                 if ("attributes" in thing) {
                     // --- for each attribute put row in details table
@@ -112,7 +118,7 @@ $(document).ready(function () {
                 }
                 if ("features" in thing) {
                     // --- for each feature property put row in details table
-                    Object.getOwnPropertyNames(thing.features).forEach(function (featureId) {
+                    Object.getOwnPropertyNames(thing.features).sort().forEach(function (featureId) {
                         var feature = thing.features[featureId];
                         if ("properties" in feature) {
                             var row = $("<tr>");

@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "IoT-Things",
-		"_postman_id": "d1757426-4e44-7f6a-2a9e-b59f5d045044",
+		"_postman_id": "1465b474-153e-7f78-d0e7-6d5992183e23",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -2385,7 +2385,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "schema @expand(template: \"ResourceAwareTopology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\t\tID!\r\n\tbuildingName:\tString\r\n\trooms: \t\t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n\tlamps: \t\t[Lamp]\r\n\t# lamps: \t    Lamp\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n\r\ninterface LampThing @resource(protocol: \"com.bosch.iot.things:features-protocol:0.0.1\") {\r\n\tid:\t\t\tID!\r\n}\r\n\r\ntype Lamp implements LampThing {\r\n\tid:\t\t\t\t\tID!\t\r\n\tstatus:\t\t\t\tStatus\r\n\tpowerConsumption:\tFloat\r\n}\r\n\r\nenum Status {\r\n\tON\r\n\tOFF\r\n\tBROKEN\r\n}"
+							"raw": "schema @expand(template: \"ResourceAwareTopology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\t\tID!\r\n\tbuildingName:\tString\r\n\trooms: \t\t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n\tlamps: \t\t[Lamp]\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n\r\ninterface LampThing @resource(protocol: \"com.bosch.iot.things:features-protocol:0.0.1\") {\r\n\tid:\t\t\tID!\r\n}\r\n\r\ntype Lamp implements LampThing {\r\n\tid:\t\t\t\t\tID!\t\r\n\tstatus:\t\t\t\tStatus\r\n\tpowerConsumption:\tFloat\r\n}\r\n\r\nenum Status {\r\n\tON\r\n\tOFF\r\n\tBROKEN\r\n}"
 						},
 						"description": ""
 					},

@@ -5,8 +5,9 @@ This repository contains examples for using the Bosch IoT Things in the cloud.
 The Bosch IoT Things service is part of the Bosch IoT Suite which is the cloud-based IoT platform provided by Bosch Software Innovations as part of the Bosch Group.
 
 Background information can be found here:
-- [Bosch IoT Suite](https://www.bosch-si.com/products/bosch-iot-suite/platform-as-service/paas.html)
-- [Bosch IoT Things](https://things.apps.bosch-iot-cloud.com/)
+- [Bosch IoT Things](https://www.bosch-iot-suite.com/things/)
+- Bosch IoT Things as part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com/)
+- More news/background about the about [Bosch IoT Suite](https://www.bosch-si.com/iot-platform/bosch-iot-suite/homepage-bosch-iot-suite.html)
 
 ## Examples
 

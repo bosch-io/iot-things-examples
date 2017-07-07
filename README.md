@@ -6,8 +6,8 @@ The Bosch IoT Things service is part of the Bosch IoT Suite which is the cloud-b
 
 Background information can be found here:
 - [Bosch IoT Things](https://www.bosch-iot-suite.com/things/)
-- Bosch IoT Things as part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com/)
-- More news/background about the about [Bosch IoT Suite](https://www.bosch-si.com/iot-platform/bosch-iot-suite/homepage-bosch-iot-suite.html)
+- [Bosch IoT Suite](https://www.bosch-iot-suite.com/)
+- More [news/background about the Bosch IoT Suite](https://www.bosch-si.com/iot-platform/bosch-iot-suite/homepage-bosch-iot-suite.html)
 
 ## Examples
 

@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "IoT-Things",
-		"_postman_id": "1465b474-153e-7f78-d0e7-6d5992183e23",
+		"_postman_id": "389d0814-2184-454f-b7c1-7243c59f0deb",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -2086,14 +2086,40 @@
 			"description": "/topology-schemas/{schemaId}",
 			"item": [
 				{
-					"name": "Create: A Schema",
+					"name": "Create: A Policy for Topologies",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:topologyPolicy",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"entries\": {\r\n\t\t\"DEFAULT\": {\r\n\t\t\t\"subjects\": {\r\n\t\t\t\t\"${request.subjectId}\": {\r\n\t\t\t\t\t\"type\": \"iot-permissions-sid\"\r\n\t\t\t\t}\r\n\t\t\t},\r\n\t\t\t\"resources\": {\r\n\t\t\t\t\"policy:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"thing:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"message:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"topology:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"topology-schema:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: An empty Schema with policyId",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "schema @expand(template: \"Topology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\t\tID!\r\n\tbuildingName:\tString\r\n\trooms: \t\t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n"
+							"raw": "{\n\t\"policyId\": \"{{namespace}}:topologyPolicy\"\n}"
 						},
 						"description": ""
 					},
@@ -2102,7 +2128,7 @@
 				{
 					"name": "Update: A Schema",
 					"request": {
-						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1/content",
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -2130,7 +2156,7 @@
 				{
 					"name": "Delete: A Schema",
 					"request": {
-						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema-remote:99",
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
 						"method": "DELETE",
 						"header": [],
 						"body": {
@@ -2161,7 +2187,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) { campusName } }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\"id\": \"b2\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 2\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"38.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t],\r\n\t\t\t\t\"companies\": [{\r\n\t\t\t\t\t\t\"name\": \"Acme\",\r\n\t\t\t\t\t\t\"units\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1\"\r\n\t\t\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) { campusName } }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\"id\": \"b2\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 2\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"38.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t],\r\n\t\t\t\t\"companies\": [{\r\n\t\t\t\t\t\t\"name\": \"Acme\",\r\n\t\t\t\t\t\t\"units\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1\"\r\n\t\t\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
 						},
 						"description": ""
 					},
@@ -2181,7 +2207,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"_content\": {\r\n\t\t\"query\":  \"mutation { create(topology: { id: \\\"c1\\\", campusName: \\\"Berlin\\\", buildings: [{ id: \\\"b1\\\", buildingName: \\\"Building 1\\\", rooms: [{ id: \\\"b1r1\\\", roomName: \\\"Room 1\\\", area: 25.5 } ] }, { id: \\\"b2\\\", buildingName: \\\"Building 2\\\", rooms: [{ id: \\\"b2r1\\\", roomName: \\\"Room 1\\\", area: 38.5 } ] } ], companies: [{ name: \\\"Acme\\\", units: [{ id: \\\"b1\\\" }, { id: \\\"b2r1\\\" } ] } ] }) { campusName } }\"\r\n\t}\r\n}"
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\":  \"mutation { create(topology: { id: \\\"c1\\\", campusName: \\\"Berlin\\\", buildings: [{ id: \\\"b1\\\", buildingName: \\\"Building 1\\\", rooms: [{ id: \\\"b1r1\\\", roomName: \\\"Room 1\\\", area: 25.5 } ] }, { id: \\\"b2\\\", buildingName: \\\"Building 2\\\", rooms: [{ id: \\\"b2r1\\\", roomName: \\\"Room 1\\\", area: 38.5 } ] } ], companies: [{ name: \\\"Acme\\\", units: [{ id: \\\"b1\\\" }, { id: \\\"b2r1\\\" } ] } ] }) { campusName } }\"\r\n\t}\r\n}"
 						},
 						"description": ""
 					},
@@ -2378,9 +2404,29 @@
 			"description": "",
 			"item": [
 				{
-					"name": "Create: A Schema with remote resource",
+					"name": "Create: An empty Schema with policyId",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema-remote:1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"policyId\": \"{{namespace}}:topologyPolicy\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Schema with remote resource",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema-remote:1/content",
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -2400,6 +2446,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
+								"description": ""
+							},
+							{
+								"key": "x-cr-api-token",
+								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
 								"description": ""
 							}
 						],
@@ -2421,11 +2477,21 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
+								"description": ""
+							},
+							{
+								"key": "x-cr-api-token",
+								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
+								"description": ""
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema-remote:1\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\",\r\n\t\t\t\t\t\t\t\t\"lamps\": [{\r\n\t\t\t\t\t\t\t\t\t\t\"id\": \"{{namespace}}:lamp01/LampFeature\"\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t]\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema-remote:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\",\r\n\t\t\t\t\t\t\t\t\"lamps\": [{\r\n\t\t\t\t\t\t\t\t\t\t\"id\": \"{{namespace}}:lamp01/LampFeature\"\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t]\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
 						},
 						"description": ""
 					},
@@ -2440,6 +2506,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
+								"description": ""
+							},
+							{
+								"key": "x-cr-api-token",
+								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
 								"description": ""
 							}
 						],
@@ -2461,6 +2537,16 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
+								"description": ""
+							},
+							{
+								"key": "x-cr-api-token",
+								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
+								"description": ""
 							}
 						],
 						"body": {
@@ -2480,6 +2566,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/graphql",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
+								"description": ""
+							},
+							{
+								"key": "x-cr-api-token",
+								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
 								"description": ""
 							}
 						],

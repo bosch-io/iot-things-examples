@@ -641,11 +641,6 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic Q1JhYVMtVXNlcjpDUmFhUy1Vc2VyUHcxIQ==",
-								"description": ""
 							}
 						],
 						"body": {
@@ -665,11 +660,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic Q1JhYVMtVXNlcjpDUmFhUy1Vc2VyUHcxIQ==",
 								"description": ""
 							}
 						],
@@ -2447,16 +2437,6 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
-								"description": ""
-							},
-							{
-								"key": "x-cr-api-token",
-								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
-								"description": ""
 							}
 						],
 						"body": {
@@ -2476,16 +2456,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
-								"description": ""
-							},
-							{
-								"key": "x-cr-api-token",
-								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
 								"description": ""
 							}
 						],
@@ -2507,16 +2477,6 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
-								"description": ""
-							},
-							{
-								"key": "x-cr-api-token",
-								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
-								"description": ""
 							}
 						],
 						"body": {
@@ -2537,16 +2497,6 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
-								"description": ""
-							},
-							{
-								"key": "x-cr-api-token",
-								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
-								"description": ""
 							}
 						],
 						"body": {
@@ -2566,16 +2516,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/graphql",
-								"description": ""
-							},
-							{
-								"key": "Authorization",
-								"value": "Basic N0Q3QjExNjE1NkFGODczMjczMkU4QThca2JhcnRoZWxtOjZJdlBpQm41dGlCfFZVUnA=",
-								"description": ""
-							},
-							{
-								"key": "x-cr-api-token",
-								"value": "0d0a1ae93a8e4da8bc221cba30f4ef47",
 								"description": ""
 							}
 						],

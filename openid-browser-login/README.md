@@ -4,10 +4,10 @@
 Example application to simulate browser-based login for _Bosch Account_ to get OpenId Connect JWT token without human interaction.
 
 **IMPORTANT:**
-This example tool does only communicate with the official Bosch endpoints https://identity.bosch.com and https://accounts.bosch.com
+This example tool does only communicate with the official Bosch endpoints https://identity.bosch.com and https://accounts.bosch.com  
 No secret information will be sent to any other 3rd-party endpoint.
 
-**SUPPORTED ONLY AS EXAMPLE FOR DEVELOPMENT - DO NOT USE IN PRODUCTION!**
+**PROVIDED ONLY AS EXAMPLE FOR DEVELOPMENT - DO NOT USE IN PRODUCTION!**
 
 ## Prerequisites
 
@@ -41,6 +41,5 @@ Bearer abcxxx
 
 ## License
 
-Thi example is made available under the terms of Bosch SI Example Code License, Version 1.0.
-
+Thi example is made available under the terms of Bosch SI Example Code License, Version 1.0.  
 See the iot-things-examples top level README.md file for license details.

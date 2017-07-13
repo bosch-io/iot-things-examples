@@ -4,6 +4,7 @@ target/
 *.iml
 **/config*.properties
 **/CRClient.jks
+db/
 mvnw*
 nbactions.xml
 .mvn

@@ -25,9 +25,13 @@ This is a list of prepared REST call examples to demonstrate typical usages of t
 
 The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
 
+### Example "cr-integration-api-examples"
+
+This example shows how to use the CR-Integration Client for Java. The CR-Integration Client for Java will be replaced by the upcoming Things Client for Java.
+
 ### Example "things-client-examples"
 
-This example shows how to use the CR-Integration Client for Java.
+This example shows how to use the upcoming of the Things Client for Java. The Things Client for Java is currently a release candidate.
 
 ### Example "things-rest-angular""
 
@@ -68,7 +72,7 @@ After adding the public repository as described above, you can simply use the Th
 <dependency>
    <groupId>com.bosch.iot.things</groupId>
    <artifactId>things-client</artifactId>
-   <version>3.0.0.RC6</version>
+   <version>3.0.0.RC9</version>
 </dependency>
 ```
 
@@ -78,7 +82,7 @@ We also provide an OSGi-bundle:
 <dependency>
    <groupId>com.bosch.iot.things</groupId>
       <artifactId>things-client-osgi</artifactId>
-   <version>3.0.0.RC6</version>
+   <version>3.0.0.RC9</version>
 </dependency>
 ```
 

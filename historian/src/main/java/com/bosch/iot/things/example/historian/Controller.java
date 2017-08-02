@@ -78,60 +78,85 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 public class Controller {
 
+    public static class HistoricData {
+
+        private final Param param;
+        private final Map data;
+
+        public HistoricData(Param param, Map data) {
+            this.param = param;
+            this.data = data;
+        }
+
+        public Param getParam() {
+            return this.param;
+        }
+
+        public Map getData() {
+            return this.data;
+        }
+    }
+
+    public static final class Param {
+
+        private final String thingId;
+        private final String featureId;
+        private final String propertyPath;
+
+        private Param(String thingId, String featureId, String propertyPath) {
+            this.thingId = thingId;
+            this.featureId = featureId;
+            this.propertyPath = propertyPath;
+        }
+
+        public String getThingId() {
+            return thingId;
+        }
+
+        public String getFeatureId() {
+            return featureId;
+        }
+
+        public String getPropertyPath() {
+            return propertyPath;
+        }
+
+        static List<Param> createFromRequest() {
+            HttpServletRequest request =
+                    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+            List<String> paths = expandBracketRepeats(fullPath);
+
+            List<Param> result = new ArrayList<>();
+            for (String p : paths) {
+                Matcher matcher = PARAM_PATTERN.matcher(p);
+                if (!matcher.matches()) {
+                    throw new IllegalArgumentException(fullPath);
+                }
+                result.add(new Param(matcher.group(1), matcher.group(2), matcher.group(3)));
+            }
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + "thingId: " + thingId + ", featureId: " + featureId + ", propertyPath: " + propertyPath + "}";
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
     // URL Pattern: * / history / [data|view|embeddedview] / <thingId> / features / <featureId> / properties / <propertyPath>
     // with support for the following repeat-syntax: a [ b, c ] z --> a b z + a c z
     private static final Pattern PARAM_PATTERN = Pattern.compile(".*/history/.+?/(.+?)/features/(.+?)/properties/(.+)");
+
     // Property Pattern: features/
     private Properties theConfig;
     private CloseableHttpClient theHttpClient;
+
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    /**
-     * Expand comma seperated alternatives put in square brackets in a String.
-     */
-    private static List<String> expandBracketRepeats(String s) {
-        List<String> result = new ArrayList<>();
-
-        int p = s.indexOf("[");
-        if (p >= 0) {
-            // find matching closing bracket
-            int q = p;
-            int level = 0;
-            while (q < s.length() && level >= 0) {
-                q++;
-                if (s.charAt(q) == '[') {
-                    level++;
-                } else if (s.charAt(q) == ']') {
-                    level--;
-                }
-            }
-            if (level >= 0) {
-                throw new IllegalArgumentException("Matching bracket not found: " + s);
-            }
-
-            String prefix = s.substring(0, p);
-            String repeats = s.substring(p + 1, q);
-            String suffix = s.substring(q + 1);
-
-            // first do recursive expand within current bracket pair
-            List<String> expands = expandBracketRepeats(repeats);
-
-            // then expand current bracket pair
-            for (String e : expands) {
-                String[] parts = e.split(",");
-                for (String part : parts) {
-                    // expand recursivly to also do expand in suffixes
-                    result.addAll(expandBracketRepeats(prefix + part + suffix));
-                }
-            }
-        } else {
-            result.add(s);
-        }
-
-        return result;
-    }
 
     @PostConstruct
     public void postConstruct() {
@@ -264,7 +289,7 @@ public class Controller {
                     theConfig.load(i);
                     i.close();
                 }
-                LOGGER.info("Used integration client config: {}", theConfig);
+                LOGGER.info("Used config: {}", theConfig);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -314,71 +339,49 @@ public class Controller {
         return theHttpClient;
     }
 
-    public static class HistoricData {
+    /**
+     * Expand comma seperated alternatives put in square brackets in a String.
+     */
+    private static List<String> expandBracketRepeats(String s) {
+        List<String> result = new ArrayList<>();
 
-        private final Param param;
-        private final Map data;
-
-        public HistoricData(Param param, Map data) {
-            this.param = param;
-            this.data = data;
-        }
-
-        public Param getParam() {
-            return this.param;
-        }
-
-        public Map getData() {
-            return this.data;
-        }
-    }
-
-    public static final class Param {
-
-        private final String thingId;
-        private final String featureId;
-        private final String propertyPath;
-
-        private Param(String thingId, String featureId, String propertyPath) {
-            this.thingId = thingId;
-            this.featureId = featureId;
-            this.propertyPath = propertyPath;
-        }
-
-        static List<Param> createFromRequest() {
-            HttpServletRequest request =
-                    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-            String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-
-            List<String> paths = expandBracketRepeats(fullPath);
-
-            List<Param> result = new ArrayList<>();
-            for (String p : paths) {
-                Matcher matcher = PARAM_PATTERN.matcher(p);
-                if (!matcher.matches()) {
-                    throw new IllegalArgumentException(fullPath);
+        int p = s.indexOf("[");
+        if (p >= 0) {
+            // find matching closing bracket
+            int q = p;
+            int level = 0;
+            while (q < s.length() && level >= 0) {
+                q++;
+                if (s.charAt(q) == '[') {
+                    level++;
+                } else if (s.charAt(q) == ']') {
+                    level--;
                 }
-                result.add(new Param(matcher.group(1), matcher.group(2), matcher.group(3)));
             }
-            return result;
+            if (level >= 0) {
+                throw new IllegalArgumentException("Matching bracket not found: " + s);
+            }
+
+            String prefix = s.substring(0, p);
+            String repeats = s.substring(p + 1, q);
+            String suffix = s.substring(q + 1);
+
+            // first do recursive expand within current bracket pair
+            List<String> expands = expandBracketRepeats(repeats);
+
+            // then expand current bracket pair
+            for (String e : expands) {
+                String[] parts = e.split(",");
+                for (String part : parts) {
+                    // expand recursivly to also do expand in suffixes
+                    result.addAll(expandBracketRepeats(prefix + part + suffix));
+                }
+            }
+        } else {
+            result.add(s);
         }
 
-        public String getThingId() {
-            return thingId;
-        }
-
-        public String getFeatureId() {
-            return featureId;
-        }
-
-        public String getPropertyPath() {
-            return propertyPath;
-        }
-
-        @Override
-        public String toString() {
-            return "{" + "thingId: " + thingId + ", featureId: " + featureId + ", propertyPath: " + propertyPath + "}";
-        }
+        return result;
     }
 
 }

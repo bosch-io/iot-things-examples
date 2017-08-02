@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -39,9 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
@@ -58,16 +57,17 @@ import com.mongodb.BasicDBObject;
 
 import com.bosch.cr.integration.IntegrationClient;
 import com.bosch.cr.integration.client.ThingsClientFactory;
-import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.ProviderConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
+import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messaging.MessagingProviders;
-import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
+import com.bosch.cr.integration.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonArray;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
+import com.bosch.cr.model.things.Thing;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -85,6 +85,96 @@ public class Collector implements Runnable {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    private static class History {
+
+        private final String thingId;
+        private final String featureId;
+        private final JsonPointer path;
+        private final JsonValue value;
+        private final LocalDateTime timestamp;
+
+        public History(String thingId, String featureId, JsonPointer path, JsonValue value, LocalDateTime timestamp) {
+            this.thingId = thingId;
+            this.featureId = featureId;
+            this.path = path;
+            this.value = value;
+            this.timestamp = timestamp;
+        }
+
+        @Override
+        public String toString() {
+            return "History{" + "thingId=" + thingId + ", featureId=" + featureId + ", path=" + path + ", value=" +
+                    value + ", timestamp=" + timestamp + '}';
+        }
+
+    }
+
+    @PostConstruct
+    public void start() {
+        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+
+        if (!mongoTemplate.collectionExists("history")) {
+            mongoTemplate.createCollection("history");
+        }
+
+        Thread thread = new Thread(this);
+        thread.start();
+
+        LOGGER.info("Historian collector started");
+    }
+
+    @Override
+    public void run() {
+        IntegrationClient client = setupClient();
+
+        try {
+            Thing t = client.twin().retrieve("demo:dev20170523").get(10, TimeUnit.SECONDS).get(0);
+            LOGGER.info("Thing: {}", t);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        client.twin().registerForFeatureChanges("changes", change -> {
+            final ChangeAction action = change.getAction();
+            if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
+                LOGGER.debug("Change: {}", change);
+
+                // collect list of individual property changes
+                List<History> target = new LinkedList<>();
+                collectChanges(target, change.getThingId(), change.getFeature().getId(),
+                        JsonPointer.newInstance(), change.getValue().get());
+
+                // write them all the the MongoDB
+                target.stream().forEachOrdered(h -> storeHistory(h));
+            }
+        });
+
+        // start consuming changes
+        client.twin().startConsumption();
+    }
+
+    /**
+     * Write history to the the MongoDB
+     */
+    private void storeHistory(History h) {
+        LOGGER.trace("Store history: {}", h);
+
+        // do combined update query: add newest value+timestamp to the array property and slice array if too long
+        String id = h.thingId + "/features/" + h.featureId + h.path;
+        Update update = new Update()
+                .push("values",
+                        new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
+                                .append("$slice", -HISTORY_SIZE))
+                .push("timestamps",
+                        new BasicDBObject("$each", Arrays.asList(h.timestamp))
+                                .append("$slice", -HISTORY_SIZE));
+
+        // update or create document for this specific property in this thing/feature
+        mongoTemplate.upsert(
+                Query.query(Criteria.where("_id").is(id)),
+                update, String.class, "history");
+    }
 
     /**
      * Collect list of individual property changes
@@ -149,19 +239,15 @@ public class Collector implements Runnable {
                 props.load(i);
                 i.close();
             }
-            LOGGER.info("Used integration client config: {}", props);
+            LOGGER.info("Used config: {}", props);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
+        String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
+        String clientId = props.getProperty("clientId");
         String apiToken = props.getProperty("apiToken");
-        String userName = props.getProperty("userName");
-        String password = props.getProperty("password");
         String defaultNamespace = props.getProperty("defaultNamespace");
-
-        String proxyHost = props.getProperty("http.proxyHost");
-        String proxyPort = props.getProperty("http.proxyPort");
-
         URI keystoreUri;
         try {
             keystoreUri = Collector.class.getResource("/CRClient.jks").toURI();
@@ -169,119 +255,46 @@ public class Collector implements Runnable {
             throw new RuntimeException(ex);
         }
 
-        CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
-                CredentialsAuthenticationConfiguration
-                        .newBuilder()
-                        .username(userName)
-                        .password(password)
-                        .build();
+        String keystorePassword = props.getProperty("keyStorePassword");
+        String keyAlias = props.getProperty("keyAlias");
+        String keyAliasPassword = props.getProperty("keyAliasPassword");
+        String proxyHost = props.getProperty("http.proxyHost");
+        String proxyPort = props.getProperty("http.proxyPort");
 
-        ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .build();
-
-        TwinConfiguration.OptionalTwinConfigurationStep configurationStep = ThingsClientFactory
-                .twinConfigurationBuilder()
-                .apiToken(apiToken)
-                .defaultNamespace(defaultNamespace)
-                .providerConfiguration(thingsWsMessagingProviderConfiguration);
-
-        if (proxyHost != null && proxyPort != null) {
-            configurationStep = configurationStep.proxyConfiguration(ProxyConfiguration.newBuilder()
-                    .proxyHost(proxyHost)
-                    .proxyPort(Integer.parseInt(proxyPort))
-                    .build());
-        }
-
-        return ThingsClientFactory.newInstance(configurationStep.build());
-    }
-
-    @PostConstruct
-    public void start() {
-        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-
-        if (!mongoTemplate.collectionExists("history")) {
-            mongoTemplate.createCollection("history");
-        }
-
-        Thread thread = new Thread(this);
-        thread.start();
-
-        LOGGER.info("Historian collector started");
-    }
-
-    @Override
-    public void run() {
-        IntegrationClient client = setupClient();
-
-        client.things().registerForFeatureChanges("changes", change -> {
-            final ChangeAction action = change.getAction();
-            if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
-                LOGGER.debug("Change: {}", change);
-
-                // collect list of individual property changes
-                List<History> target = new LinkedList<>();
-                collectChanges(target, change.getThingId(), change.getFeature().getId(),
-                        JsonPointer.newInstance(), change.getValue().get());
-
-                // write them all the the MongoDB
-                target.stream().forEachOrdered(h -> storeHistory(h));
-            }
-        });
-
-        // start consuming changes
+        PublicKeyAuthenticationConfiguration authenticationConfiguration;
         try {
-            client.twin().startConsumption().get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            authenticationConfiguration = PublicKeyAuthenticationConfiguration.newBuilder()
+                    .clientId(clientId)
+                    .keyStoreLocation(keystoreUri.toURL())
+                    .keyStorePassword(keystorePassword)
+                    .alias(keyAlias)
+                    .aliasPassword(keyAliasPassword)
+                    .build();
+        } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
-    }
 
-    /**
-     * Write history to the the MongoDB
-     */
-    private void storeHistory(History h) {
-        LOGGER.trace("Store history: {}", h);
+        ProviderConfiguration providerConfig = ThingsWsMessagingProviderConfigurationImpl.newBuilder()
+                .endpoint(thingsMessagingEndpointUrl)
+                .authenticationConfiguration(authenticationConfiguration)
+                .build();
 
-        // do combined update query: add newest value+timestamp to the array property and slice array if too long
-        String id = h.thingId + "/features/" + h.featureId + "/" + h.path;
-        Update update = new Update()
-                .push("values",
-                        new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
-                                .append("$slice", -HISTORY_SIZE))
-                .push("timestamps",
-                        new BasicDBObject("$each", Arrays.asList(h.timestamp))
-                                .append("$slice", -HISTORY_SIZE));
+        TwinConfiguration.OptionalTwinConfigurationStep configSettable = TwinConfiguration.newBuilder()
+                .apiToken(apiToken)
+                .defaultNamespace(defaultNamespace)
+                .providerConfiguration(providerConfig);
 
-        // update or create document for this specific property in this thing/feature
-        mongoTemplate.upsert(
-                Query.query(Criteria.where("_id").is(id)),
-                update, String.class, "history");
-    }
-
-    private static class History {
-
-        private final String thingId;
-        private final String featureId;
-        private final JsonPointer path;
-        private final JsonValue value;
-        private final LocalDateTime timestamp;
-
-        public History(String thingId, String featureId, JsonPointer path, JsonValue value, LocalDateTime timestamp) {
-            this.thingId = thingId;
-            this.featureId = featureId;
-            this.path = path;
-            this.value = value;
-            this.timestamp = timestamp;
+        if (proxyHost != null && proxyPort != null) {
+            configSettable = configSettable.proxyConfiguration(
+                    ProxyConfiguration.newBuilder()
+                            .proxyHost(proxyHost)
+                            .proxyPort(Integer.parseInt(proxyPort))
+                            .build());
         }
 
-        @Override
-        public String toString() {
-            return "History{" + "thingId=" + thingId + ", featureId=" + featureId + ", path=" + path + ", value=" +
-                    value + ", timestamp=" + timestamp + '}';
-        }
+        IntegrationClient client = ThingsClientFactory.newInstance(configSettable.build());
 
+        return client;
     }
 
 }

@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
  * following conditions are met:
@@ -33,7 +33,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,12 +46,12 @@ import java.util.concurrent.TimeoutException;
 import io.netty.util.internal.ThreadLocalRandom;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.ChangeAction;
 import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonObject;
@@ -63,182 +62,164 @@ import com.bosch.cr.model.things.Thing;
  * This example simulates vehicle movements.
  */
 
-public class VehicleSimulator
-{
+public class VehicleSimulator {
 
-   private static boolean shouldRun = true;
+    private static boolean shouldRun = true;
 
-   public static void main(String[] args) throws Exception
-   {
-      Properties props = new Properties(System.getProperties());
-      try
-      {
-         if (new File("config.properties").exists())
-         {
-            props.load(new FileReader("config.properties"));
-         }
-         else
-         {
-            InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
-            props.load(i);
-            i.close();
-         }
-         System.out.println("Config: " + props);
-      }
-      catch (IOException ex)
-      {
-         throw new RuntimeException(ex);
-      }
-
-      String clientId = props.getProperty("clientId");
-      String apiToken = props.getProperty("apiToken");
-      String defaultNamespace = props.getProperty("defaultNamespace");
-
-      URI keystoreUri = new File("CRClient.jks").toURI();
-      String keystorePassword = props.getProperty("keyStorePassword");
-      String keyAlias = props.getProperty("keyAlias");
-      String keyAliasPassword = props.getProperty("keyAliasPassword");
-
-      String proxyHost = props.getProperty("http.proxyHost");
-      String proxyPort = props.getProperty("http.proxyPort");
-
-      AuthenticationConfiguration authenticationConfiguration =
-         PublicKeyAuthenticationConfiguration.newBuilder().clientId(clientId).keyStoreLocation(keystoreUri.toURL())
-            .keyStorePassword(keystorePassword).alias(keyAlias).aliasPassword(keyAliasPassword).build();
-
-
-      IntegrationClientConfiguration.OptionalConfigSettable configSettable =
-         IntegrationClientConfiguration.newBuilder()
-                 .apiToken(apiToken)
-                 .defaultNamespace(defaultNamespace)
-                 .authenticationConfiguration(authenticationConfiguration)
-                 .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build());
-      if (proxyHost != null && proxyPort != null)
-      {
-         configSettable = configSettable.proxyConfiguration(
-            ProxyConfiguration.newBuilder().proxyHost(proxyHost).proxyPort(Integer.parseInt(proxyPort)).build());
-      }
-
-      IntegrationClient client = IntegrationClientImpl.newInstance(configSettable.build());
-
-
-      TreeSet<String> activeThings = new TreeSet<>();
-      activeThings.addAll(readActiveThings());
-
-      System.out.println("Started...");
-      System.out.println("Active things: " + activeThings);
-
-
-      client.things().registerForThingChanges("lifecycle", change -> {
-         if (change.getAction() == ChangeAction.CREATED && change.isFull())
-         {
-            activeThings.add(change.getThingId());
-            writeActiveThings(activeThings);
-            System.out.println("New thing " + change.getThingId() + " created -> active things: " + activeThings);
-         }
-      });
-
-      client.subscriptions().consume().get(10, TimeUnit.SECONDS);
-
-      Thread thread = new Thread(() -> {
-         Random random = ThreadLocalRandom.current();
-         while (shouldRun)
-         {
-            for (String thingId : activeThings)
-            {
-
-               try
-               {
-                  Thing thing = client.things().forId(thingId)
-                     .retrieve(JsonFactory.newFieldSelector("thingId", "features/geolocation/properties/geoposition"))
-                     .get(5, TimeUnit.SECONDS);
-
-                  if (!thing.getFeatures().isPresent() || !thing.getFeatures().get().getFeature("geolocation")
-                     .isPresent())
-                  {
-                     System.out.println("Thing " + thingId + " has no Feature \"geolocation\"");
-                     return;
-                  }
-
-                  JsonObject geolocation =
-                     thing.getFeatures().get().getFeature("geolocation").orElseThrow(RuntimeException::new)
-                        .getProperties().get();
-                  double latitude =
-                     geolocation.getValue(JsonFactory.newPointer("geoposition/latitude")).get().asDouble();
-                  double longitude =
-                     geolocation.getValue(JsonFactory.newPointer("geoposition/longitude")).get().asDouble();
-                  JsonObject newGeoposition =
-                     JsonFactory.newObjectBuilder().set("latitude", latitude + (random.nextDouble() - 0.5) / 250)
-                        .set("longitude", longitude + (random.nextDouble() - 0.5) / 250).build();
-
-                  client.things().forFeature(thingId, "geolocation").putProperty("geoposition", newGeoposition).get(5, TimeUnit.SECONDS);
-
-                  System.out.print(".");
-                  if (random.nextDouble() < 0.01)
-                  {
-                     System.out.println();
-                  }
-                  Thread.sleep(250);
-               }
-               catch (InterruptedException e)
-               {
-                  System.out.println("Update thread interrupted");
-                  return;
-               }
-               catch (ExecutionException | TimeoutException e)
-               {
-                  System.out.println("Retrieve thing " + thingId + " failed: " + e);
-               }
+    public static void main(String[] args) throws Exception {
+        Properties props = new Properties(System.getProperties());
+        try {
+            if (new File("config.properties").exists()) {
+                props.load(new FileReader("config.properties"));
+            } else {
+                InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
+                props.load(i);
+                i.close();
             }
-         }
-      });
+            System.out.println("Config: " + props);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
-      thread.start();
+        String apiToken = props.getProperty("apiToken");
+        String userName = props.getProperty("userName");
+        String password = props.getProperty("password");
+        String defaultNamespace = props.getProperty("defaultNamespace");
 
-      System.out.println("Press enter to terminate");
-      System.in.read();
+        String proxyHost = props.getProperty("http.proxyHost");
+        String proxyPort = props.getProperty("http.proxyPort");
 
-      System.out.println("Shutting down ...");
-      shouldRun = false;
-      Thread.sleep(5000);
-      client.destroy();
-      System.out.println("Client destroyed");
-   }
+        CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(userName)
+                        .password(password)
+                        .build();
 
-   private static Collection<String> readActiveThings()
-   {
-      Properties p = new Properties();
-      try
-      {
-         FileReader r = new FileReader("things.properties");
-         p.load(r);
-         r.close();
-         return Arrays.asList(p.getProperty("thingIds").split(","));
-      }
-      catch (FileNotFoundException ex)
-      {
-         return Collections.emptyList();
-      }
-      catch (IOException ex)
-      {
-         throw new RuntimeException(ex);
-      }
-   }
+        ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
 
-   private static void writeActiveThings(TreeSet<String> activeThings)
-   {
-      Properties p = new Properties();
-      p.setProperty("thingIds", String.join(",", activeThings));
-      try
-      {
-         FileWriter w = new FileWriter("things.properties");
-         p.store(w, "List of currently managed things by this gateway");
-         w.close();
-      }
-      catch (IOException ex)
-      {
-         throw new RuntimeException(ex);
-      }
-   }
+        TwinConfiguration.OptionalTwinConfigurationStep configurationStep = ThingsClientFactory
+                .twinConfigurationBuilder()
+                .apiToken(apiToken)
+                .defaultNamespace(defaultNamespace)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration);
+
+        if (proxyHost != null && proxyPort != null) {
+            configurationStep = configurationStep.proxyConfiguration(ProxyConfiguration.newBuilder()
+                    .proxyHost(proxyHost)
+                    .proxyPort(Integer.parseInt(proxyPort))
+                    .build());
+        }
+
+        IntegrationClient client = ThingsClientFactory.newInstance(configurationStep.build());
+
+
+        TreeSet<String> activeThings = new TreeSet<>();
+        activeThings.addAll(readActiveThings());
+
+        System.out.println("Started...");
+        System.out.println("Active things: " + activeThings);
+
+
+        client.things().registerForThingChanges("lifecycle", change -> {
+            if (change.getAction() == ChangeAction.CREATED && change.isFull()) {
+                activeThings.add(change.getThingId());
+                writeActiveThings(activeThings);
+                System.out.println("New thing " + change.getThingId() + " created -> active things: " + activeThings);
+            }
+        });
+
+        client.twin().startConsumption().get(10, TimeUnit.SECONDS);
+
+        Thread thread = new Thread(() -> {
+            Random random = ThreadLocalRandom.current();
+            while (shouldRun) {
+                for (String thingId : activeThings) {
+
+                    try {
+                        Thing thing = client.things().forId(thingId)
+                                .retrieve(JsonFactory.newFieldSelector("thingId",
+                                        "features/geolocation/properties/geoposition"))
+                                .get(5, TimeUnit.SECONDS);
+
+                        if (!thing.getFeatures().isPresent() || !thing.getFeatures().get().getFeature("geolocation")
+                                .isPresent()) {
+                            System.out.println("Thing " + thingId + " has no Feature \"geolocation\"");
+                            return;
+                        }
+
+                        JsonObject geolocation =
+                                thing.getFeatures().get().getFeature("geolocation").orElseThrow(RuntimeException::new)
+                                        .getProperties().get();
+                        double latitude =
+                                geolocation.getValue(JsonFactory.newPointer("geoposition/latitude")).get().asDouble();
+                        double longitude =
+                                geolocation.getValue(JsonFactory.newPointer("geoposition/longitude")).get().asDouble();
+                        JsonObject newGeoposition =
+                                JsonFactory.newObjectBuilder()
+                                        .set("latitude", latitude + (random.nextDouble() - 0.5) / 250)
+                                        .set("longitude", longitude + (random.nextDouble() - 0.5) / 250)
+                                        .build();
+
+                        client.things()
+                                .forFeature(thingId, "geolocation")
+                                .putProperty("geoposition", newGeoposition)
+                                .get(5, TimeUnit.SECONDS);
+
+                        System.out.print(".");
+                        if (random.nextDouble() < 0.01) {
+                            System.out.println();
+                        }
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        System.out.println("Update thread interrupted");
+                        return;
+                    } catch (ExecutionException | TimeoutException e) {
+                        System.out.println("Retrieve thing " + thingId + " failed: " + e);
+                    }
+                }
+            }
+        });
+
+        thread.start();
+
+        System.out.println("Press enter to terminate");
+        System.in.read();
+
+        System.out.println("Shutting down ...");
+        shouldRun = false;
+        Thread.sleep(5000);
+        client.destroy();
+        System.out.println("Client destroyed");
+    }
+
+    private static Collection<String> readActiveThings() {
+        Properties p = new Properties();
+        try {
+            FileReader r = new FileReader("things.properties");
+            p.load(r);
+            r.close();
+            return Arrays.asList(p.getProperty("thingIds").split(","));
+        } catch (FileNotFoundException ex) {
+            return Collections.emptyList();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static void writeActiveThings(TreeSet<String> activeThings) {
+        Properties p = new Properties();
+        p.setProperty("thingIds", String.join(",", activeThings));
+        try {
+            FileWriter w = new FileWriter("things.properties");
+            p.store(w, "List of currently managed things by this gateway");
+            w.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 }

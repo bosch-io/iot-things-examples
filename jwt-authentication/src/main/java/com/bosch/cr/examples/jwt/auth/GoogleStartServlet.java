@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -44,63 +44,57 @@ import com.bosch.cr.examples.jwt.ConfigurationProperty;
  * Servlet to start the google oauth flow. Redirects requests to /oauth2start/google to google.
  */
 @WebServlet("/oauth2start/google")
-public class GoogleStartServlet extends HttpServlet
-{
-   private static final long serialVersionUID = 940262123430910542L;
+public class GoogleStartServlet extends HttpServlet {
 
-   /**
-    * The base URL for oauth authorization requests.
-    */
-   private static final String GOOGLE_OAUTH2_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
+    private static final long serialVersionUID = 940262123430910542L;
 
-   /**
-    * The scope to include in JSON Web Tokens.
-    */
-   private static final String OPENID_SCOPE = "openid";
+    /**
+     * The base URL for oauth authorization requests.
+     */
+    private static final String GOOGLE_OAUTH2_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 
-   private String authorizationUri;
+    /**
+     * The scope to include in JSON Web Tokens.
+     */
+    private static final String OPENID_SCOPE = "openid";
 
-   @Override
-   public void init() throws ServletException
-   {
-      super.init();
+    private String authorizationUri;
 
-      final ConfigurationProperties config = ConfigurationProperties.getInstance();
-      final String clientId = config.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_ID);
-      final String redirectUrl = config.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_REDIRECT_URL);
+    @Override
+    public void init() throws ServletException {
+        super.init();
 
-      authorizationUri = buildAuthorizationUri(clientId, redirectUrl);
-   }
+        final ConfigurationProperties config = ConfigurationProperties.getInstance();
+        final String clientId = config.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_ID);
+        final String redirectUrl = config.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_REDIRECT_URL);
 
-   @Override
-   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
-   {
-      resp.sendRedirect(authorizationUri);
-   }
+        authorizationUri = buildAuthorizationUri(clientId, redirectUrl);
+    }
 
-   /**
-    * Builds the URI for oauth authorization requests for the given {@code clientId} and {@code redirectUrl}.
-    * 
-    * @return the URI.
-    */
-   private String buildAuthorizationUri(final String clientId, final String redirectUrl)
-   {
-      try
-      {
-         final OAuthClientRequest authorizationRequest =
-            OAuthClientRequest.authorizationLocation(GOOGLE_OAUTH2_AUTH_URL) //
-               .setClientId(clientId) //
-               .setResponseType(OAuth.OAUTH_CODE) //
-               .setRedirectURI(redirectUrl) //
-               .setScope(OPENID_SCOPE) //
-               .buildQueryMessage();
+    @Override
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        resp.sendRedirect(authorizationUri);
+    }
 
-         return authorizationRequest.getLocationUri();
-      }
-      catch (final OAuthSystemException e)
-      {
-         throw new IllegalStateException("Building authorization URI failed", e);
-      }
-   }
+    /**
+     * Builds the URI for oauth authorization requests for the given {@code clientId} and {@code redirectUrl}.
+     *
+     * @return the URI.
+     */
+    private String buildAuthorizationUri(final String clientId, final String redirectUrl) {
+        try {
+            final OAuthClientRequest authorizationRequest =
+                    OAuthClientRequest.authorizationLocation(GOOGLE_OAUTH2_AUTH_URL) //
+                            .setClientId(clientId) //
+                            .setResponseType(OAuth.OAUTH_CODE) //
+                            .setRedirectURI(redirectUrl) //
+                            .setScope(OPENID_SCOPE) //
+                            .buildQueryMessage();
+
+            return authorizationRequest.getLocationUri();
+        } catch (final OAuthSystemException e) {
+            throw new IllegalStateException("Building authorization URI failed", e);
+        }
+    }
 }

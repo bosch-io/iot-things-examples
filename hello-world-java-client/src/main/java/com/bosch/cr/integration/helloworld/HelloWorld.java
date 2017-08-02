@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -35,13 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.IntegrationClientImpl;
-import com.bosch.cr.integration.client.configuration.AuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.IntegrationClientConfiguration;
+import com.bosch.cr.integration.client.ThingsClientFactory;
+import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.cr.integration.client.configuration.TwinConfiguration;
+import com.bosch.cr.integration.client.messaging.HubMessagingProviderConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
+import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.FeatureHandle;
-import com.bosch.cr.integration.things.ThingIntegration;
+import com.bosch.cr.integration.twin.Twin;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.model.acl.AclEntry;
 import com.bosch.cr.model.acl.Permission;
@@ -52,231 +54,228 @@ import com.bosch.cr.model.things.Thing;
 /**
  * This example shows how to create and use the Java Integration Client for managing your first Hello World Thing.
  */
-public class HelloWorld
-{
+public class HelloWorld {
 
-   // Insert your Solution ID here
-   private static final String SOLUTION_ID = "<your-solution-id>";
-   private static final String CLIENT_ID = SOLUTION_ID + ":connector";
-   private static final String SOLUTION_API_TOKEN = "<your-solution-api-token>";
-   private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
-   private static final String USER_ID = "<UUID-of-your-user>";
+    // Insert your Solution ID here
+    private static final String SOLUTION_ID = "<your-solution-id>";
+    private static final String CLIENT_ID = SOLUTION_ID + ":connector";
+    private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
+    private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
+    private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
+    private static final String USER_ID = "<UUID-of-your-user>";
 
-   // Insert your keystore passwords here
-   private static final URL KEYSTORE_LOCATION = HelloWorld.class.getResource("/CRClient.jks");
-   private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
-   private static final String ALIAS = "CR";
-   private static final String ALIAS_PASSWORD = "<your-alias-password>";
+    // Authentication credentials for Thing Websocket channel
+    private static final String USER_NAME = "<your-user-name";
+    private static final String PASSWORD = "<your-password>";
 
-   // optionally configure a proxy server
-   // public static final String PROXY_HOST = "proxy.server.com";
-   // public static final int PROXY_PORT = 8080;
+    // Insert your keystore passwords here
+    private static final URL KEYSTORE_LOCATION = HelloWorld.class.getResource("/CRClient.jks");
+    private static final String KEYSTORE_PASSWORD = "<your-keystore-password>";
+    private static final String ALIAS = "CR";
+    private static final String ALIAS_PASSWORD = "<your-alias-password>";
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorld.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorld.class);
 
-   private static final int TIMEOUT = 5;
-   private static final String NAMESPACE = "com.bosch.example:";
-   private static final String THING_ID = NAMESPACE + UUID.randomUUID().toString();
-   private static final String COUNTER = "counter";
-   private static final String COUNTER_VALUE = "value";
+    private static final int TIMEOUT = 5;
+    private static final String NAMESPACE = "com.bosch.example:";
+    private static final String THING_ID = NAMESPACE + UUID.randomUUID().toString();
+    private static final String COUNTER = "counter";
+    private static final String COUNTER_VALUE = "value";
 
-   final IntegrationClient integrationClient;
-   final ThingIntegration thingIntegration;
+    // optionally configure a proxy server
+    // public static final String PROXY_HOST = "proxy.server.com";
+    // public static final int PROXY_PORT = 8080;
 
-   public static void main(final String... args)
-   {
-      new HelloWorld().execute();
-   }
+    final IntegrationClient integrationClient;
+    final Twin twin;
 
-   /**
-    * Create and update a thing with the java client.
-    */
-   public void execute()
-   {
-      try
-      {
-         // Create a Thing with a counter Feature and get the FeatureHandle
-         final FeatureHandle counter = createThingWithCounter();
+    /**
+     * Client instantiation
+     */
+    public HelloWorld() {
+        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
+        // via its websocket channel
+        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
+                CredentialsAuthenticationConfiguration
+                        .newBuilder()
+                        .username(USER_NAME)
+                        .password(PASSWORD)
+                        .build();
 
-         // Update the ACL with your User ID to see your thing in the Demo Web UI
-         updateACL();
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration)
+                .build();
 
-         // Log full Thing info (as JSON)
-         LOGGER.info("Thing looks like this: {}", getThingById(THING_ID).toJson());
+        // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
+        // over IoT Hub
+        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
+                PublicKeyAuthenticationConfiguration
+                        .newBuilder()
+                        .clientId(CLIENT_ID)
+                        .keyStoreLocation(KEYSTORE_LOCATION)
+                        .keyStorePassword(KEYSTORE_PASSWORD)
+                        .alias(ALIAS)
+                        .aliasPassword(ALIAS_PASSWORD)
+                        .build();
 
-         // Loop to update the attributes of the Thing
-         for (int i = 0; i <= 100; i++)
-         {
-            updateCounter(counter, i);
-            Thread.sleep(2000);
-         }
+        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
+                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
+                .build();
 
-         // This step must always be concluded to terminate the Java client.
-         terminate();
-      }
-      catch (InterruptedException | ExecutionException | TimeoutException e)
-      {
-         LOGGER.error(e.getMessage());
-      }
-   }
+        // Optionally configure a proxy server
+        /*final ProxyConfiguration proxyConfiguration = ProxyConfiguration.newBuilder()
+                .proxyHost(PROXY_HOST)
+                .proxyPort(PROXY_PORT)
+                .build();*/
 
-   /**
-    * Client instantiation
-    */
-   public HelloWorld()
-   {
-      // Build an authentication configuration
-      final AuthenticationConfiguration authenticationConfiguration =
-         PublicKeyAuthenticationConfiguration.newBuilder().clientId(CLIENT_ID) //
-            .keyStoreLocation(KEYSTORE_LOCATION) //
-            .keyStorePassword(KEYSTORE_PASSWORD) //
-            .alias(ALIAS) //
-            .aliasPassword(ALIAS_PASSWORD) //
-            .build();
 
-      // Optionally configure a proxy server
-      // final ProxyConfiguration proxy = ProxyConfiguration.newBuilder() //
-      // .proxyHost(PROXY_HOST) //
-      // .proxyPort(PROXY_PORT) //
-      // .build();
+        final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
+                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                //.proxyConfiguration(proxyConfiguration)
+                .build();
 
-      /**
-       * Provide required configuration (authentication configuration), optional proxy configuration can be
-       * added when needed
-       */
-      final IntegrationClientConfiguration integrationClientConfiguration = IntegrationClientConfiguration.newBuilder() //
-         .apiToken(SOLUTION_API_TOKEN) //
-         .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE) //
-         .authenticationConfiguration(authenticationConfiguration)
-         .providerConfiguration(MessagingProviders.thingsWebsocketProviderBuilder().build()) //
-         // .proxyConfiguration(proxy) //
-         .build();
+        LOGGER.info("Creating integration client ...");
 
-      LOGGER.info("Creating Things Client for ClientID: {}", CLIENT_ID);
+        // Create a new integration client object to start interacting with IoT Things service
+        integrationClient = ThingsClientFactory.newInstance(twinConfiguration);
 
-      // Create a new integration client object to start interacting service
-      integrationClient = IntegrationClientImpl.newInstance(integrationClientConfiguration);
+        // Create a new twin client for managing things
+        twin = integrationClient.twin();
+    }
 
-      // Create a new thing integration object for working with things
-      thingIntegration = integrationClient.things();
-   }
+    public static void main(final String... args) {
+        new HelloWorld().execute();
+    }
 
-   /**
-    * Create a {@code Thing} with the counter {@code Feature}. Blocks until Thing has been created.
-    *
-    * @return a handle for the counter.
-    */
-   public FeatureHandle createThingWithCounter()
-   {
-      final Thing thing = Thing.newBuilder() //
-         .setId(THING_ID) //
-         .setFeature(Feature.newBuilder() //
-            .properties(JsonObject.newBuilder() //
-               .set(COUNTER_VALUE, 0) //
-               .build()) //
-            .withId(COUNTER) //
-            .build()) //
-         .build();
+    /**
+     * Create and update a thing with the java client.
+     */
+    public void execute() {
+        try {
+            // Create a Thing with a counter Feature and get the FeatureHandle
+            final FeatureHandle counter = createThingWithCounter();
 
-      FeatureHandle featureHandle = null;
+            // Update the ACL with your User ID to see your thing in the Demo Web UI
+            updateACL();
 
-      try
-      {
-         featureHandle = thingIntegration.create(thing) //
-            .thenApply(created -> thingIntegration.forFeature(THING_ID, COUNTER)) //
-            .get(TIMEOUT, TimeUnit.SECONDS);
+            // Log full Thing info (as JSON)
+            LOGGER.info("Thing looks like this: {}", getThingById(THING_ID).toJson());
 
-         LOGGER.info("Thing with ID '{}' created.", THING_ID);
-      }
-      catch (InterruptedException | ExecutionException | TimeoutException e)
-      {
-         LOGGER.error(e.getMessage());
-      }
-
-      return featureHandle;
-   }
-
-   /**
-    * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
-    */
-   public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException
-   {
-      return thingIntegration.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
-   }
-
-   /**
-    * Delete a Thing.
-    */
-   public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException
-   {
-      thingIntegration.delete(thingId) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID deleted: {}", thingId);
+            // Loop to update the attributes of the Thing
+            for (int i = 0; i <= 100; i++) {
+                updateCounter(counter, i);
+                Thread.sleep(2000);
             }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         }) //
-         .get(TIMEOUT, TimeUnit.SECONDS);
-   }
 
-   /**
-    * Update the ACL of a specified Thing. Blocks until ACL has been updated.
-    */
-   public void updateACL() throws InterruptedException, ExecutionException, TimeoutException
-   {
-      thingIntegration.forId(THING_ID) //
-         .retrieve() //
-         .thenCompose(thing -> {
-            final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(USER_ID), //
-               Permission.READ, //
-               Permission.WRITE, //
-               Permission.ADMINISTRATE);
+            // This step must always be concluded to terminate the Java client.
+            terminate();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOGGER.error(e.getMessage());
+        }
+    }
 
-            final Thing updated = thing.setAclEntry(aclEntry);
-            return thingIntegration.update(updated);
-         }) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID '{}' updated ACL entry!", THING_ID);
-            }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         }).get(TIMEOUT, TimeUnit.SECONDS);
-   }
+    /**
+     * Create a {@code Thing} with the counter {@code Feature}. Blocks until Thing has been created.
+     *
+     * @return a handle for the counter.
+     */
+    public FeatureHandle createThingWithCounter() {
+        final Thing thing = Thing.newBuilder() //
+                .setId(THING_ID) //
+                .setFeature(Feature.newBuilder() //
+                        .properties(JsonObject.newBuilder() //
+                                .set(COUNTER_VALUE, 0) //
+                                .build()) //
+                        .withId(COUNTER) //
+                        .build()) //
+                .build();
 
-   /**
-    * Update {@code counter} with {@code value}. Method does not block but returns as soon as the update has been
-    * triggered.
-    */
-   public void updateCounter(final FeatureHandle counter, final int value)
-   {
-      counter.putProperty(COUNTER_VALUE, value) //
-         .whenComplete((aVoid, throwable) -> {
-            if (null == throwable)
-            {
-               LOGGER.info("Thing with ID '{}' updated with Counter={}!", counter.getThingId(), value);
-            }
-            else
-            {
-               LOGGER.error(throwable.getMessage());
-            }
-         });
-   }
+        FeatureHandle featureHandle = null;
 
-   /**
-    * Destroys the client and waits for its graceful shutdown.
-    */
-   public void terminate()
-   {
-      // Gracefully shutdown the integrationClient
-      integrationClient.destroy();
-   }
+        try {
+            featureHandle = twin.create(thing) //
+                    .thenApply(created -> twin.forFeature(THING_ID, COUNTER)) //
+                    .get(TIMEOUT, TimeUnit.SECONDS);
+
+            LOGGER.info("Thing with ID '{}' created.", THING_ID);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOGGER.error(e.getMessage());
+        }
+
+        return featureHandle;
+    }
+
+    /**
+     * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
+     */
+    public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
+        return twin.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Delete a Thing.
+     */
+    public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
+        twin.delete(thingId) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID deleted: {}", thingId);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                }) //
+                .get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update the ACL of a specified Thing. Blocks until ACL has been updated.
+     */
+    public void updateACL() throws InterruptedException, ExecutionException, TimeoutException {
+        twin.forId(THING_ID) //
+                .retrieve() //
+                .thenCompose(thing -> {
+                    final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(USER_ID), //
+                            Permission.READ, //
+                            Permission.WRITE, //
+                            Permission.ADMINISTRATE);
+
+                    final Thing updated = thing.setAclEntry(aclEntry);
+                    return twin.update(updated);
+                }) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID '{}' updated ACL entry!", THING_ID);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                }).get(TIMEOUT, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update {@code counter} with {@code value}. Method does not block but returns as soon as the update has been
+     * triggered.
+     */
+    public void updateCounter(final FeatureHandle counter, final int value) {
+        counter.putProperty(COUNTER_VALUE, value) //
+                .whenComplete((aVoid, throwable) -> {
+                    if (null == throwable) {
+                        LOGGER.info("Thing with ID '{}' updated with Counter={}!", counter.getThingId(), value);
+                    } else {
+                        LOGGER.error(throwable.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Destroys the client and waits for its graceful shutdown.
+     */
+    public void terminate() {
+        // Gracefully shutdown the integrationClient
+        integrationClient.destroy();
+    }
 
 }

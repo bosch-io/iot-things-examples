@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -66,141 +66,128 @@ import com.bosch.cr.examples.jwt.auth.ImAuthenticationServlet;
  * ProxyServlet to forward all requests to target service required as replacement for for cross domain requests.
  */
 @WebServlet("/api/*")
-public class CustomProxyServlet extends ProxyServlet
-{
-   private static final long serialVersionUID = -1029323114335880228L;
+public class CustomProxyServlet extends ProxyServlet {
 
-   private static final String X_CR_API_TOKEN_HTTP_HEADER = "x-cr-api-token";
+    private static final long serialVersionUID = -1029323114335880228L;
 
-   private CloseableHttpClient httpClient;
-   private ConfigurationProperties configurationProperties;
+    private static final String X_CR_API_TOKEN_HTTP_HEADER = "x-cr-api-token";
 
-   @Override
-   public void init(ServletConfig config) throws ServletException
-   {
-      configurationProperties = ConfigurationProperties.getInstance();
-      System.out.print(configurationProperties);
-      super.init(config);
-   }
+    private CloseableHttpClient httpClient;
+    private ConfigurationProperties configurationProperties;
 
-   @Override
-   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
-   {
-      final Optional<Cookie[]> cookies = Optional.ofNullable(req.getCookies());
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        configurationProperties = ConfigurationProperties.getInstance();
+        System.out.print(configurationProperties);
+        super.init(config);
+    }
 
-      if (cookies.isPresent())
-      {
-         final Optional<Cookie> authorizationCookie = Stream.of(cookies.get()) //
-            .filter(CookieUtil::isJwtAuthenticationCookie) //
-            .findFirst();
+    @Override
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        final Optional<Cookie[]> cookies = Optional.ofNullable(req.getCookies());
 
-         if (authorizationCookie.isPresent())
-         {
-            super.service(req, resp);
-            return;
-         }
-      }
+        if (cookies.isPresent()) {
+            final Optional<Cookie> authorizationCookie = Stream.of(cookies.get()) //
+                    .filter(CookieUtil::isJwtAuthenticationCookie) //
+                    .findFirst();
 
-      resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
-   }
-
-   /**
-    * Adds the {@code x-cr-api-token} and {@code Authorization} header to the {@code proxyRequest}. Authorization is set
-    * only if an authorization cookie containing a JWT is present on the {@code request}. The JWT cookie is set on login
-    * and send back to the browser.
-    * 
-    * @see ImAuthenticationServlet
-    * @see GoogleCallbackServlet
-    * @param request the request.
-    * @param proxyRequest the proxy request.
-    */
-   @Override
-   protected void copyRequestHeaders(final HttpServletRequest request, final HttpRequest proxyRequest)
-   {
-      super.copyRequestHeaders(request, proxyRequest);
-
-      final Optional<Cookie> authorizationCookie = Stream.of(request.getCookies()) //
-         .filter(CookieUtil::isJwtAuthenticationCookie) //
-         .findFirst();
-
-      if (authorizationCookie.isPresent())
-      {
-         // add authorization if cookie is present
-         proxyRequest.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + authorizationCookie.get().getValue());
-      }
-
-      // add api token
-      proxyRequest.addHeader(X_CR_API_TOKEN_HTTP_HEADER,
-         configurationProperties.getPropertyAsString(ConfigurationProperty.THINGS_API_TOKEN));
-
-      System.out.println("Proxying request with Headers:");
-      System.out.println(proxyRequest.getFirstHeader(HttpHeaders.AUTHORIZATION));
-   }
-
-   @Override
-   protected HttpClient createHttpClient(final HttpParams hcParams)
-   {
-      // use custom httpClient with http-proxy support
-      return getHttpClient();
-   }
-
-   @Override
-   protected String getConfigParam(final String key)
-   {
-      switch (key)
-      {
-         case "targetUri":
-            return configurationProperties.getPropertyAsString(ConfigurationProperty.THINGS_URL) + "/api";
-         case "log":
-            return "true";
-      }
-      return super.getConfigParam(key);
-   }
-
-   private synchronized CloseableHttpClient getHttpClient()
-   {
-      if (httpClient == null)
-      {
-         try
-         {
-            final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
-            // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
-            final SSLContext sslContext =
-               new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
-            httpClientBuilder.setSSLContext(sslContext);
-
-            // #### ONLY FOR TEST: Do NOT verify hostname
-            final SSLConnectionSocketFactory sslConnectionSocketFactory =
-               new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-
-            final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-               .<ConnectionSocketFactory> create().register("http", PlainConnectionSocketFactory.getSocketFactory())
-               .register("https", sslConnectionSocketFactory).build();
-            final PoolingHttpClientConnectionManager httpClientConnectionManager =
-               new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            httpClientBuilder.setConnectionManager(httpClientConnectionManager);
-
-            final boolean proxyEnabled =
-               configurationProperties.getPropertyAsBoolean(ConfigurationProperty.PROXY_ENABLED);
-            if (proxyEnabled)
-            {
-               final String proxyHost = configurationProperties.getPropertyAsString(ConfigurationProperty.PROXY_HOST);
-               final int proxyPort = configurationProperties.getPropertyAsInt(ConfigurationProperty.PROXY_PORT);
-               final HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-               httpClientBuilder.setProxy(proxy);
+            if (authorizationCookie.isPresent()) {
+                super.service(req, resp);
+                return;
             }
+        }
 
-            httpClient = httpClientBuilder.build();
-         }
-         catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex)
-         {
-            throw new RuntimeException(ex);
-         }
-      }
+        resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    }
 
-      return httpClient;
-   }
+    /**
+     * Adds the {@code x-cr-api-token} and {@code Authorization} header to the {@code proxyRequest}. Authorization is
+     * set only if an authorization cookie containing a JWT is present on the {@code request}. The JWT cookie is set on
+     * login and send back to the browser.
+     *
+     * @param request the request.
+     * @param proxyRequest the proxy request.
+     * @see ImAuthenticationServlet
+     * @see GoogleCallbackServlet
+     */
+    @Override
+    protected void copyRequestHeaders(final HttpServletRequest request, final HttpRequest proxyRequest) {
+        super.copyRequestHeaders(request, proxyRequest);
+
+        final Optional<Cookie> authorizationCookie = Stream.of(request.getCookies()) //
+                .filter(CookieUtil::isJwtAuthenticationCookie) //
+                .findFirst();
+
+        if (authorizationCookie.isPresent()) {
+            // add authorization if cookie is present
+            proxyRequest.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + authorizationCookie.get().getValue());
+        }
+
+        // add api token
+        proxyRequest.addHeader(X_CR_API_TOKEN_HTTP_HEADER,
+                configurationProperties.getPropertyAsString(ConfigurationProperty.THINGS_API_TOKEN));
+
+        System.out.println("Proxying request with Headers:");
+        System.out.println(proxyRequest.getFirstHeader(HttpHeaders.AUTHORIZATION));
+    }
+
+    @Override
+    protected HttpClient createHttpClient(final HttpParams hcParams) {
+        // use custom httpClient with http-proxy support
+        return getHttpClient();
+    }
+
+    @Override
+    protected String getConfigParam(final String key) {
+        switch (key) {
+            case "targetUri":
+                return configurationProperties.getPropertyAsString(ConfigurationProperty.THINGS_URL) + "/api";
+            case "log":
+                return "true";
+        }
+        return super.getConfigParam(key);
+    }
+
+    private synchronized CloseableHttpClient getHttpClient() {
+        if (httpClient == null) {
+            try {
+                final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+
+                // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
+                final SSLContext sslContext =
+                        new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
+                httpClientBuilder.setSSLContext(sslContext);
+
+                // #### ONLY FOR TEST: Do NOT verify hostname
+                final SSLConnectionSocketFactory sslConnectionSocketFactory =
+                        new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+
+                final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                        .<ConnectionSocketFactory>create().register("http",
+                                PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", sslConnectionSocketFactory).build();
+                final PoolingHttpClientConnectionManager httpClientConnectionManager =
+                        new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                httpClientBuilder.setConnectionManager(httpClientConnectionManager);
+
+                final boolean proxyEnabled =
+                        configurationProperties.getPropertyAsBoolean(ConfigurationProperty.PROXY_ENABLED);
+                if (proxyEnabled) {
+                    final String proxyHost =
+                            configurationProperties.getPropertyAsString(ConfigurationProperty.PROXY_HOST);
+                    final int proxyPort = configurationProperties.getPropertyAsInt(ConfigurationProperty.PROXY_PORT);
+                    final HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+                    httpClientBuilder.setProxy(proxy);
+                }
+
+                httpClient = httpClientBuilder.build();
+            } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        return httpClient;
+    }
 
 }

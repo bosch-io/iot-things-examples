@@ -4,7 +4,7 @@ This example shows how to create a simple user interface to authenticate with JW
 
 # Create a Solution
 
-<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:cr_02_booking-cr-service.txt">Book the Bosch IoT Things cloud service</a>
+<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking">Book the Bosch IoT Things cloud service</a>
 
 
 # Configure your API Token and other settings

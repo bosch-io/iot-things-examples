@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -32,51 +32,47 @@ import javax.servlet.http.Cookie;
 /**
  * Helper class for creating a {@link Cookie}.
  */
-public final class CookieUtil
-{
+public final class CookieUtil {
 
-   /**
-    * The name of the JWT authentication cookie.
-    */
-   private static final String JWT_AUTHENTICATION_TOKEN_COOKIE_NAME = "jwt-authentication-token";
+    /**
+     * The name of the JWT authentication cookie.
+     */
+    private static final String JWT_AUTHENTICATION_TOKEN_COOKIE_NAME = "jwt-authentication-token";
 
-   private CookieUtil()
-   {
-      // no-op
-   }
+    private CookieUtil() {
+        // no-op
+    }
 
-   /**
-    * Returns a {@code Cookie} for the given {@code name}, {@code value}, {@code secure} and {@code maxAge}.
-    * 
-    * @param value the value of the cookie.
-    * @param secure whether or not the cookie is secure.
-    * @param maxAge the expiry of the cookie.
-    * @return the cookie.
-    * @throws NullPointerException if any argument is {@code null}.
-    */
-   public static Cookie getJwtAuthenticationCookie(final String value, final boolean secure, final int maxAge)
-   {
-      requireNonNull(value);
-      requireNonNull(secure);
-      requireNonNull(maxAge);
+    /**
+     * Returns a {@code Cookie} for the given {@code name}, {@code value}, {@code secure} and {@code maxAge}.
+     *
+     * @param value the value of the cookie.
+     * @param secure whether or not the cookie is secure.
+     * @param maxAge the expiry of the cookie.
+     * @return the cookie.
+     * @throws NullPointerException if any argument is {@code null}.
+     */
+    public static Cookie getJwtAuthenticationCookie(final String value, final boolean secure, final int maxAge) {
+        requireNonNull(value);
+        requireNonNull(secure);
+        requireNonNull(maxAge);
 
-      final Cookie cookie = new Cookie(JWT_AUTHENTICATION_TOKEN_COOKIE_NAME, value);
-      cookie.setPath("/");
-      cookie.setHttpOnly(true);
-      cookie.setSecure(secure);
-      cookie.setMaxAge(maxAge);
-      return cookie;
-   }
+        final Cookie cookie = new Cookie(JWT_AUTHENTICATION_TOKEN_COOKIE_NAME, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(secure);
+        cookie.setMaxAge(maxAge);
+        return cookie;
+    }
 
-   /**
-    * Returns whether or not the given {@code cookie} is an JWT authentication cookie.
-    * 
-    * @param cookie the cookie.
-    * @return {@code true} if the cookie is an JWT authentication cookie, else {@code false}.
-    */
-   public static boolean isJwtAuthenticationCookie(final Cookie cookie)
-   {
-      return cookie.getName().equals(JWT_AUTHENTICATION_TOKEN_COOKIE_NAME);
-   }
+    /**
+     * Returns whether or not the given {@code cookie} is an JWT authentication cookie.
+     *
+     * @param cookie the cookie.
+     * @return {@code true} if the cookie is an JWT authentication cookie, else {@code false}.
+     */
+    public static boolean isJwtAuthenticationCookie(final Cookie cookie) {
+        return cookie.getName().equals(JWT_AUTHENTICATION_TOKEN_COOKIE_NAME);
+    }
 
 }

@@ -1,0 +1,2533 @@
+{
+	"variables": [],
+	"info": {
+		"name": "IoT-Things",
+		"_postman_id": "389d0814-2184-454f-b7c1-7243c59f0deb",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "messages",
+			"description": "",
+			"item": [
+				{
+					"name": "Send a message TO a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/inbox/messages/randomMessageSubject",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "some random body"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Send a message TO a Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/someFeature/inbox/messages/someMessageSubject",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"some\":\"json\"}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Send a message FROM a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/outbox/messages/randomMessageSubject",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "some random body"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Send a message FROM a Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/someFeature/outbox/messages/someMessageSubject",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"some\":\"json\"}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Claim a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/inbox/claim",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/plain",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "you shall be mine!"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Claim a Thing with timeout",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/inbox/claim?timeout=10",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things",
+								"{{namespace}}:CRaaSCar",
+								"inbox",
+								"claim"
+							],
+							"query": [
+								{
+									"key": "timeout",
+									"value": "10"
+								}
+							],
+							"variable": []
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/plain",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "you shall be mine!"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "policies",
+			"description": "",
+			"item": [
+				{
+					"name": "Create or update a Policy",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Modify the entries of a specific Policy",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"ALL\": {\r\n\t  \"subjects\": {\r\n\t    \"iot-permissions:test\": {\r\n\t      \"type\": \"iot-permissions-sid\"\r\n\t    }\r\n\t  },\r\n\t  \"resources\": {\r\n\t    \"policy:/\": {\r\n\t      \"grant\": [\r\n\t        \"READ\",\r\n\t        \"WRITE\"\r\n\t      ],\r\n\t      \"revoke\": []\r\n\t    },\r\n\t    \"thing:/\": {\r\n\t      \"grant\": [\r\n\t        \"READ\",\r\n\t        \"WRITE\"\r\n\t      ],\r\n\t      \"revoke\": []\r\n\t    },\r\n\t    \"message:/\": {\r\n\t      \"grant\": [\r\n\t        \"READ\",\r\n\t        \"WRITE\"\r\n\t      ],\r\n\t      \"revoke\": []\r\n\t    }\r\n\t  }\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create or modify one Policy entry of a Policy for a specific label",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"subjects\": {\r\n    \"iot-permissions:restricted\": {\r\n      \"type\": \"iot-permissions-sid\"\r\n    }\r\n  },\r\n  \"resources\": {\r\n    \"policy:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes/VIN\": {\r\n      \"grant\": [],\r\n      \"revoke\": [\r\n      \t\"WRITE\"\r\n      ]\r\n    },\r\n    \"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n      \"grant\": [\r\n        \"WRITE\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"message:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create or modify all Subjects of a Policy Entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"iot-permissions:restricted\": {\r\n\t  \"type\": \"iot-permissions-sid\"\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create or modify one specific Subject of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects/iot-permissions:restricted",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"type\": \"iot-permissions-sid\"\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create or modify all Resources of a Policy Entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"policy:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes/VIN\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": [\r\n\t  \t\"WRITE\"\r\n\t  ]\r\n\t},\r\n\t\"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n\t  \"grant\": [\r\n\t    \"WRITE\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"message:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create or modify one specific Resource of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources/thing:/attributes",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"grant\": [\r\n\t\t\"READ\"\r\n\t],\r\n\t\"revoke\": []\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a specific Policy",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve the entries of a specific Policy",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve one Policy entry of a Policy for a specific label",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"subjects\": {\r\n    \"iot-permissions:restricted\": {\r\n      \"type\": \"iot-permissions-sid\"\r\n    }\r\n  },\r\n  \"resources\": {\r\n    \"policy:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes/VIN\": {\r\n      \"grant\": [],\r\n      \"revoke\": [\r\n      \t\"WRITE\"\r\n      ]\r\n    },\r\n    \"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n      \"grant\": [\r\n        \"WRITE\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"message:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Subjects of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"iot-permissions:restricted\": {\r\n\t  \"type\": \"iot-permissions-sid\"\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve one specific Subject of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects/iot-permissions:restricted",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"type\": \"iot-permissions-sid\"\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Resources of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"policy:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes/VIN\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": [\r\n\t  \t\"WRITE\"\r\n\t  ]\r\n\t},\r\n\t\"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n\t  \"grant\": [\r\n\t    \"WRITE\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"message:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve one specific Resource of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources/thing:/attributes",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"grant\": [\r\n\t\t\"READ\"\r\n\t],\r\n\t\"revoke\": []\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a specific Policy",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete one Policy entry of a Policy for a specific label",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete one specific Subject of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects/iot-permissions:restricted",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete one Resource of a Policy entry",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources/thing:/attributes",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "relations",
+			"description": "",
+			"item": [
+				{
+					"name": "Create: A Relation ",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"source\": \"<source>\",\r\n  \"target\": \"<target>\",\r\n  \"attributes\": {}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Relation with complex attributes",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"source\": \"<source>\",\r\n  \"target\": \"<target>\",\r\n  \"attributes\": {\r\n    \"simpleString\": \"simple\",\r\n    \"simpleInt\": 42,\r\n    \"nested\": {\r\n      \"nestedString\": \"nested\",\r\n      \"nestedBoolean\": false,\r\n      \"subnested\" : {\r\n        \"list\": [\r\n          1,2,3,5,8\r\n        ],\r\n        \"some\": \"value\"\r\n      }\r\n    },\r\n    \"toplist\": [\r\n      \"IOT\",\"BUM\",\"FOO\"\r\n    ],\r\n    \"toplistWithObjects\": [\r\n      {\r\n        \"thevalue\": 1,\r\n        \"nested\": {\r\n          \"bum\": \"lux\",\r\n          \"foo\": 3\r\n        }\r\n      },\r\n      {\r\n        \"thevalue\": 2,\r\n        \"nested\": {\r\n          \"bum\": \"ta\",\r\n          \"foo\": 6\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Relation with given ID",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"source\": \"<source>\",\r\n  \"target\": \"<target>\",\r\n  \"attributes\": {\r\n      parent:{\r\n          child:{\r\n              attribute:\"cool\"\r\n          }\r\n      }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A new Attribute at an existing Relation",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<new-attribute>",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"<the new Attribute>\"\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Relation ",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"source\":\"<source>\",\n  \"target\":\"<target>\",\n  \"attributes\": {\n    \"foo\":\"bar\",\n    \"baz\": 42\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Attribute at an existing Relation",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"<the new value for the Attribute>\""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: One Relation ",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: Attribute of a Relation",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes/<attribute>",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: One Relation",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: One Relation (relationId,source,target)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=relationId,source,target",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"relations",
+								"{{namespace}}:MyRelation"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "relationId,source,target"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Queries a Relation with the \"relationId\",\"source\" and \"target\" field selector."
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A List of Relations",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"relations"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "{{namespace}}:MyRelation,{{namespace}}:MyRelation2>"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Queries a list of Relations"
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A List of Relations (relationId,source,target)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/relations?ids={{namespace}}:MyRelation,{{namespace}}:MyRelation2>&fields=relationId,source,target",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"relations"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "{{namespace}}:MyRelation,{{namespace}}:MyRelation2>"
+								},
+								{
+									"key": "fields",
+									"value": "relationId,source,target"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Queries a list of Relations with the \"relationId\",\"source\" and \"target\" field selector"
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Relation",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Relation with field selector: only partial structures",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<attributeObject>(<attribute1>,<attribute2>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"relations",
+								"{{namespace}}:MyRelation"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "attributes(<attributeObject>(<attribute1>,<attribute2>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Relation with field selector: only partial structures of a list of objects",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation?fields=attributes(<topAttributeObject>(<nestedAttributeObject>/<attribute>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"relations",
+								"{{namespace}}:MyRelation"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "attributes(<topAttributeObject>(<nestedAttributeObject>/<attribute>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "search-things",
+			"description": "",
+			"item": [
+				{
+					"name": "(equals): A Thing with a given thingId",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=eq(thingId,\"<thingId>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "eq(thingId,\"<thingId>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(not equals): All Things with not the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ne(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ne(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(greater than): All Things greater than the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=gt(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "gt(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(greater equals): All Things greater equals the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(less then): All Things less then the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=lt(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "lt(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(less equals): All Things less equals the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=le(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "le(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(in): List of Things with a List of  given thingIds",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=in(thingId,\"<thingId>,<thingId2>,<thingId3>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "in(thingId,\"<thingId>,<thingId2>,<thingId3>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(like): A Thing with a partial given thingId",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=like(thingId,\"<thingId>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "like(thingId,\"<thingId>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Starts with = \\*, \nEnds with = \\*, \nWildcard for one Char = ?,\nWildcard for many Chars = \\*"
+					},
+					"response": []
+				},
+				{
+					"name": "(and): All Things with two given Attribute Values",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(or): All Things with one of the two given Attributes Values or both",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(not): All Things not greater than a given Attribute Values",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=not(gt(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "not(gt(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(sort): All Things with a higher or equal Attribute Value than the given  sorted descending",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "sort(-attributes/<sortAtt>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Sort ascending = +,\nSort descending = -,\nSort with two criterias: \nsort(+attributes/att1,-attributes/att2)"
+					},
+					"response": []
+				},
+				{
+					"name": "(limit): All Things with a higher or equal Attribute Value than the given  and among these the second ten elements",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "limit(10,10)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "maximum allowed count is 200"
+					},
+					"response": []
+				},
+				{
+					"name": "(sort&limit): All Things with a higher or equal Attribute Value than the given  sorted descending  and among these the second ten elements",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "sort(-attributes/<sortAtt>),limit(10,10)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "things",
+			"description": "",
+			"item": [
+				{
+					"name": "Create: A Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attributes\": {\n    \"manufacturer\": \"ACME\",\n    \"make\": \"Fancy Fab Car\",\n    \"model\": \"Environmental FourWheeler 4711\",\n    \"VIN\": \"0815666337\"\n  },\n  \"features\": {\n    \"Vehicle\": {\n      \"properties\": {\n        \"configuration\": {\n          \"transmission\": {\n            \"type\": \"manual\",\n            \"gears\": 7\n          }\n        },\n        \"status\": {\n          \"running\": true,\n          \"speed\": 90,\n          \"gear\": 5\n        },\n        \"fault\": {\n          \"flatTyre\": false\n        }\n      }\n    },\n    \"EnvironmentScanner\": {\n      \"properties\": {\n          \"temperature\": 20.8,\n          \"humidity\": 73,\n          \"barometricPressure\": 970.7,\n          \"location\": {\n            \"longitude\": 47.682170,\n            \"latitude\": 9.386372\n          },\n          \"altitude\": 399\n      }\n    }\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: An empty Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Thing with complex attributes",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attributes\": {\n    \"simpleString\": \"simple\",\n    \"simpleInt\": 42,\n    \"nested\": {\n      \"nestedString\": \"nested\",\n      \"nestedBoolean\": false,\n      \"subnested\" : {\n        \"list\": [\n          1,2,3,5,8\n        ],\n        \"some\": \"value\"\n      }\n    },\n    \"toplist\": [\n      \"IOT\",\"BUM\",\"FOO\"\n    ],\n    \"toplistWithObjects\": [\n      {\n        \"thevalue\": 1,\n        \"nested\": {\n          \"bum\": \"lux\",\n          \"foo\": 3\n        }\n      },\n      {\n        \"thevalue\": 2,\n        \"nested\": {\n          \"bum\": \"ta\",\n          \"foo\": 6\n        }\n      }\n    ]\n  },\n  \"features\": {\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Thing with given ID",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attributes\": {\n    \"manufacturer\": \"ACME\",\n    \"make\": \"Fancy Fab Car\",\n    \"model\": \"Environmental FourWheeler 4711\",\n    \"VIN\": \"0815666337\"\n  },\n  \"features\": {\n    \"Vehicle\": {\n      \"properties\": {\n        \"configuration\": {\n          \"transmission\": {\n            \"type\": \"manual\",\n            \"gears\": 7\n          }\n        },\n        \"status\": {\n          \"running\": true,\n          \"speed\": 90,\n          \"gear\": 5\n        },\n        \"fault\": {\n          \"flatTyre\": false\n        }\n      }\n    },\n    \"EnvironmentScanner\": {\n      \"properties\": {\n          \"temperature\": 20.8,\n          \"humidity\": 73,\n          \"barometricPressure\": 970.7,\n          \"location\": {\n            \"longitude\": 47.682170,\n            \"latitude\": 9.386372\n          },\n          \"altitude\": 399\n      }\n    }\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A new Attribute at an existing Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes/new",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"someValue\"\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A new Property of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties/brightness",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "1400"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attributes\": {\n    \"foo\":\"bar\",\n    \"baz\": 42\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: An existing Attribute at an existing Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes/new",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "23"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: ACL of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/acl",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ed420ff0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true,\n    \"WRITE\": true,\n    \"ADMINISTRATE\": true\n  },\n  \"edca04a0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true,\n    \"WRITE\": false,\n    \"ADMINISTRATE\": false\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: All  Features of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"abc\":{\n        \"properties\":{\n            \"foo\":\"bar\"\n        }\n    },\n  \"test\":{\n        \"properties\":{\n            \"foo2\":\"bar2\"\n        }\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: Feature of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/abc",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"properties\":{\n        \"foo\":\"bar\"\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: All Properties of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"temperature\": 20.8,\n  \"humidity\": 73,\n  \"barometricPressure\": 970.7,\n  \"location\": {\n    \"longitude\": 47.682170,\n    \"latitude\": 9.386372\n  },\n  \"altitude\": 399\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: One Property of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties/location",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"longitude\": 49.008085,\n  \"latitude\": 8.403756\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A List of Things",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things?ids={{namespace}}:CRaaSCar,{{namespace}}:CRaaSCar1,{{namespace}}:CRaaSCar2",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "{{namespace}}:CRaaSCar,{{namespace}}:CRaaSCar1,{{namespace}}:CRaaSCar2"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A List of Things (thingId,acl)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things?ids={{namespace}}:CRaaSCar,{{namespace}}:CRaaSCar1,{{namespace}}:CRaaSCar2&fields=thingId,acl",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "{{namespace}}:CRaaSCar,{{namespace}}:CRaaSCar1,{{namespace}}:CRaaSCar2"
+								},
+								{
+									"key": "fields",
+									"value": "thingId,acl"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Queries a list of Things with the \"thingId\" and \"acl\" field selector"
+					},
+					"response": []
+				},
+				{
+					"name": "Query: One Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: One Thing (thingId,acl)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar?fields=thingId,acl",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things",
+								"{{namespace}}:CRaaSCar"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "thingId,acl"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Queries a Thing with the \"thingId\" and \"acl\" field selector."
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Thing: single attribute object",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes/nested",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Thing with field selector: only partial structures",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar?fields=attributes(nested(nestedString,nestedBoolean))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things",
+								"{{namespace}}:CRaaSCar"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "attributes(nested(nestedString,nestedBoolean))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Attributes of one Thing with field selector: only partial structures of a list of objects",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar?fields=attributes(toplistWithObjects(nested/foo))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"things",
+								"{{namespace}}:CRaaSCar"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "attributes(toplistWithObjects(nested/foo))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: ACL of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/acl",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ed420ff0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true,\n    \"WRITE\": true,\n    \"ADMINISTRATE\": true\n  },\n  \"edca04a0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: ACL Entry of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: All Features of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: Feature of a Thing ",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/Vehicle",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: All Properties of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: One Property of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties/location",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: One Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: Attribute of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes/new",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: ACL Entry of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/acl/ed420ff0-b1c96661e4-9070-3863bbc77d82",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: Features of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: Feature of a Thing",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/Vehicle",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: All Properties of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "1400"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: One Property of a Thing's Feature",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties/brightness",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "1400"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "topologies-schema",
+			"description": "/topology-schemas/{schemaId}",
+			"item": [
+				{
+					"name": "Create: A Policy for Topologies",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:topologyPolicy",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"entries\": {\r\n\t\t\"DEFAULT\": {\r\n\t\t\t\"subjects\": {\r\n\t\t\t\t\"${request.subjectId}\": {\r\n\t\t\t\t\t\"type\": \"iot-permissions-sid\"\r\n\t\t\t\t}\r\n\t\t\t},\r\n\t\t\t\"resources\": {\r\n\t\t\t\t\"policy:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"thing:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"message:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"topology:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t},\r\n\t\t\t\t\"topology-schema:/\": {\r\n\t\t\t\t\t\"grant\": [\r\n\t\t\t\t\t\t\"READ\",\r\n\t\t\t\t\t\t\"WRITE\"\r\n\t\t\t\t\t],\r\n\t\t\t\t\t\"revoke\": []\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: An empty Schema with policyId",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"policyId\": \"{{namespace}}:topologyPolicy\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Schema",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1/content",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "schema @expand(template: \"Topology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\t\tID!\r\n\tbuildingName:\tString\r\n\trooms: \t\t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Schema",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "schema @expand(template: \"Topology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\tID!\r\n\tbuildingName: \t\tString\r\n\trooms: \t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n\t# devices: \t[Device]\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: A Schema",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "topologies-simple",
+			"description": "/topologies/{topologyId}",
+			"item": [
+				{
+					"name": "Create: A Topology (variable based)",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) { campusName } }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\"id\": \"b2\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 2\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"38.5\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t],\r\n\t\t\t\t\"companies\": [{\r\n\t\t\t\t\t\t\"name\": \"Acme\",\r\n\t\t\t\t\t\t\"units\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1\"\r\n\t\t\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\t\t\"id\": \"b2r1\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Topology",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\":  \"mutation { create(topology: { id: \\\"c1\\\", campusName: \\\"Berlin\\\", buildings: [{ id: \\\"b1\\\", buildingName: \\\"Building 1\\\", rooms: [{ id: \\\"b1r1\\\", roomName: \\\"Room 1\\\", area: 25.5 } ] }, { id: \\\"b2\\\", buildingName: \\\"Building 2\\\", rooms: [{ id: \\\"b2r1\\\", roomName: \\\"Room 1\\\", area: 38.5 } ] } ], companies: [{ name: \\\"Acme\\\", units: [{ id: \\\"b1\\\" }, { id: \\\"b2r1\\\" } ] } ] }) { campusName } }\"\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A complete Topology",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/graphql",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\ttopology {\r\n\t\tcampusName,\r\n\t\tbuildings {\r\n\t\t\tbuildingName,\r\n\t\t\trooms {\r\n\t\t\t\troomName\r\n\t\t\t}\r\n\t\t},\r\n\t\tcompanies {\r\n\t\t\tname,\r\n\t\t\tunits {\r\n\t\t\t\tid\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Topology's buildings",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content?query=%7Btopology%7BcampusName%2Cbuildings%7BbuildingName%7D%7D%7D",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"2",
+								"topologies",
+								"{{namespace}}:campus-1",
+								"content"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "%7Btopology%7BcampusName%2Cbuildings%7BbuildingName%7D%7D%7D",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ topology { campusName }}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Topology with referenceables",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/graphql",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\ttopology {\r\n\t\tcompanies {\r\n\t\t\tname,\r\n\t\t\tunits {\r\n\t\t\t\t...on Building {\r\n\t\t\t\t\tid,\r\n\t\t\t\t\tbuildingName\r\n\t\t\t\t}\r\n\t\t\t\t...on Room {\r\n\t\t\t\t\tid,\r\n\t\t\t\t\troomName\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Topology (application/json) split room",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"query\": \"mutation ($campus: CampusUpdateType) { update(topology: $campus) { campusName, buildings { rooms {roomName, area } } } }\",\r\n\t\"variables\": {\r\n\t\t\"campus\": {\r\n\t\t\t\"id\": \"c1\",\r\n\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\"id\": \"b1r1a\",\r\n\t\t\t\t\t\t\t\"roomName\": \"Room 1a\",\r\n\t\t\t\t\t\t\t\"area\": \"15.5\"\r\n\t\t\t\t\t\t}, {\r\n\t\t\t\t\t\t\t\"id\": \"b1r1b\",\r\n\t\t\t\t\t\t\t\"roomName\": \"Room 1b\",\r\n\t\t\t\t\t\t\t\"area\": \"10.0\"\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t]\r\n\t\t\t\t}\r\n\t\t\t]\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A Topology (application/graphql) split room",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/graphql",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "mutation {\r\n\tupdate(topology: {\r\n\t\tid: \"c1\",\r\n\t\tcampusName: \"Berlin\",\r\n\t\tbuildings: [{\r\n\t\t\t\tid: \"b1\",\r\n\t\t\t\tbuildingName: \"Building 1\",\r\n\t\t\t\trooms: [{\r\n\t\t\t\t\t\tid: \"b1r1a\",\r\n\t\t\t\t\t\troomName: \"Room 1a\",\r\n\t\t\t\t\t\tarea: 15.5\r\n\t\t\t\t\t}, {\r\n\t\t\t\t\t\tid: \"b1r1b\",\r\n\t\t\t\t\t\troomName: \"Room 1b\",\r\n\t\t\t\t\t\tarea: 10\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t]\r\n\t}) {\r\n\t\tcampusName,\r\n\t\tbuildings {\r\n\t\t\trooms {\r\n\t\t\t\troomName,\r\n\t\t\t\tarea\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Archive: A Topology via tag",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/tags/campusTopology-V1",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete: A Topology",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: An archived Topology",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content?tag=campusTopology-V1",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"2",
+								"topologies",
+								"{{namespace}}:campus-1",
+								"content"
+							],
+							"query": [
+								{
+									"key": "tag",
+									"value": "campusTopology-V1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/graphql",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\ttopology {\r\n\t\tcampusName,\r\n\t\tbuildings {\r\n\t\t\tbuildingName,\r\n\t\t\trooms {\r\n\t\t\t\troomName\r\n\t\t\t}\r\n\t\t},\r\n\t\tcompanies {\r\n\t\t\tname,\r\n\t\t\tunits {\r\n\t\t\t\tid\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "topologies-things",
+			"description": "",
+			"item": [
+				{
+					"name": "Create: An empty Schema with policyId",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema-remote:1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"policyId\": \"{{namespace}}:topologyPolicy\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Schema with remote resource",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema-remote:1/content",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "schema @expand(template: \"ResourceAwareTopology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\t\tID!\r\n\tbuildingName:\tString\r\n\trooms: \t\t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n\tlamps: \t\t[Lamp]\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n\r\ninterface LampThing @resource(protocol: \"com.bosch.iot.things:features-protocol:0.0.1\") {\r\n\tid:\t\t\tID!\r\n}\r\n\r\ntype Lamp implements LampThing {\r\n\tid:\t\t\t\t\tID!\t\r\n\tstatus:\t\t\t\tStatus\r\n\tpowerConsumption:\tFloat\r\n}\r\n\r\nenum Status {\r\n\tON\r\n\tOFF\r\n\tBROKEN\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Thing for a Topology",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/things/{{namespace}}:lamp01",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"features\": {\n    \"LampFeature\": {\n      \"properties\": {\n        \"status\": \"ON\",\n        \"powerConsumption\": 10.8\n        }\n    }\n  }\n}\n"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create: A Topology with remote resource",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"schemaId\": \"{{namespace}}:campus-schema-remote:1\",\r\n\t\"policyId\": \"{{namespace}}:topologyPolicy\",\r\n\t\"_content\": {\r\n\t\t\"query\": \"mutation ($campus: CampusCreateType) { create(topology: $campus) }\",\r\n\t\t\"variables\": {\r\n\t\t\t\"campus\": {\r\n\t\t\t\t\"id\": \"c1\",\r\n\t\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\t\"area\": \"25.5\",\r\n\t\t\t\t\t\t\t\t\"lamps\": [{\r\n\t\t\t\t\t\t\t\t\t\t\"id\": \"{{namespace}}:lamp01/LampFeature\"\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t]\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t]\r\n\t\t\t\t\t}\r\n\t\t\t\t]\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: A remote resource via Topology",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"query\": \"mutation ($campus: CampusUpdateType) { update(topology: $campus) { outcome, resourceUpdates { id }, resourceFailures { id } } }\",\r\n\t\"variables\": {\r\n\t\t\"campus\": {\r\n\t\t\t\"id\": \"c1\",\r\n\t\t\t\"campusName\": \"Berlin\",\r\n\t\t\t\"buildings\": [{\r\n\t\t\t\t\t\"id\": \"b1\",\r\n\t\t\t\t\t\"buildingName\": \"Building 1\",\r\n\t\t\t\t\t\"rooms\": [{\r\n\t\t\t\t\t\t\t\"id\": \"b1r1\",\r\n\t\t\t\t\t\t\t\"roomName\": \"Room 1\",\r\n\t\t\t\t\t\t\t\"area\": \"25.5\",\r\n\t\t\t\t\t\t\t\"lamps\": {\r\n\t\t\t\t\t\t\t\t\"id\": \"{{namespace}}:lamp01/LampFeature\",\r\n\t\t\t\t\t\t\t\t\"status\": \"ON\",\r\n\t\t\t\t\t\t\t\t\"powerConsumption\": \"150.6\"\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t]\r\n\t\t\t\t}\r\n\t\t\t]\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update: Remote resources via Things",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/things/{{namespace}}:lamp01/features/LampFeature/properties",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"powerConsumption\": 0,\n  \"status\": \"OFF\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Topology with remote resource",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/graphql",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\ttopology {\r\n\t\tcampusName,\r\n\t\tbuildings {\r\n\t\t\tbuildingName,\r\n\t\t\trooms {\r\n\t\t\t\troomName,\r\n\t\t\t\tlamps {\r\n\t\t\t\t\tid,\r\n\t\t\t\t\tstatus,\r\n\t\t\t\t\tpowerConsumption\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

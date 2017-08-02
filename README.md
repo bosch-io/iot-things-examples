@@ -86,6 +86,29 @@ We also provide an OSGi-bundle:
 </dependency>
 ```
 
+
+Afterwards, inspire yourself by looking at the Examples:
+
+## Examples
+
+### Example "inventory-browser"
+
+This example shows how to create a simple user interface to list things and their details and show the things on a map.
+
+### Example "postman-collection"
+
+This is a list of prepared REST call examples to demonstrate typical usages of the REST APIs.
+
+The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
+
+### Example "things-client-examples"
+
+This example shows how to use the CR-Integration Client for Java.
+
+### Example "things-rest-angular""
+
+Implements a simple web application with angular.js and bootstrap to show how to use the Bosch IoT Things REST API with JavaScript.
+
 ## License
 
 The examples are made available under the terms of Bosch SI Example Code License. See individual files for details.

@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -28,15 +28,14 @@
 /**
  * Very simple main class which can launch the example to try it out.
  */
-public class ExampleLauncher
-{
-   public static void main(final String... args) throws Exception
-   {
-      final RegisterForChanges registerForChanges = new RegisterForChanges();
-      registerForChanges.setUpCountDownLatch();
-      registerForChanges.registerForAttributeChanges();
-      registerForChanges.registerForThingChanges();
-      registerForChanges.registerForThingChangesWithDeregistration();
-      registerForChanges.destroy();
-   }
+public class ExampleLauncher {
+
+    public static void main(final String... args) throws Exception {
+        final RegisterForChanges registerForChanges = new RegisterForChanges();
+        registerForChanges.setUpCountDownLatch();
+        registerForChanges.registerForAttributeChanges();
+        registerForChanges.registerForThingChanges();
+        registerForChanges.registerForThingChangesWithDeregistration();
+        registerForChanges.destroy();
+    }
 }

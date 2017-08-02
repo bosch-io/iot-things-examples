@@ -1,7 +1,7 @@
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *
- * Copyright 2016 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -52,68 +52,62 @@ import com.bosch.cr.examples.jwt.ConfigurationProperty;
  * https://your.domain/jwt-authentication/oauth2callback/google as callback uri in your google account.
  */
 @WebServlet("/oauth2callback/google")
-public class GoogleCallbackServlet extends HttpServlet
-{
-   private static final long serialVersionUID = 1207454571295364520L;
+public class GoogleCallbackServlet extends HttpServlet {
 
-   private static final String GOOGLE_OAUTH2_TOKEN_URL = "https://www.googleapis.com/oauth2/v4/token";
-   private static final String ID_TOKEN_PROPERTY = "id_token";
-   private static final String REDIRECT_URL = "../index.html";
+    private static final long serialVersionUID = 1207454571295364520L;
 
-   private ConfigurationProperties configurationProperties;
+    private static final String GOOGLE_OAUTH2_TOKEN_URL = "https://www.googleapis.com/oauth2/v4/token";
+    private static final String ID_TOKEN_PROPERTY = "id_token";
+    private static final String REDIRECT_URL = "../index.html";
 
-   @Override
-   public void init() throws ServletException
-   {
-      super.init();
+    private ConfigurationProperties configurationProperties;
 
-      configurationProperties = ConfigurationProperties.getInstance();
-   }
+    @Override
+    public void init() throws ServletException {
+        super.init();
 
-   @Override
-   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
-      throws ServletException, IOException
-   {
-      try
-      {
-         final String code = OAuthAuthzResponse.oauthCodeAuthzResponse(req).getCode();
-         final String idToken = getIdToken(code);
+        configurationProperties = ConfigurationProperties.getInstance();
+    }
 
-         final boolean secure = configurationProperties.getPropertyAsBoolean(ConfigurationProperty.SECURE_COOKIE);
-         final int maxAge = -1; // cookie is deleted when browser is closed
-         final Cookie cookie = CookieUtil.getJwtAuthenticationCookie(idToken, secure, maxAge);
+    @Override
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        try {
+            final String code = OAuthAuthzResponse.oauthCodeAuthzResponse(req).getCode();
+            final String idToken = getIdToken(code);
 
-         resp.addCookie(cookie);
-         resp.sendRedirect(REDIRECT_URL);
-      }
-      catch (final OAuthProblemException | OAuthSystemException e)
-      {
-         resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
-         resp.getOutputStream().print(e.getMessage());
-         throw new RuntimeException(e);
-      }
-   }
+            final boolean secure = configurationProperties.getPropertyAsBoolean(ConfigurationProperty.SECURE_COOKIE);
+            final int maxAge = -1; // cookie is deleted when browser is closed
+            final Cookie cookie = CookieUtil.getJwtAuthenticationCookie(idToken, secure, maxAge);
 
-   private String getIdToken(final String code) throws OAuthSystemException, OAuthProblemException
-   {
-      final String clientId = configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_ID);
-      final String clientSecret =
-         configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_SECRET);
-      final String redirectUrl =
-         configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_REDIRECT_URL);
+            resp.addCookie(cookie);
+            resp.sendRedirect(REDIRECT_URL);
+        } catch (final OAuthProblemException | OAuthSystemException e) {
+            resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
+            resp.getOutputStream().print(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
-      final OAuthClientRequest request = OAuthClientRequest //
-         .tokenLocation(GOOGLE_OAUTH2_TOKEN_URL) //
-         .setGrantType(GrantType.AUTHORIZATION_CODE) //
-         .setClientId(clientId) //
-         .setClientSecret(clientSecret) //
-         .setRedirectURI(redirectUrl) //
-         .setCode(code) //
-         .buildBodyMessage();
+    private String getIdToken(final String code) throws OAuthSystemException, OAuthProblemException {
+        final String clientId = configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_ID);
+        final String clientSecret =
+                configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_SECRET);
+        final String redirectUrl =
+                configurationProperties.getPropertyAsString(ConfigurationProperty.GOOGLE_CLIENT_REDIRECT_URL);
 
-      final OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
-      final OAuthJSONAccessTokenResponse accessTokenResponse =
-         oAuthClient.accessToken(request, OAuthJSONAccessTokenResponse.class);
-      return accessTokenResponse.getParam(ID_TOKEN_PROPERTY);
-   }
+        final OAuthClientRequest request = OAuthClientRequest //
+                .tokenLocation(GOOGLE_OAUTH2_TOKEN_URL) //
+                .setGrantType(GrantType.AUTHORIZATION_CODE) //
+                .setClientId(clientId) //
+                .setClientSecret(clientSecret) //
+                .setRedirectURI(redirectUrl) //
+                .setCode(code) //
+                .buildBodyMessage();
+
+        final OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+        final OAuthJSONAccessTokenResponse accessTokenResponse =
+                oAuthClient.accessToken(request, OAuthJSONAccessTokenResponse.class);
+        return accessTokenResponse.getParam(ID_TOKEN_PROPERTY);
+    }
 }

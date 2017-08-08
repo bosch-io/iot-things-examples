@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "IoT-Things",
-		"_postman_id": "389d0814-2184-454f-b7c1-7243c59f0deb",
+		"_postman_id": "a0276722-ccb8-8b4b-e19f-5d5f4b53201a",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -900,556 +900,6 @@
 			]
 		},
 		{
-			"name": "search-things",
-			"description": "",
-			"item": [
-				{
-					"name": "(equals): A Thing with a given thingId",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=eq(thingId,\"<thingId>\")",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "eq(thingId,\"<thingId>\")"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(not equals): All Things with not the given Attribute Value",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ne(attributes/<attribute>,<attributeValue>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "ne(attributes/<attribute>,<attributeValue>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(greater than): All Things greater than the given Attribute Value",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=gt(attributes/<attribute>,<attributeValue>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "gt(attributes/<attribute>,<attributeValue>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(greater equals): All Things greater equals the given Attribute Value",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<attribute>,<attributeValue>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "ge(attributes/<attribute>,<attributeValue>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(less then): All Things less then the given Attribute Value",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=lt(attributes/<attribute>,<attributeValue>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "lt(attributes/<attribute>,<attributeValue>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(less equals): All Things less equals the given Attribute Value",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=le(attributes/<attribute>,<attributeValue>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "le(attributes/<attribute>,<attributeValue>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(in): List of Things with a List of  given thingIds",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=in(thingId,\"<thingId>,<thingId2>,<thingId3>\")",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "in(thingId,\"<thingId>,<thingId2>,<thingId3>\")"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(like): A Thing with a partial given thingId",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=like(thingId,\"<thingId>\")",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "like(thingId,\"<thingId>\")"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": "Starts with = \\*, \nEnds with = \\*, \nWildcard for one Char = ?,\nWildcard for many Chars = \\*"
-					},
-					"response": []
-				},
-				{
-					"name": "(and): All Things with two given Attribute Values",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(or): All Things with one of the two given Attributes Values or both",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(not): All Things not greater than a given Attribute Values",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=not(gt(attributes/<attribute>,<attributeValue>))",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "not(gt(attributes/<attribute>,<attributeValue>))"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "(sort): All Things with a higher or equal Attribute Value than the given  sorted descending",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
-								},
-								{
-									"key": "option",
-									"value": "sort(-attributes/<sortAtt>)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": "Sort ascending = +,\nSort descending = -,\nSort with two criterias: \nsort(+attributes/att1,-attributes/att2)"
-					},
-					"response": []
-				},
-				{
-					"name": "(limit): All Things with a higher or equal Attribute Value than the given  and among these the second ten elements",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
-								},
-								{
-									"key": "option",
-									"value": "limit(10,10)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": "maximum allowed count is 200"
-					},
-					"response": []
-				},
-				{
-					"name": "(sort&limit): All Things with a higher or equal Attribute Value than the given  sorted descending  and among these the second ten elements",
-					"request": {
-						"url": {
-							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
-							"host": [
-								"{{base.protocol}}{{base.url}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"search",
-								"things"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
-								},
-								{
-									"key": "option",
-									"value": "sort(-attributes/<sortAtt>),limit(10,10)"
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "things",
 			"description": "",
 			"item": [
@@ -2072,6 +1522,556 @@
 			]
 		},
 		{
+			"name": "search-things",
+			"description": "",
+			"item": [
+				{
+					"name": "(equals): A Thing with a given thingId",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=eq(thingId,\"<thingId>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "eq(thingId,\"<thingId>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(not equals): All Things with not the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ne(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ne(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(greater than): All Things greater than the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=gt(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "gt(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(greater equals): All Things greater equals the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(less then): All Things less then the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=lt(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "lt(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(less equals): All Things less equals the given Attribute Value",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=le(attributes/<attribute>,<attributeValue>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "le(attributes/<attribute>,<attributeValue>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(in): List of Things with a List of  given thingIds",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=in(thingId,\"<thingId>,<thingId2>,<thingId3>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "in(thingId,\"<thingId>,<thingId2>,<thingId3>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(like): A Thing with a partial given thingId",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=like(thingId,\"<thingId>\")",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "like(thingId,\"<thingId>\")"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Starts with = \\*, \nEnds with = \\*, \nWildcard for one Char = ?,\nWildcard for many Chars = \\*"
+					},
+					"response": []
+				},
+				{
+					"name": "(and): All Things with two given Attribute Values",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "and(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(or): All Things with one of the two given Attributes Values or both",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "or(eq(attributes/<attribute>,<attributeValue>),eq(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(not): All Things not greater than a given Attribute Values",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=not(gt(attributes/<attribute>,<attributeValue>))",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "not(gt(attributes/<attribute>,<attributeValue>))"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "(sort): All Things with a higher or equal Attribute Value than the given  sorted descending",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "sort(-attributes/<sortAtt>)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Sort ascending = +,\nSort descending = -,\nSort with two criterias: \nsort(+attributes/att1,-attributes/att2)"
+					},
+					"response": []
+				},
+				{
+					"name": "(limit): All Things with a higher or equal Attribute Value than the given  and among these the second ten elements",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=limit(10,10)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "limit(10,10)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "maximum allowed count is 200"
+					},
+					"response": []
+				},
+				{
+					"name": "(sort&limit): All Things with a higher or equal Attribute Value than the given  sorted descending  and among these the second ten elements",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/1/search/things?search=ge(attributes/<sortAtt>,<attributeValue>)&option=sort(-attributes/<sortAtt>),limit(10,10)",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"search",
+								"things"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ge(attributes/<sortAtt>,<attributeValue>)"
+								},
+								{
+									"key": "option",
+									"value": "sort(-attributes/<sortAtt>),limit(10,10)"
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "topologies-schema",
 			"description": "/topology-schemas/{schemaId}",
 			"item": [
@@ -2161,7 +2161,7 @@
 		},
 		{
 			"name": "topologies-simple",
-			"description": "/topologies/{topologyId}",
+			"description": "",
 			"item": [
 				{
 					"name": "Create: A Topology (variable based)",
@@ -2522,6 +2522,32 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n\ttopology {\r\n\t\tcampusName,\r\n\t\tbuildings {\r\n\t\t\tbuildingName,\r\n\t\t\trooms {\r\n\t\t\t\troomName,\r\n\t\t\t\tlamps {\r\n\t\t\t\t\tid,\r\n\t\t\t\t\tstatus,\r\n\t\t\t\t\tpowerConsumption\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "search-topologies",
+			"description": "",
+			"item": [
+				{
+					"name": "All Topologies for which I have read permissions ",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/search/topologies",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
 						},
 						"description": ""
 					},

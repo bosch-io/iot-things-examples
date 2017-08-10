@@ -290,17 +290,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -310,17 +300,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -330,17 +310,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -350,17 +320,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -370,17 +330,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/subjects/iot-permissions:restricted",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -390,17 +340,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -410,17 +350,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:myPolicy/entries/RESTRICTED/resources/thing:/attributes",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -676,17 +606,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -714,17 +634,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "Queries a Relation with the \"relationId\",\"source\" and \"target\" field selector."
 					},
 					"response": []
@@ -751,17 +661,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "Queries a list of Relations"
 					},
 					"response": []
@@ -792,17 +692,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "Queries a list of Relations with the \"relationId\",\"source\" and \"target\" field selector"
 					},
 					"response": []
@@ -812,17 +702,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/1/relations/{{namespace}}:MyRelation/attributes",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -850,17 +730,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -889,10 +759,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1132,10 +998,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1167,10 +1029,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": "Queries a list of Things with the \"thingId\" and \"acl\" field selector"
 					},
 					"response": []
@@ -1181,10 +1039,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1213,10 +1067,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": "Queries a Thing with the \"thingId\" and \"acl\" field selector."
 					},
 					"response": []
@@ -1227,10 +1077,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1241,10 +1087,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/attributes/nested",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1273,10 +1115,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1305,10 +1143,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1319,10 +1153,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/acl",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1333,10 +1163,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1347,10 +1173,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1361,10 +1183,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/Vehicle",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -1374,17 +1192,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1394,17 +1202,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/1/things/{{namespace}}:CRaaSCar/features/EnvironmentScanner/properties/location",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1548,17 +1346,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1586,17 +1374,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1624,17 +1402,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1662,17 +1430,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1700,17 +1458,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1738,17 +1486,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1776,17 +1514,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1814,17 +1542,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "Starts with = \\*, \nEnds with = \\*, \nWildcard for one Char = ?,\nWildcard for many Chars = \\*"
 					},
 					"response": []
@@ -1852,17 +1570,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1890,17 +1598,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1928,17 +1626,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -1970,17 +1658,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "Sort ascending = +,\nSort descending = -,\nSort with two criterias: \nsort(+attributes/att1,-attributes/att2)"
 					},
 					"response": []
@@ -2012,17 +1690,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": "maximum allowed count is 200"
 					},
 					"response": []
@@ -2054,17 +1722,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -2135,10 +1793,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -2149,10 +1803,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1/content",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -2183,10 +1833,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"description": ""
 					},
 					"response": []
@@ -2257,10 +1903,6 @@
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{ topology { campusName }}"
-						},
 						"description": ""
 					},
 					"response": []
@@ -2291,10 +1933,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{ topology { campusName }}"
-						},
 						"description": ""
 					},
 					"response": []
@@ -2346,10 +1984,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{ topology { campusName }}"
-						},
 						"description": ""
 					},
 					"response": []
@@ -2634,17 +2268,7 @@
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/search/topologies",
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []
@@ -2674,17 +2298,7 @@
 							"variable": []
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"description": ""
 					},
 					"response": []

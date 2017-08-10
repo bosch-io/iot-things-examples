@@ -299,7 +299,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -319,7 +319,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -339,7 +339,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"subjects\": {\r\n    \"iot-permissions:restricted\": {\r\n      \"type\": \"iot-permissions-sid\"\r\n    }\r\n  },\r\n  \"resources\": {\r\n    \"policy:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes\": {\r\n      \"grant\": [\r\n        \"READ\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"thing:/attributes/VIN\": {\r\n      \"grant\": [],\r\n      \"revoke\": [\r\n      \t\"WRITE\"\r\n      ]\r\n    },\r\n    \"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n      \"grant\": [\r\n        \"WRITE\"\r\n      ],\r\n      \"revoke\": []\r\n    },\r\n    \"message:/\": {\r\n      \"grant\": [],\r\n      \"revoke\": []\r\n    }\r\n  }\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -359,7 +359,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"iot-permissions:restricted\": {\r\n\t  \"type\": \"iot-permissions-sid\"\r\n\t}\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -379,7 +379,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"type\": \"iot-permissions-sid\"\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -399,7 +399,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"policy:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes\": {\r\n\t  \"grant\": [\r\n\t    \"READ\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"thing:/attributes/VIN\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": [\r\n\t  \t\"WRITE\"\r\n\t  ]\r\n\t},\r\n\t\"thing:/features/EnvironmentScanner/properties/temperature\": {\r\n\t  \"grant\": [\r\n\t    \"WRITE\"\r\n\t  ],\r\n\t  \"revoke\": []\r\n\t},\r\n\t\"message:/\": {\r\n\t  \"grant\": [],\r\n\t  \"revoke\": []\r\n\t}\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -419,7 +419,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"grant\": [\r\n\t\t\"READ\"\r\n\t],\r\n\t\"revoke\": []\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -439,7 +439,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"entries\": {\r\n    \"ALL\": {\r\n      \"subjects\": {\r\n        \"iot-permissions:test\": {\r\n          \"type\": \"iot-permissions-sid\"\r\n        }\r\n      },\r\n      \"resources\": {\r\n        \"policy:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"thing:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        },\r\n        \"message:/\": {\r\n          \"grant\": [\r\n            \"READ\",\r\n            \"WRITE\"\r\n          ],\r\n          \"revoke\": []\r\n        }\r\n      }\r\n    }\r\n  }\r\n}"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -1321,7 +1321,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"ed420ff0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true,\n    \"WRITE\": true,\n    \"ADMINISTRATE\": true\n  },\n  \"edca04a0-b1c96661e4-9070-3863bbc77d82\": {\n    \"READ\": true\n  }\n}\n"
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -2076,7 +2076,7 @@
 			"description": "/topology-schemas/{schemaId}",
 			"item": [
 				{
-					"name": "Create: A Policy for Topologies",
+					"name": "Create/Update: A Policy for Topologies",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/policies/{{namespace}}:topologyPolicy",
 						"method": "PUT",
@@ -2096,7 +2096,7 @@
 					"response": []
 				},
 				{
-					"name": "Create: An empty Schema with policyId",
+					"name": "Create/Update: An empty Schema",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1",
 						"method": "PUT",
@@ -2116,7 +2116,7 @@
 					"response": []
 				},
 				{
-					"name": "Update: A Schema",
+					"name": "Create/Update: A Schema's content",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1/content",
 						"method": "PUT",
@@ -2137,7 +2137,55 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "schema @expand(template: \"Topology\") { query: Ignored }\r\n\r\ntype Campus implements Topology {\r\n\tid: \t\t\tID!\r\n\tcampusName: \tString\r\n\tbuildings: \t\t[Building]\r\n\tcompanies:\t\t[Company]\r\n}\r\n\r\ntype Building implements Referenceable {\r\n\tid:\t\t\tID!\r\n\tbuildingName: \t\tString\r\n\trooms: \t\t[Room]\r\n}\r\n\r\ntype Room implements Referenceable {\r\n\tid:\t\t\tID!\r\n\troomName: \tString\r\n\tarea:\t\tFloat\r\n\t# devices: \t[Device]\r\n}\r\n\r\ntype Company {\r\n\tname:\t\tString\r\n\tunits:\t\t[Referenceable]\r\n}\r\n"
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Schema's content",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1/content",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Schema (schemaId,_revision)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/2/topology-schemas/{{namespace}}:campus-schema:1?fields=schemaId,_revision",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"2",
+								"topology-schemas",
+								"{{namespace}}:campus-schema:1"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "schemaId,_revision",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
 						},
 						"description": ""
 					},
@@ -2164,7 +2212,7 @@
 			"description": "",
 			"item": [
 				{
-					"name": "Create: A Topology (variable based)",
+					"name": "Create: A Topology with content (variable based)",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
 						"method": "PUT",
@@ -2184,7 +2232,7 @@
 					"response": []
 				},
 				{
-					"name": "Create: A Topology",
+					"name": "Create: A Topology with content",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
 						"method": "PUT",
@@ -2204,7 +2252,55 @@
 					"response": []
 				},
 				{
-					"name": "Query: A complete Topology",
+					"name": "Query: A Topology (without content)",
+					"request": {
+						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ topology { campusName }}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: A Topology (without content, with fields: topoloyId,_revision)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1?fields=topologyId,_revision",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"2",
+								"topologies",
+								"{{namespace}}:campus-1"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "topologyId,_revision",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ topology { campusName }}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: The complete content of a Topology",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
 						"method": "POST",
@@ -2224,7 +2320,7 @@
 					"response": []
 				},
 				{
-					"name": "Query: A Topology's buildings",
+					"name": "Query: All buildings contained in a Topology's content",
 					"request": {
 						"url": {
 							"raw": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content?query=%7Btopology%7BcampusName%2Cbuildings%7BbuildingName%7D%7D%7D",
@@ -2259,7 +2355,7 @@
 					"response": []
 				},
 				{
-					"name": "Query: A Topology with referenceables",
+					"name": "Query: Topology content containing referenceables",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
 						"method": "POST",
@@ -2279,7 +2375,7 @@
 					"response": []
 				},
 				{
-					"name": "Update: A Topology (application/json) split room",
+					"name": "Update: Topology content (application/json) split room",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
 						"method": "POST",
@@ -2299,7 +2395,7 @@
 					"response": []
 				},
 				{
-					"name": "Update: A Topology (application/graphql) split room",
+					"name": "Update: Topology content (application/graphql) split room",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content",
 						"method": "POST",
@@ -2347,7 +2443,7 @@
 					"response": []
 				},
 				{
-					"name": "Query: An archived Topology",
+					"name": "Query: Archived Topology content",
 					"request": {
 						"url": {
 							"raw": "{{base.protocol}}{{base.url}}/api/2/topologies/{{namespace}}:campus-1/content?tag=campusTopology-V1",
@@ -2534,9 +2630,49 @@
 			"description": "",
 			"item": [
 				{
-					"name": "All Topologies for which I have read permissions ",
+					"name": "Query: All Topologies for which I have read permissions ",
 					"request": {
 						"url": "{{base.protocol}}{{base.url}}/api/2/search/topologies",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Query: All Topologies for which I have read permissions  (topologyId)",
+					"request": {
+						"url": {
+							"raw": "{{base.protocol}}{{base.url}}/api/2/search/topologies?fields=topologyId",
+							"host": [
+								"{{base.protocol}}{{base.url}}"
+							],
+							"path": [
+								"api",
+								"2",
+								"search",
+								"topologies"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "topologyId",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{

@@ -17,9 +17,9 @@ If your network requires access via proxy server then configure your proxy setti
 
 ## Usage
 
-Install dependencies: `npm install`
+Install dependencies: `npm install` and `npm install -g typescript`
 
-Build application: `npm build`
+Build application: `tsc`
 
 Execute application: `node dist/openid-browser-login [--username <username>] [--password <password>]'`
 

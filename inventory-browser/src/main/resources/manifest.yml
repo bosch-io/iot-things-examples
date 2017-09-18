@@ -25,10 +25,10 @@
 
 ---
 applications:
-- name: inventory-browser
+- name: inventory-browser2
   memory: 768M
   disk_quota: 256M
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
   domain: internal.bosch-iot-cloud.com
-  host: inventory-browser
+  host: inventory-browser2
   path: inventory-browser-${project.version}

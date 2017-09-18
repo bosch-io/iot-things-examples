@@ -93,7 +93,7 @@ $(document).ready(function () {
     // --- Click handler for refreshing details
     var refreshDetails = function () {
         var thingId = $("#details").attr("thingId");
-        $.getJSON("api/1/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified")
+        $.getJSON("api/2/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified")
             .done(function (thing, status) {
 
                 // --- clear table content and remember thingId
@@ -145,7 +145,7 @@ $(document).ready(function () {
     // --- Click handler for refreshing list and map of things
     var refreshTable = function () {
 
-        $.getJSON("api/1/search/things"
+        $.getJSON("api/2/search/things"
             + "?fields=thingId,features/description,features/geolocation,features/orientation,features/xdk-sensors"
             + "&option=limit(0,200),sort(%2BthingId)")
             .fail(failHandler)
@@ -253,13 +253,17 @@ $(document).ready(function () {
     var createThing = function () {
 
         var created = function(thing, status) {
-            // include WRITE ACL for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688)
-            $.ajax("api/1/things/" + thing.thingId + "/acl/1d138250-49a8-11e6-826c-c2ae337e6688", {
+            // include WRITE permissions for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688) via implictly created policy for new Thing
+            $.ajax("api/2/policies/" + thing.thingId + "/entries/simulator", {
                 method: "PUT",
                 data: JSON.stringify({
-                    READ: false,
-                    WRITE: true,
-                    ADMINISTRATE: false
+                    subjects: { "iot-permissions:1d138250-49a8-11e6-826c-c2ae337e6688": { type: "iot-permissions-userid" } },
+                    resources: {
+                        "thing:/": {
+                            grant: [ "WRITE" ],
+                            revoke: []
+                        }
+                    }
                 })
             })
             .fail(failHandler)
@@ -272,14 +276,14 @@ $(document).ready(function () {
         var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
             +"You will have full access rights and the device simulator will have write access.");
         if (thingId == "") {
-            $.ajax("api/1/things", {
+            $.ajax("api/2/things", {
                 method: "POST",
                 data: JSON.stringify({})
             })
             .fail(failHandler)
             .done(created);
         } else if (thingId != null) {
-            $.ajax("api/1/things/" + thingId, {
+            $.ajax("api/2/things/" + thingId, {
                 method: "PUT",
                 data: JSON.stringify({})
             })
@@ -290,7 +294,7 @@ $(document).ready(function () {
     // --- Click handler for showing simulator popup
     var simulateThing = function () {
         var thingId = $("#details").attr("thingId");
-        openPopupSimulator("https://demos.apps.bosch-iot-cloud.com/device-simulator?thingId=" + thingId);
+        openPopupSimulator("https://demos.apps.bosch-iot-cloud.com/device-simulator2?thingId=" + thingId);
     };
 
     // --- create map

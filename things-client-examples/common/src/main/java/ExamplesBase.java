@@ -74,8 +74,7 @@ public abstract class ExamplesBase {
     protected static final String CLIENT_ID = SOLUTION_ID + ":example";
     protected static final String CLIENT_ID2 = SOLUTION_ID + ":example2";
 
-    private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
-    private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
+    private static final String SOLUTION_API_TOKEN = "<your-solution-api-token-registered-in-things-service>";
 
     private static final String USER_NAME = "<your-user-name";
     private static final String PASSWORD = "<your-password>";
@@ -150,9 +149,9 @@ public abstract class ExamplesBase {
                 .build();
 
         return ThingsClientFactory.twinConfigurationBuilder()
-                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .apiToken(SOLUTION_API_TOKEN)
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
-                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration)
                 //.proxyConfiguration(proxyConfiguration)
                 .build();
     }
@@ -160,7 +159,6 @@ public abstract class ExamplesBase {
     private LiveConfiguration createLiveConfiguration(final String clientId) {
 
         // Build a key-based authentication configuration for communicating with IoT Things service and with live
-        // clients over IoT Hub
         final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
                 PublicKeyAuthenticationConfiguration.newBuilder()
                         .clientId(clientId)
@@ -170,14 +168,14 @@ public abstract class ExamplesBase {
                         .aliasPassword(ALIAS_PASSWORD)
                         .build();
 
-        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
-                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
                 .authenticationConfiguration(publicKeyAuthenticationConfiguration)
                 .build();
 
         return ThingsClientFactory.liveConfigurationBuilder()
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
-                .providerConfiguration(hubMessagingProviderConfiguration)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration)
                 //.proxyConfiguration(proxyConfiguration)
                 .build();
 

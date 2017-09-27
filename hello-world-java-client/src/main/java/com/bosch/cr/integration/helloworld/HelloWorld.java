@@ -59,8 +59,7 @@ public class HelloWorld {
     // Insert your Solution ID here
     private static final String SOLUTION_ID = "<your-solution-id>";
     private static final String CLIENT_ID = SOLUTION_ID + ":connector";
-    private static final String SOLUTION_API_TOKEN_THINGS = "<your-solution-api-token-registered-in-things-service>";
-    private static final String SOLUTION_API_TOKEN_HUB = "<your-solution-api-token-registered-in-hub-service>";
+    private static final String SOLUTION_API_TOKEN = "<your-solution-api-token-registered-in-things-service>";
     private static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
     private static final String USER_ID = "<UUID-of-your-user>";
 
@@ -102,13 +101,7 @@ public class HelloWorld {
                         .password(PASSWORD)
                         .build();
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .build();
-
         // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
-        // over IoT Hub
         final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
                 PublicKeyAuthenticationConfiguration
                         .newBuilder()
@@ -119,9 +112,9 @@ public class HelloWorld {
                         .aliasPassword(ALIAS_PASSWORD)
                         .build();
 
-        final HubMessagingProviderConfiguration hubMessagingProviderConfiguration = MessagingProviders
-                .hubProviderBuilder(SOLUTION_API_TOKEN_HUB)
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+                .thingsWebsocketProviderBuilder()
+                .authenticationConfiguration(credentialsAuthenticationConfiguration /* or publicKeyAuthenticationConfiguration */)
                 .build();
 
         // Optionally configure a proxy server
@@ -130,11 +123,10 @@ public class HelloWorld {
                 .proxyPort(PROXY_PORT)
                 .build();*/
 
-
         final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
-                .apiToken(SOLUTION_API_TOKEN_THINGS)
+                .apiToken(SOLUTION_API_TOKEN)
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
-                .providerConfiguration(thingsWsMessagingProviderConfiguration /* or hubMessagingProviderConfiguration*/)
+                .providerConfiguration(thingsWsMessagingProviderConfiguration)
                 //.proxyConfiguration(proxyConfiguration)
                 .build();
 

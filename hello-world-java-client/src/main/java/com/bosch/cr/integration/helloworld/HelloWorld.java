@@ -39,7 +39,6 @@ import com.bosch.cr.integration.client.ThingsClientFactory;
 import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
 import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messaging.HubMessagingProviderConfiguration;
 import com.bosch.cr.integration.client.messaging.MessagingProviders;
 import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
 import com.bosch.cr.integration.things.FeatureHandle;

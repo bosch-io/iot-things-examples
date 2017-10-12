@@ -90,10 +90,36 @@ $(document).ready(function () {
 
     };
 
+    function findNestedProperty(obj, key) {
+        if (obj == null) {
+            return undefined;
+        }
+        for (var prop in obj) {
+           if (obj.hasOwnProperty(prop)) {
+               var val = obj[prop];
+               if (prop === key) {
+                   return val;
+               }
+               if (val instanceof Array) {
+                   for (var i = 0; i < val.length; i++) {
+                       var result =  findNestedProperty(val[i], key);
+                       if (result != undefined) {
+                           return result;
+                       }
+                   }
+               }
+               if (typeof val === 'object') {
+                return findNestedProperty(obj[prop], key);
+            }
+         }
+        }
+        return undefined;
+    }
+
     // --- Click handler for refreshing details
     var refreshDetails = function () {
         var thingId = $("#details").attr("thingId");
-        $.getJSON("api/2/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified")
+        $.getJSON("api/2/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified%2C_policy")
             .done(function (thing, status) {
 
                 // --- clear table content and remember thingId
@@ -105,7 +131,7 @@ $(document).ready(function () {
                 var row = $("<tr>");
                 tablebody.append(row);
                 row.append($("<td>").text("Last modified"));
-                row.append($("<td>").text(thing._modified));
+                row.append($("<td>").text(new Date(thing._modified).toLocaleString()));
 
                 if ("attributes" in thing) {
                     // --- for each attribute put row in details table
@@ -117,6 +143,9 @@ $(document).ready(function () {
                     populateDetails(cell, thing.attributes);
                 }
                 if ("features" in thing) {
+
+                    var hasHistory = findNestedProperty(thing._policy, "iot-things:b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian") != undefined;
+
                     // --- for each feature property put row in details table
                     Object.getOwnPropertyNames(thing.features).sort().forEach(function (featureId) {
                         var feature = thing.features[featureId];
@@ -126,8 +155,8 @@ $(document).ready(function () {
                             row.append($("<td>").text("Feature \"" + featureId + "\""));
                             var cell = $("<td>");
                             row.append(cell);
-                            populateDetails(cell, feature.properties,
-                                "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/");
+                            var historyUrl = hasHistory ? "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/" : undefined;
+                            populateDetails(cell, feature.properties, historyUrl);
                         }
                     });
                 }

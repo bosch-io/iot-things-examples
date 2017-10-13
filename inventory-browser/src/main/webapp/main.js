@@ -81,6 +81,8 @@ $(document).ready(function () {
                     link.click(function () {
                         openPopupHistory(historyBaseUrl + (path + prop).replace("\.", "/"));
                     });
+                    var icon = $("<span>").addClass("glyphicon").addClass("glyphicon-time").css("padding-left", ".5em");
+                    link.append(icon);
                     row.append($("<td>").html(link));
                 } else {
                     row.append($("<td>").text(JSON.stringify(value, null, 3)));
@@ -297,13 +299,29 @@ $(document).ready(function () {
             })
             .fail(failHandler)
             .done(function () {
-                $("#details").attr("thingId", thing.thingId);
-                refreshDetails();
-            });
+                // include READ permissions for historian-client (b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian) via implictly created policy for new Thing
+                $.ajax("api/2/policies/" + thing.thingId + "/entries/historian", {
+                    method: "PUT",
+                    data: JSON.stringify({
+                        subjects: { "iot-things:b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian": { type: "iot-things-clientid" } },
+                        resources: {
+                            "thing:/": {
+                                grant: [ "READ" ],
+                                revoke: []
+                            }
+                        }
+                    })
+                })
+                .fail(failHandler)
+                .done(function () {
+                    $("#details").attr("thingId", thing.thingId);
+                    refreshDetails();
+                });
+            })
         };
 
         var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
-            +"You will have full access rights and the device simulator will have write access.");
+            +"You will have full access rights, the device simulator write access and historian read access.");
         if (thingId == "") {
             $.ajax("api/2/things", {
                 method: "POST",

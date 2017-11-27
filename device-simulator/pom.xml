@@ -45,7 +45,7 @@
 
     <properties>
         <!-- The URL of the Things service REST API -->
-        <things.service.endpoint.url>https://things.apps.bosch-iot-cloud.com</things.service.endpoint.url>
+        <things.service.endpoint.url>https://things.s-apps.de1.bosch-iot-cloud.com</things.service.endpoint.url>
         <!-- The Solution API Token to use in the reverse proxy -->
         <api.token></api.token>
         <!-- The Basic Auth value (base64 encoded) to use in the reverse proxy -->

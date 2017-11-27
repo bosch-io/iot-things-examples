@@ -98,6 +98,26 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
 }
 ```
 
+## Optionally configure history size for your thing
+
+If you want to define a custom history size for a thing you can do so by adding a special feature to this thing.
+Add a feature "HistoryConfig" with a property "historySize" in order to configure the custom size of the history.
+
+```
+{
+   ...
+   "features": {
+      ...
+      "HistoryConfig": {
+         "properties": {
+            "historySize": 5000
+         }
+      }
+   }
+   ...
+}
+```
+
 ## Usage
 
 Use the following URL to look at the collected data:

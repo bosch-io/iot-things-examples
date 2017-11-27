@@ -41,7 +41,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.bosch.iot.things</groupId>
+            <groupId>com.bosch.iot.things.client</groupId>
             <artifactId>things-client</artifactId>
         </dependency>
         <!--Logging-->

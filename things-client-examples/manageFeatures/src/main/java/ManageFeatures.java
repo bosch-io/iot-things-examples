@@ -32,20 +32,21 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonPointer;
+import org.eclipse.ditto.json.JsonValue;
+import org.eclipse.ditto.model.things.FeatureProperties;
+import org.eclipse.ditto.model.things.Features;
+import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.integration.things.FeatureHandle;
-import com.bosch.cr.integration.things.ThingHandle;
-import com.bosch.cr.integration.twin.Twin;
-import com.bosch.cr.integration.twin.TwinThingHandle;
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.json.JsonPointer;
-import com.bosch.cr.json.JsonValue;
-import com.bosch.cr.model.things.FeatureProperties;
-import com.bosch.cr.model.things.Features;
-import com.bosch.cr.model.things.Thing;
-import com.bosch.cr.model.things.ThingsModelFactory;
+import com.bosch.iot.things.clientapi.things.FeatureHandle;
+import com.bosch.iot.things.clientapi.things.ThingHandle;
+import com.bosch.iot.things.clientapi.twin.Twin;
+import com.bosch.iot.things.clientapi.twin.TwinFeatureHandle;
+import com.bosch.iot.things.clientapi.twin.TwinThingHandle;
 
 /**
  * This example shows how a {@link ThingHandle} and {@link FeatureHandle} can be used to perform CRUD (Create, Read,
@@ -57,27 +58,25 @@ public class ManageFeatures extends ExamplesBase {
 
     private static final int TIMEOUT = 5;
 
-    private static final String NAMESPACE = "com.bosch.cr.integration.examples.ManageFeatures:";
     private static final String FEATURE_ID = "smokeDetector";
     private static final String FEATURE_ID2 = "elevator";
     private static final JsonPointer PROPERTY_JSON_POINTER = JsonFactory.newPointer("density");
     private static final JsonValue PROPERTY_JSON_VALUE = JsonFactory.newValue(0.7);
 
     public void crudFeature() throws InterruptedException, ExecutionException, TimeoutException {
-        LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.info("Create, read, update and delete a Feature of a Thing.");
 
-        final String thingId = NAMESPACE + UUID.randomUUID().toString();
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
+        final String thingId = generateRandomThingId();
+        final Thing thing = ThingsModelFactory.newThingBuilder()
+                .setId(thingId)
                 .setFeature(ThingsModelFactory.newFeature("foo",
                         ThingsModelFactory.newFeatureProperties(JsonFactory.newObjectBuilder().set("foo", 1).build())))
                 .build();
 
-        client.twin().registerForFeatureChanges(UUID.randomUUID().toString(), featureChange ->
-        {
+        client.twin().registerForFeatureChanges(UUID.randomUUID().toString(), featureChange -> {
             final String featureId = featureChange.getFeature().getId();
             final JsonPointer path = featureChange.getPath();
-            final Optional<JsonValue> value = featureChange.getValue() //
+            final Optional<JsonValue> value = featureChange.getValue()
                     .map(JsonValue::asObject) // "feature" is a JsonObject
                     .flatMap(jsonObj -> path.isEmpty() ? featureChange.getValue() : jsonObj.getValue(path));
             LOGGER.info("FeatureChange for featureId {} received on path {} - value was: {}", featureId, path, value);
@@ -85,29 +84,28 @@ public class ManageFeatures extends ExamplesBase {
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final ThingHandle thingHandle = client.twin().forId(thingId);
+        final ThingHandle<TwinFeatureHandle> thingHandle = client.twin().forId(thingId);
 
         thingHandle.registerForFeatureChanges(UUID.randomUUID().toString(),
                 featureChange -> LOGGER.info("{} Feature '{}'", featureChange.getAction(), featureChange.getFeature()));
 
-        thingHandle.putFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
-                .thenCompose(aVoid -> thingHandle.forFeature(FEATURE_ID).retrieve()) //
-                .thenCompose(feature ->
-                {
+        thingHandle.putFeature(ThingsModelFactory.newFeature(FEATURE_ID))
+                .thenCompose(aVoid -> thingHandle.forFeature(FEATURE_ID).retrieve())
+                .thenCompose(feature -> {
                     LOGGER.info("RETRIEVED Feature '{}'", feature);
-                    return thingHandle.putFeature(ThingsModelFactory.newFeature(FEATURE_ID) //
+                    return thingHandle.putFeature(ThingsModelFactory.newFeature(FEATURE_ID)
                             .setProperty(PROPERTY_JSON_POINTER, PROPERTY_JSON_VALUE));
-                }).thenCompose(aVoid -> thingHandle.forFeature(FEATURE_ID).delete()) //
+                }).thenCompose(aVoid -> thingHandle.forFeature(FEATURE_ID).delete())
                 .get(TIMEOUT, SECONDS);
     }
 
     public void crudFeatureProperty() throws InterruptedException, ExecutionException, TimeoutException {
-        LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.info("Create, read, update and delete a property of a Feature.");
 
-        final String thingId = NAMESPACE + UUID.randomUUID().toString();
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
-                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
+        final String thingId = generateRandomThingId();
+        final Thing thing = ThingsModelFactory.newThingBuilder()
+                .setId(thingId)
+                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID))
                 .build();
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
@@ -116,13 +114,14 @@ public class ManageFeatures extends ExamplesBase {
 
         client.twin().registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID,
                 featurePropertyChange -> LOGGER
-                        .info("Integration handler: {} Property '{}:{}'", featurePropertyChange.getAction(),
+                        .info("Things Client handler: {} Property '{}:{}'", featurePropertyChange.getAction(),
                                 featurePropertyChange.getPath(), featurePropertyChange.getValue()));
 
         client.twin()
                 .registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID, PROPERTY_JSON_POINTER,
                         featurePropertyChange -> LOGGER
-                                .info("Integration handler for property {}: {} Property '{}:{}'", PROPERTY_JSON_POINTER,
+                                .info("Things Client handler for property {}: {} Property '{}:{}'",
+                                        PROPERTY_JSON_POINTER,
                                         featurePropertyChange.getAction(), featurePropertyChange.getPath(),
                                         featurePropertyChange.getValue()));
 
@@ -131,24 +130,23 @@ public class ManageFeatures extends ExamplesBase {
                         featurePropertyChange.getAction(),
                         featurePropertyChange.getPath(), featurePropertyChange.getValue()));
 
-        featureHandle.putProperty(PROPERTY_JSON_POINTER, PROPERTY_JSON_VALUE) //
-                .thenCompose(aVoid -> featureHandle.retrieve()) //
-                .thenCompose(feature ->
-                {
+        featureHandle.putProperty(PROPERTY_JSON_POINTER, PROPERTY_JSON_VALUE)
+                .thenCompose(aVoid -> featureHandle.retrieve())
+                .thenCompose(feature -> {
                     LOGGER.info("RETRIEVED Property '{}'", feature.getProperty(PROPERTY_JSON_POINTER));
                     return featureHandle.putProperty(PROPERTY_JSON_POINTER, 0.9);
-                }) //
-                .thenCompose(aVoid -> featureHandle.deleteProperty(PROPERTY_JSON_POINTER)) //
+                })
+                .thenCompose(aVoid -> featureHandle.deleteProperty(PROPERTY_JSON_POINTER))
                 .get(TIMEOUT, SECONDS);
     }
 
     public void crudFeatureProperties() throws InterruptedException, ExecutionException, TimeoutException {
-        LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.info("Create, read, update and delete all properties of a Feature.");
 
-        final String thingId = NAMESPACE + UUID.randomUUID().toString();
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
-                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
+        final String thingId = generateRandomThingId();
+        final Thing thing = ThingsModelFactory.newThingBuilder()
+                .setId(thingId)
+                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID))
                 .build();
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
@@ -159,46 +157,42 @@ public class ManageFeatures extends ExamplesBase {
                 .info("{} Properties '{}:{}'", featurePropertyChange.getAction(), featurePropertyChange.getPath(),
                         featurePropertyChange.getValue()));
 
-        featureHandle.setProperties(ThingsModelFactory.newFeaturePropertiesBuilder() //
-                .set(PROPERTY_JSON_POINTER, PROPERTY_JSON_VALUE) //
-                .build()) //
-                .thenCompose(aVoid -> featureHandle.retrieve()) //
-                .thenCompose(feature ->
-                {
+        featureHandle.setProperties(ThingsModelFactory.newFeaturePropertiesBuilder()
+                .set(PROPERTY_JSON_POINTER, PROPERTY_JSON_VALUE)
+                .build())
+                .thenCompose(aVoid -> featureHandle.retrieve())
+                .thenCompose(feature -> {
                     LOGGER.info("RETRIEVED Properties '{}'", feature.getProperties());
-                    return featureHandle.setProperties(ThingsModelFactory.newFeaturePropertiesBuilder() //
-                            .set(PROPERTY_JSON_POINTER, 0.9) //
+                    return featureHandle.setProperties(ThingsModelFactory.newFeaturePropertiesBuilder()
+                            .set(PROPERTY_JSON_POINTER, 0.9)
                             .build());
-                }).thenCompose(aVoid -> featureHandle.deleteProperties()) //
+                }).thenCompose(aVoid -> featureHandle.deleteProperties())
                 .get(TIMEOUT, SECONDS);
     }
 
     public void deleteFeatures() throws InterruptedException, ExecutionException, TimeoutException {
-        LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
+        LOGGER.info("Deleting all features of a Thing.");
 
-        final String thingId = NAMESPACE + UUID.randomUUID().toString();
+        final String thingId = generateRandomThingId();
 
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
-                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID)) //
-                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID2)) //
+        final Thing thing = ThingsModelFactory.newThingBuilder()
+                .setId(thingId)
+                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID))
+                .setFeature(ThingsModelFactory.newFeature(FEATURE_ID2))
                 .build();
 
-        final Twin thingIntegration = client.twin();
+        final Twin twin = client.twin();
 
-        thingIntegration.create(thing).get(TIMEOUT, SECONDS);
+        twin.create(thing).get(TIMEOUT, SECONDS);
 
-        final TwinThingHandle thingHandle = thingIntegration.forId(thingId);
+        final TwinThingHandle thingHandle = twin.forId(thingId);
 
-        thingHandle.registerForFeaturesChanges(UUID.randomUUID().toString(), featuresChange -> LOGGER
-                .info("{} Features '{}:{}'", featuresChange.getAction(), featuresChange.getPath(),
-                        featuresChange.getValue()));
+        thingHandle.registerForFeaturesChanges(UUID.randomUUID().toString(),
+                featuresChange -> LOGGER.info("{} Features '{}:{}'", featuresChange.getAction(),
+                        featuresChange.getPath(), featuresChange.getValue()));
 
         thingHandle.deleteFeatures().thenCompose(aVoid -> thingHandle.retrieve())
-                .thenAccept(thing1 -> LOGGER.info("Features have been deleted: {}", thing1.getFeatures()));
-    }
-
-    public void destroy() throws InterruptedException {
-        client.destroy();
+                .thenAccept(thing1 -> LOGGER.info("Features have been deleted: {}", thing1.toJsonString()))
+                .get(TIMEOUT, SECONDS);
     }
 }

@@ -1,4 +1,4 @@
-# Bosch IoT Things service Java Integration Client examples
+# Bosch IoT Things service Java Client examples
 
 ## License
 

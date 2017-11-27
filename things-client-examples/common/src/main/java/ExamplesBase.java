@@ -44,34 +44,34 @@ import org.slf4j.LoggerFactory;
 
 import model.ExampleUser;
 
-import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.ThingsClientFactory;
-import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.LiveConfiguration;
-import com.bosch.cr.integration.client.configuration.MessageSerializerConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messages.MessageSerializerRegistry;
-import com.bosch.cr.integration.client.messages.MessageSerializers;
-import com.bosch.cr.integration.client.messaging.MessagingProviders;
-import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.cr.integration.things.ThingHandle;
-import com.bosch.cr.integration.things.ThingIntegration;
-import com.bosch.cr.integration.twin.Twin;
+import com.bosch.iot.things.client.ThingsClientFactory;
+import com.bosch.iot.things.client.configuration.CommonConfiguration;
+import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.iot.things.client.configuration.MessageSerializerConfiguration;
+import com.bosch.iot.things.client.configuration.ProxyConfiguration;
+import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.iot.things.client.messages.MessageSerializerRegistry;
+import com.bosch.iot.things.client.messages.MessageSerializers;
+import com.bosch.iot.things.client.messaging.MessagingProviders;
+import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
+import com.bosch.iot.things.clientapi.ThingsClient;
+import com.bosch.iot.things.clientapi.things.ThingHandle;
+import com.bosch.iot.things.clientapi.twin.Twin;
+import com.bosch.iot.things.clientapi.twin.TwinFeatureHandle;
 
 /**
- * Instantiates an {@link IntegrationClient} and connects to the Bosch IoT Things service. It also initializes
- * {@link ThingIntegration} and {@link ThingHandle} instances for reuse in tests that extend this base class.
+ * Instantiates an {@link ThingsClient} and connects to the Bosch IoT Things service. It also initializes {@link Twin}
+ * and {@link ThingHandle} instances for reuse in tests that extend this base class.
  */
 public abstract class ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExamplesBase.class);
 
     private static final String SOLUTION_ID = "<your-solution-id>";
-    protected static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
+    static final String SOLUTION_DEFAULT_NAMESPACE = "com.your.namespace";
 
-    protected static final String CLIENT_ID = SOLUTION_ID + ":example";
-    protected static final String CLIENT_ID2 = SOLUTION_ID + ":example2";
+    static final String CLIENT_ID = SOLUTION_ID + ":example";
+    static final String CLIENT_ID2 = SOLUTION_ID + ":example2";
 
     private static final String SOLUTION_API_TOKEN = "<your-solution-api-token-registered-in-things-service>";
 
@@ -81,7 +81,7 @@ public abstract class ExamplesBase {
     private static final String USER_NAME2 = "<another-user-name";
     private static final String PASSWORD2 = "<another-password>";
 
-    private static final URL KEYSTORE_LOCATION = ExamplesBase.class.getResource("/CRClient.jks");
+    private static final URL KEYSTORE_LOCATION = ExamplesBase.class.getResource("/ThingsClient.jks");
     private static final String ALIAS = "<your-key-alias>";
     private static final String KEYSTORE_PASSWORD = "<your-keystore-password";
     private static final String ALIAS_PASSWORD = "<your-alias-password>";
@@ -95,25 +95,25 @@ public abstract class ExamplesBase {
     //    .proxyPort(PROXY_PORT)
     //    .build();
 
-    protected final IntegrationClient client;
-    protected final IntegrationClient client2;
-    protected final Twin twin;
-    protected final String myThingId;
-    protected final ThingHandle myThing;
+    protected final ThingsClient client;
+    final ThingsClient client2;
+    final Twin twin;
+    final String myThingId;
+    final ThingHandle<TwinFeatureHandle> myThing;
 
     /**
      * Constructor.
      */
-    public ExamplesBase() {
-        final TwinConfiguration twinConfiguration = createTwinConfiguration(USER_NAME, PASSWORD);
-        final TwinConfiguration twinConfiguration2 = createTwinConfiguration(USER_NAME2, PASSWORD2);
+    ExamplesBase() {
+        final CommonConfiguration twinConfiguration = createTwinConfiguration(USER_NAME, PASSWORD);
+        final CommonConfiguration twinConfiguration2 = createTwinConfiguration(USER_NAME2, PASSWORD2);
 
-        final LiveConfiguration liveConfiguration = createLiveConfiguration(CLIENT_ID);
-        final LiveConfiguration liveConfiguration2 = createLiveConfiguration(CLIENT_ID2);
+        final CommonConfiguration liveConfiguration = createLiveConfiguration(CLIENT_ID);
+        final CommonConfiguration liveConfiguration2 = createLiveConfiguration(CLIENT_ID2);
 
-        LOGGER.info("Creating integration client ...");
+        LOGGER.info("Creating Things Client ...");
 
-        // Create a new integration client object to start interacting with IoT Things service
+        // Create a new ThingsClient object to start interacting with IoT Things service
         client = ThingsClientFactory.newInstance(twinConfiguration, liveConfiguration);
         client2 = ThingsClientFactory.newInstance(twinConfiguration2, liveConfiguration2);
 
@@ -127,11 +127,11 @@ public abstract class ExamplesBase {
             throw new IllegalStateException("Error creating Things Client.", e);
         }
 
-        this.myThingId = ":myThing_" + UUID.randomUUID().toString();
+        this.myThingId = SOLUTION_DEFAULT_NAMESPACE + ":myThing_" + UUID.randomUUID().toString();
         this.myThing = twin.forId(myThingId);
     }
 
-    private TwinConfiguration createTwinConfiguration(final String userName, final String password) {
+    private CommonConfiguration createTwinConfiguration(final String userName, final String password) {
 
         // Build a credential authentication configuration if you want to directly connect to the IoT Things service
         // via its websocket channel.
@@ -147,7 +147,7 @@ public abstract class ExamplesBase {
                 .authenticationConfiguration(credentialsAuthenticationConfiguration)
                 .build();
 
-        return ThingsClientFactory.twinConfigurationBuilder()
+        return ThingsClientFactory.configurationBuilder()
                 .apiToken(SOLUTION_API_TOKEN)
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
                 .providerConfiguration(thingsWsMessagingProviderConfiguration)
@@ -155,7 +155,7 @@ public abstract class ExamplesBase {
                 .build();
     }
 
-    private LiveConfiguration createLiveConfiguration(final String clientId) {
+    private CommonConfiguration createLiveConfiguration(final String clientId) {
 
         // Build a key-based authentication configuration for communicating with IoT Things service and with live
         final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
@@ -172,12 +172,25 @@ public abstract class ExamplesBase {
                 .authenticationConfiguration(publicKeyAuthenticationConfiguration)
                 .build();
 
-        return ThingsClientFactory.liveConfigurationBuilder()
+        final MessageSerializerConfiguration serializerConfiguration = MessageSerializerConfiguration.newInstance();
+        setupCustomMessageSerializer(serializerConfiguration);
+
+        return ThingsClientFactory.configurationBuilder()
+                .apiToken(SOLUTION_API_TOKEN)
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
                 .providerConfiguration(thingsWsMessagingProviderConfiguration)
                 //.proxyConfiguration(proxyConfiguration)
+                .serializerConfiguration(serializerConfiguration)
                 .build();
 
+    }
+
+    static String generateRandomThingId() {
+        return SOLUTION_DEFAULT_NAMESPACE + ":" + UUID.randomUUID().toString();
+    }
+
+    static String generateRandomThingId(final String prefix) {
+        return SOLUTION_DEFAULT_NAMESPACE + ":" + prefix + UUID.randomUUID().toString();
     }
 
     /**
@@ -197,9 +210,8 @@ public abstract class ExamplesBase {
         final MessageSerializerRegistry serializerRegistry = serializerConfiguration.getMessageSerializerRegistry();
 
         serializerRegistry.registerMessageSerializer(
-                MessageSerializers.of(ExampleUser.USER_CUSTOM_CONTENT_TYPE, ExampleUser.class, "*", //
-                        (exampleUser, charset) ->
-                        {
+                MessageSerializers.of(ExampleUser.USER_CUSTOM_CONTENT_TYPE, ExampleUser.class, "*",
+                        (exampleUser, charset) -> {
                             try {
                                 final Marshaller marshaller = jaxbContext.createMarshaller();
                                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -209,8 +221,7 @@ public abstract class ExamplesBase {
                             } catch (final JAXBException e) {
                                 throw new RuntimeException("Could not serialize", e);
                             }
-                        }, (byteBuffer, charset) ->
-                        {
+                        }, (byteBuffer, charset) -> {
                             try {
                                 final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                                 final ByteArrayInputStream is = new ByteArrayInputStream(byteBuffer.array());

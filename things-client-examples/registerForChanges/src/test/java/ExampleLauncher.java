@@ -32,10 +32,14 @@ public class ExampleLauncher {
 
     public static void main(final String... args) throws Exception {
         final RegisterForChanges registerForChanges = new RegisterForChanges();
-        registerForChanges.setUpCountDownLatch();
-        registerForChanges.registerForAttributeChanges();
-        registerForChanges.registerForThingChanges();
-        registerForChanges.registerForThingChangesWithDeregistration();
-        registerForChanges.destroy();
+        try {
+            registerForChanges.registerForAttributeChanges();
+            registerForChanges.registerForThingChanges();
+            registerForChanges.registerForThingChangesWithDeregistration();
+
+            registerForChanges.createThing();
+        } finally {
+            registerForChanges.destroy();
+        }
     }
 }

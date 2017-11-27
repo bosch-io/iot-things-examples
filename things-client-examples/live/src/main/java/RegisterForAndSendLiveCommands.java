@@ -25,65 +25,68 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import static org.eclipse.ditto.model.base.auth.AuthorizationModelFactory.newAuthSubject;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.model.things.Permission;
+import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingsModelFactory;
+import org.eclipse.ditto.signals.commands.live.modify.ModifyFeaturePropertyLiveCommandAnswerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.iot.things.commands.live.modify.CreateThingLiveCommandAnswerBuilder;
-import com.bosch.iot.things.commands.live.modify.ModifyFeaturePropertyLiveCommandAnswerBuilder;
+import com.bosch.iot.things.clientapi.ThingsClient;
 
 /**
- * This example shows how the {@link com.bosch.cr.integration.live.Live Live} client can be used to register for,
- * send, and respond to live commands.
+ * This example shows how the {@link com.bosch.iot.things.clientapi.live.Live} client can be used to register for, send,
+ * and respond to live commands.
  */
 public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForAndEmitLiveEvents.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForAndSendLiveCommands.class);
 
-    private final String thingId = SOLUTION_DEFAULT_NAMESPACE + ":live1";
-    private final String featureId = "temp-sensor";
+    private static final String THING_ID = generateRandomThingId("live_");
+    private static final String FEATURE_ID = "temp-sensor";
 
-    private final IntegrationClient backendClient;
-    private final IntegrationClient clientAtDevice;
+    private final ThingsClient backendClient;
+    private final ThingsClient clientAtDevice;
 
     private final CountDownLatch latch;
 
-    public RegisterForAndSendLiveCommands() throws Exception {
+    RegisterForAndSendLiveCommands() {
         backendClient = client;
         clientAtDevice = client2;
 
         latch = new CountDownLatch(2);
     }
 
-    public void registerForAndEmitLiveCommands() throws InterruptedException {
+    public void registerForAndSendLiveCommands() throws InterruptedException, TimeoutException, ExecutionException {
 
-        LOGGER.info("[AT DEVICE] register handler for 'CreateThing' LIVE commands..");
-        clientAtDevice.live()
-                .handleCreateThingCommands(command -> {
-                    LOGGER.info("[AT DEVICE] Received live command: {}", command.getType());
-                    LOGGER.info("[AT DEVICE] Thing to create: {}", command.getThing());
-                    LOGGER.info("[AT DEVICE] Answering ...");
-
-                    return command.answer()
-                            .withResponse(CreateThingLiveCommandAnswerBuilder.ResponseFactory::created)
-                            .withEvent(CreateThingLiveCommandAnswerBuilder.EventFactory::created);
-                });
+        LOGGER.info("[AT BACKEND] create a Thing with required permissions: {}", THING_ID);
+        backendClient.twin().create(THING_ID).thenCompose(created -> {
+            final Thing updated =
+                    created.toBuilder()
+                            .setPermissions(newAuthSubject(CLIENT_ID), ThingsModelFactory.allPermissions())
+                            .setPermissions(newAuthSubject(CLIENT_ID2), Permission.READ)
+                            .setFeature(ThingsModelFactory.newFeature(FEATURE_ID))
+                            .build();
+            return backendClient.twin().update(updated);
+        }).get(2, TimeUnit.SECONDS);
 
         LOGGER.info("[AT DEVICE] register handler for 'ModifyFeatureProperty' LIVE commands..");
         clientAtDevice.live()
-                .forId(thingId)
-                .forFeature(featureId)
+                .forId(THING_ID)
+                .forFeature(FEATURE_ID)
                 .handleModifyFeaturePropertyCommands(command -> {
                     LOGGER.info("[AT DEVICE] Received live command: {}", command.getType());
                     LOGGER.info("[AT DEVICE] Property to modify: '{}' to value: '{}'", command.getPropertyPointer(),
                             command.getPropertyValue());
                     LOGGER.info("[AT DEVICE] Answering ...");
-
+                    latch.countDown();
                     return command.answer()
                             .withResponse(ModifyFeaturePropertyLiveCommandAnswerBuilder.ResponseFactory::modified)
                             .withEvent(ModifyFeaturePropertyLiveCommandAnswerBuilder.EventFactory::modified);
@@ -91,27 +94,14 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
         try {
             clientAtDevice.live().startConsumption().get(10, TimeUnit.SECONDS);
+            backendClient.live().startConsumption().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IllegalStateException("Error creating Things Client.", e);
         }
 
-        LOGGER.info("[AT BACKEND] create a new LIVE Thing..");
-        backendClient.live()
-                .create(thingId)
-                .whenComplete(((thing, throwable) -> {
-                    if (throwable != null) {
-                        LOGGER.error("[AT BACKEND] Received error when creating the thing.", throwable);
-                    } else if (thing.getId().get().equals(thingId)) {
-                        LOGGER.info("[AT BACKEND] Successfully created live Thing and got response: {}", thing);
-                    } else {
-                        LOGGER.warn("[AT BACKEND] Received unexpected thing {}.", thing);
-                    }
-                    latch.countDown();
-                }));
-
         LOGGER.info("[AT BACKEND] put 'temperature' property of 'temp-sensor' LIVE Feature..");
         backendClient.live()
-                .forFeature(thingId, "temp-sensor")
+                .forFeature(THING_ID, FEATURE_ID)
                 .putProperty("temperature", 23.21)
                 .whenComplete(((_void, throwable) -> {
                     if (throwable != null) {
@@ -121,10 +111,12 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
                         LOGGER.info("[AT BACKEND] Putting the property succeeded");
                     }
                     latch.countDown();
-                }));
+                })).get(10, TimeUnit.SECONDS);
 
-        latch.await(10, TimeUnit.SECONDS);
-        terminate();
+        if (latch.await(10, TimeUnit.SECONDS)) {
+            LOGGER.info("Received all expected events!");
+        } else {
+            LOGGER.info("Did not receive all expected events!");
+        }
     }
-
 }

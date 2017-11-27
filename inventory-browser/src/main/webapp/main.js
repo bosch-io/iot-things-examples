@@ -157,7 +157,7 @@ $(document).ready(function () {
                             row.append($("<td>").text("Feature \"" + featureId + "\""));
                             var cell = $("<td>");
                             row.append(cell);
-                            var historyUrl = hasHistory ? "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/" : undefined;
+                            var historyUrl = hasHistory ? "https://demos.s-apps.de1.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/" : undefined;
                             populateDetails(cell, feature.properties, historyUrl);
                         }
                     });
@@ -341,7 +341,7 @@ $(document).ready(function () {
     // --- Click handler for showing simulator popup
     var simulateThing = function () {
         var thingId = $("#details").attr("thingId");
-        openPopupSimulator("https://demos.apps.bosch-iot-cloud.com/device-simulator2?thingId=" + thingId);
+        openPopupSimulator("https://demos.s-apps.de1.bosch-iot-cloud.com/device-simulator2/?thingId=" + thingId);
     };
 
     // --- create map

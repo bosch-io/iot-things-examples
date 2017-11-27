@@ -28,6 +28,6 @@ applications:
   memory: 16M
   disk_quota: 16M
   buildpack: https://github.com/cloudfoundry/staticfile-buildpack.git
-  domain: internal.bosch-iot-cloud.com
+  domain: internal.de1.bosch-iot-cloud.com
   host: device-simulator2
   path: /dist

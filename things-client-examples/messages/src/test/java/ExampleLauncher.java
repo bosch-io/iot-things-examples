@@ -32,8 +32,11 @@ public class ExampleLauncher {
 
     public static void main(final String... args) throws Exception {
         final RegisterForAndSendMessages registerForAndSendMessages = new RegisterForAndSendMessages();
-        registerForAndSendMessages.registerForMessages();
-        registerForAndSendMessages.sendMessages();
-        registerForAndSendMessages.destroy();
+        try {
+            registerForAndSendMessages.registerForMessages();
+            registerForAndSendMessages.sendMessages();
+        } finally {
+            registerForAndSendMessages.destroy();
+        }
     }
 }

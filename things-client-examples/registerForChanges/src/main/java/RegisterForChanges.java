@@ -25,6 +25,8 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+import static org.eclipse.ditto.model.things.ThingsModelFactory.allPermissions;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -32,20 +34,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonValue;
+import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
+import org.eclipse.ditto.model.things.Thing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.integration.things.ChangeAction;
-import com.bosch.cr.integration.things.ThingHandle;
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.json.JsonValue;
+import com.bosch.iot.things.clientapi.things.ChangeAction;
+import com.bosch.iot.things.clientapi.things.ThingHandle;
 
 /**
- * This example shows the various possibilities that the {@code IntegrationClient} offers for registering
- * handlers to be informed about {@link com.bosch.cr.integration.things.ThingChange}s and
- * {@link com.bosch.cr.integration.things.Change}s of your {@code Thing}s.
- * NOTE: Make sure to invoke {@code IntegrationClient.subscriptions().consume()} once after all handlers are
- * registered to start receiving events.
+ * This example shows the various possibilities that the {@code ThingsClient} offers for registering handlers to be
+ * informed about {@link com.bosch.iot.things.clientapi.things.ThingChange}s and {@link
+ * com.bosch.iot.things.clientapi.things.Change}s of your {@code Thing}s. NOTE: Make sure to invoke {@code
+ * ThingsClient.twin().startConsumption()} once after all handlers are registered to start receiving events.
  */
 public final class RegisterForChanges extends ExamplesBase {
 
@@ -57,27 +60,26 @@ public final class RegisterForChanges extends ExamplesBase {
     private static final String ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE = "allThings_specificAttributeChanges";
     private static final String MY_THING_ATTRIBUTE_CHANGE = "myThing_attributeChanges";
     private static final String MY_THING_SPECIFIC_ATTRIBUTE_CHANGE = "myThing_specificAttributeChanges";
-    private static CountDownLatch countDownLatch;
 
-    /**
-     * Set up the count down latch to wait until the changes were received.
-     */
-    public void setUpCountDownLatch() {
-        countDownLatch = new CountDownLatch(2);
+    private final CountDownLatch countDownLatch;
+    private final String registrationId = UUID.randomUUID().toString();
+    private final String thingId = generateRandomThingId();
+
+    RegisterForChanges() {
+        this.countDownLatch = new CountDownLatch(2);
     }
 
     /**
      * Register for {@code ThingChange}s.
      */
     public void registerForThingChanges() {
-      /* Register for change events of *all* things */
-        client.twin().registerForThingChanges(ALL_THINGS, change ->
-        {
+        /* Register for change events of *all* things */
+        client.twin().registerForThingChanges(ALL_THINGS, change -> {
             LOGGER.info("For all things: ThingChange received: {}", change);
             countDownLatch.countDown();
         });
 
-      /* Register for *all* change events of a *specific* thing */
+        /* Register for *all* change events of a *specific* thing */
         myThing.registerForThingChanges(MY_THING, change -> LOGGER.info("My Thing: ThingChange received: {}", change));
     }
 
@@ -85,26 +87,25 @@ public final class RegisterForChanges extends ExamplesBase {
      * Register for {@code ImmutableThingAttributeChange}s.
      */
     public void registerForAttributeChanges() {
-      /* Register for *all* attribute changes of *all* things */
+        /* Register for *all* attribute changes of *all* things */
         client.twin().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
                 change -> LOGGER.info("For all things: Change received: {}", change));
 
-      /* Register for *specific* attribute changes of *all* things */
+        /* Register for *specific* attribute changes of *all* things */
         client.twin()
                 .registerForAttributeChanges(ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE,
                         JsonFactory.newPointer("address/city"),
                         change -> LOGGER.info("For all things with specific Attribute: Change received: {}", change));
 
-      /* Register for *all* attribute changes of a *specific* thing */
-        myThing.registerForAttributesChanges(MY_THING_ATTRIBUTE_CHANGE, change ->
-        {
-            final Optional<JsonValue> value = change.getValue() //
+        /* Register for *all* attribute changes of a *specific* thing */
+        myThing.registerForAttributesChanges(MY_THING_ATTRIBUTE_CHANGE, change -> {
+            final Optional<JsonValue> value = change.getValue()
                     .map(JsonValue::asObject) // "attributes" is a JsonObject
                     .flatMap(jsonObj -> jsonObj.getValue(change.getPath()));
             LOGGER.info("My Thing: Change received: {} - value was: {}", change, value);
         });
 
-      /* Register for *specific* attribute changes of a *specific* thing */
+        /* Register for *specific* attribute changes of a *specific* thing */
         myThing.registerForAttributeChanges(MY_THING_SPECIFIC_ATTRIBUTE_CHANGE, JsonFactory.newPointer("address/city"),
                 change -> LOGGER.info("My Thing with specific Attribute: attributeChange received: {}", change));
     }
@@ -112,26 +113,32 @@ public final class RegisterForChanges extends ExamplesBase {
     /**
      * Register for {@code ThingChange}s and deregister after the created-event has been retrieved.
      */
-    public void registerForThingChangesWithDeregistration()
-            throws InterruptedException, ExecutionException, TimeoutException {
-        final String registrationId = UUID.randomUUID().toString();
-        final String thingId = "com.bosch.cr.example:" + UUID.randomUUID().toString();
+    public void registerForThingChangesWithDeregistration() {
         final ThingHandle thingHandle = client.twin().forId(thingId);
 
-      /* Register for *all* change events of a *specific* thing */
+        /* Register for *all* change events of a *specific* thing */
         LOGGER.info("Register handler with id: {}", registrationId);
-        thingHandle.registerForThingChanges(registrationId, change ->
-        {
+        thingHandle.registerForThingChanges(registrationId, change -> {
             LOGGER.info("{}: ThingChange received: {}", thingId, change);
-         /* Deregister when the created-event has been retrieved */
+            /* Deregister when the created-event has been retrieved */
             if (change.getAction() == ChangeAction.CREATED) {
                 LOGGER.info("{}: Deregister handler with id: {}", thingId, registrationId);
                 thingHandle.deregister(registrationId);
                 countDownLatch.countDown();
             }
         });
+    }
 
-        client.twin().create(thingId).get(10, TimeUnit.SECONDS);
+    public void createThing() throws InterruptedException, ExecutionException, TimeoutException {
+        LOGGER.info("Create thing {} and set required permissions.", thingId);
+        client2.twin().create(thingId)
+                .thenCompose(createdThing -> {
+                    final Thing updatedThing = createdThing.toBuilder()
+                            .setPermissions(AuthorizationModelFactory.newAuthSubject(CLIENT_ID), allPermissions())
+                            .setPermissions(AuthorizationModelFactory.newAuthSubject(CLIENT_ID2), allPermissions())
+                            .build();
+                    return client2.twin().update(updatedThing);
+                }).get(10, TimeUnit.SECONDS);
     }
 
     public void destroy() throws InterruptedException {

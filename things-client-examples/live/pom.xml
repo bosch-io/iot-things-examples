@@ -38,7 +38,7 @@
     </parent>
 
     <artifactId>live</artifactId>
-    <name>Bosch IoT Things :: Java Client Examples :: Live Client Integration</name>
+    <name>Bosch IoT Things :: Java Client Examples :: Things Client live channel</name>
 
     <dependencies>
         <dependency>

@@ -32,10 +32,13 @@ public class ExampleLauncher {
 
     public static void main(final String... args) throws Exception {
         final ManageFeatures manageFeatures = new ManageFeatures();
-        manageFeatures.crudFeature();
-        manageFeatures.crudFeatureProperty();
-        manageFeatures.crudFeatureProperties();
-        manageFeatures.deleteFeatures();
-        manageFeatures.destroy();
+        try {
+            manageFeatures.crudFeature();
+            manageFeatures.crudFeatureProperty();
+            manageFeatures.crudFeatureProperties();
+            manageFeatures.deleteFeatures();
+        } finally {
+            manageFeatures.terminate();
+        }
     }
 }

@@ -30,21 +30,23 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.model.base.auth.AuthorizationContext;
+import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
+import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
+import org.eclipse.ditto.model.base.common.HttpStatusCode;
+import org.eclipse.ditto.model.things.AccessControlListModelFactory;
+import org.eclipse.ditto.model.things.AclEntry;
+import org.eclipse.ditto.model.things.Thing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.integration.live.LiveThingHandle;
-import com.bosch.cr.integration.messages.RepliableMessage;
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.model.acl.AccessControlListModelFactory;
-import com.bosch.cr.model.acl.AclEntry;
-import com.bosch.cr.model.authorization.AuthorizationContext;
-import com.bosch.cr.model.authorization.AuthorizationModelFactory;
-import com.bosch.cr.model.authorization.AuthorizationSubject;
-import com.bosch.cr.model.common.HttpStatusCode;
-import com.bosch.cr.model.things.Thing;
-import com.bosch.cr.model.things.ThingsModelFactory;
+import com.bosch.iot.things.clientapi.live.LiveThingHandle;
+import com.bosch.iot.things.clientapi.messages.RepliableMessage;
 
 /**
  * This example shows how to register for- and reply to claim messages with the Things Client.
@@ -54,7 +56,6 @@ import com.bosch.cr.model.things.ThingsModelFactory;
 public final class RegisterForClaimMessages extends ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterForClaimMessages.class);
-    private static final String NAMESPACE = "com.bosch.cr.example:";
 
     private final String registrationIdAllClaimMessages;
     private final String registrationIdClaimMessagesForThing;
@@ -74,9 +75,8 @@ public final class RegisterForClaimMessages extends ExamplesBase {
      * https://things.apps.bosch-iot-cloud.com/ or any other REST client.
      */
     public void registerForClaimMessagesToAllThings() {
-        prepareClaimableThing() //
-                .thenAccept(thingHandle ->
-                {
+        prepareClaimableThing()
+                .thenAccept(thingHandle -> {
                     client.live().registerForClaimMessage(registrationIdAllClaimMessages, this::handleMessage);
                     LOGGER.info("Thing '{}' ready to be claimed", thingHandle.getThingId());
                 });
@@ -87,65 +87,67 @@ public final class RegisterForClaimMessages extends ExamplesBase {
      * To claim the prepared Thing, you can use our swagger documentation provided at
      * https://things.apps.bosch-iot-cloud.com/ or any other REST client.
      */
-    public void registerForClaimMessagesToSingleThing() {
-        prepareClaimableThing() //
-                .thenAccept(thingHandle ->
-                {
+    public void registerForClaimMessagesToSingleThing()
+            throws InterruptedException, ExecutionException, TimeoutException {
+        client.live().startConsumption().get(10, TimeUnit.SECONDS);
+        prepareClaimableThing()
+                .thenAccept(thingHandle -> {
                     thingHandle.registerForClaimMessage(registrationIdClaimMessagesForThing, this::handleMessage);
                     LOGGER.info("Thing '{}' ready to be claimed!", thingHandle.getThingId());
                 });
     }
 
     private CompletableFuture<LiveThingHandle> prepareClaimableThing() {
-        final String thingId = NAMESPACE + UUID.randomUUID().toString();
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(ExamplesBase.CLIENT_ID),
-                        AccessControlListModelFactory.allPermissions()) //
-                .build();
-
-        return client.live().create(thing).thenApply(created -> client.live().forId(thingId));
+        final String thingId = generateRandomThingId();
+        return client.twin().create(thingId)
+                .thenCompose(created -> {
+                    final Thing updated =
+                            created.toBuilder().setPermissions(AuthorizationModelFactory.newAuthSubject(CLIENT_ID),
+                                    AccessControlListModelFactory.allPermissions()).build();
+                    return client.twin().update(updated);
+                })
+                .thenApply(created -> client.live().forId(thingId));
     }
 
     private void handleMessage(final RepliableMessage<ByteBuffer, Object> message) {
-        final Optional<AuthorizationContext> optionalAuthorizationContext = message.getAuthorizationContext();
-        if (optionalAuthorizationContext.isPresent()) {
+        final AuthorizationContext authorizationContext = message.getAuthorizationContext();
+        final Optional<AuthorizationSubject> firstAuthorizationSubject =
+                authorizationContext.getFirstAuthorizationSubject();
+        if (firstAuthorizationSubject.isPresent()) {
+            final AuthorizationSubject authorizationSubject = firstAuthorizationSubject.get();
             final String thingId = message.getThingId();
-            final AuthorizationContext authorizationContext = optionalAuthorizationContext.get();
-            final AuthorizationSubject authorizationSubject = authorizationContext.getFirstAuthorizationSubject().get();
             final AclEntry aclEntry = AccessControlListModelFactory
                     .newAclEntry(authorizationSubject, AccessControlListModelFactory.allPermissions());
 
-            client.live().forId(thingId) //
-                    .retrieve() //
-                    .thenCompose(thing -> client.live().update(thing.setAclEntry(aclEntry))) //
-                    .whenComplete((aVoid, throwable) ->
-                    {
+            client.twin().forId(thingId)
+                    .retrieve()
+                    .thenCompose(thing -> client.twin().update(thing.setAclEntry(aclEntry)))
+                    .whenComplete((aVoid, throwable) -> {
                         if (null != throwable) {
-                            message.reply() //
-                                    .statusCode(HttpStatusCode.BAD_GATEWAY) //
-                                    .timestamp(OffsetDateTime.now()) //
-                                    .payload("Error: Claiming failed. Please try again later.") //
-                                    .contentType("text/plain") //
+                            message.reply()
+                                    .statusCode(HttpStatusCode.BAD_GATEWAY)
+                                    .timestamp(OffsetDateTime.now())
+                                    .payload("Error: Claiming failed. Please try again later.")
+                                    .contentType("text/plain")
                                     .send();
                             LOGGER.info("Update failed: '{}'", throwable.getMessage());
                         } else {
-                            message.reply() //
-                                    .statusCode(HttpStatusCode.OK) //
-                                    .timestamp(OffsetDateTime.now()) //
-                                    .payload(JsonFactory.newObjectBuilder().set("success", true).build()) //
-                                    .contentType("application/json") //
+                            message.reply()
+                                    .statusCode(HttpStatusCode.OK)
+                                    .timestamp(OffsetDateTime.now())
+                                    .payload(JsonFactory.newObjectBuilder().set("success", true).build())
+                                    .contentType("application/json")
                                     .send();
                             LOGGER.info("Thing '{}' claimed from authorization subject '{}'", thingId,
                                     authorizationSubject);
                         }
                     });
         } else {
-            message.reply() //
-                    .statusCode(HttpStatusCode.BAD_REQUEST) //
-                    .timestamp(OffsetDateTime.now()) //
-                    .payload("Error: no authorization context present.") //
-                    .contentType("text/plain") //
+            message.reply()
+                    .statusCode(HttpStatusCode.BAD_REQUEST)
+                    .timestamp(OffsetDateTime.now())
+                    .payload("Error: no authorization context present.")
+                    .contentType("text/plain")
                     .send();
         }
     }

@@ -32,10 +32,13 @@ public class ExampleLauncher {
 
     public static void main(final String... args) throws Exception {
         final ManageThings manageThings = new ManageThings();
-        manageThings.createReadUpdateDelete();
-        manageThings.createAComplexThing();
-        manageThings.retrieveThings();
-        manageThings.updateThing();
-        manageThings.destroy();
+        try {
+            manageThings.createReadUpdateDelete();
+            manageThings.createAComplexThing();
+            manageThings.retrieveThings();
+            manageThings.updateThing();
+        } finally {
+            manageThings.terminate();
+        }
     }
 }

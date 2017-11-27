@@ -31,24 +31,24 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
+import org.eclipse.ditto.model.things.AclEntry;
+import org.eclipse.ditto.model.things.Feature;
+import org.eclipse.ditto.model.things.Permission;
+import org.eclipse.ditto.model.things.Thing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.ThingsClientFactory;
-import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messaging.MessagingProviders;
-import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.cr.integration.things.FeatureHandle;
-import com.bosch.cr.integration.twin.Twin;
-import com.bosch.cr.json.JsonObject;
-import com.bosch.cr.model.acl.AclEntry;
-import com.bosch.cr.model.acl.Permission;
-import com.bosch.cr.model.authorization.AuthorizationSubject;
-import com.bosch.cr.model.things.Feature;
-import com.bosch.cr.model.things.Thing;
+import com.bosch.iot.things.client.ThingsClientFactory;
+import com.bosch.iot.things.client.configuration.CommonConfiguration;
+import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.iot.things.client.messaging.MessagingProviders;
+import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
+import com.bosch.iot.things.clientapi.ThingsClient;
+import com.bosch.iot.things.clientapi.things.FeatureHandle;
+import com.bosch.iot.things.clientapi.twin.Twin;
 
 /**
  * This example shows how to create and use the Java Integration Client for managing your first Hello World Thing.
@@ -84,8 +84,8 @@ public class HelloWorld {
     // public static final String PROXY_HOST = "proxy.server.com";
     // public static final int PROXY_PORT = 8080;
 
-    final IntegrationClient integrationClient;
-    final Twin twin;
+    final ThingsClient integrationClient;
+    private final Twin twin;
 
     /**
      * Client instantiation
@@ -122,7 +122,7 @@ public class HelloWorld {
                 .proxyPort(PROXY_PORT)
                 .build();*/
 
-        final TwinConfiguration twinConfiguration = ThingsClientFactory.twinConfigurationBuilder()
+        final CommonConfiguration twinConfiguration = ThingsClientFactory.configurationBuilder()
                 .apiToken(SOLUTION_API_TOKEN)
                 .defaultNamespace(SOLUTION_DEFAULT_NAMESPACE)
                 .providerConfiguration(thingsWsMessagingProviderConfiguration)
@@ -145,7 +145,7 @@ public class HelloWorld {
     /**
      * Create and update a thing with the java client.
      */
-    public void execute() {
+    private void execute() {
         try {
             // Create a Thing with a counter Feature and get the FeatureHandle
             final FeatureHandle counter = createThingWithCounter();

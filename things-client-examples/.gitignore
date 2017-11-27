@@ -1,5 +1,5 @@
 target/
-/CRClient.jks
+/ThingsClient.jks
 .classpath
 .project
 .settings

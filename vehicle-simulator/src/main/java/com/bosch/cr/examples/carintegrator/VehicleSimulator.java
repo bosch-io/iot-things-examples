@@ -43,19 +43,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.model.things.Thing;
+
 import io.netty.util.internal.ThreadLocalRandom;
 
-import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.ThingsClientFactory;
-import com.bosch.cr.integration.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
-import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messaging.MessagingProviders;
-import com.bosch.cr.integration.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.cr.integration.things.ChangeAction;
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.json.JsonObject;
-import com.bosch.cr.model.things.Thing;
+import com.bosch.iot.things.client.ThingsClientFactory;
+import com.bosch.iot.things.client.configuration.CommonConfiguration;
+import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
+import com.bosch.iot.things.client.configuration.ProxyConfiguration;
+import com.bosch.iot.things.client.messaging.MessagingProviders;
+import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
+import com.bosch.iot.things.clientapi.ThingsClient;
+import com.bosch.iot.things.clientapi.things.ChangeAction;
 
 /**
  * Example implementation of a "Gateway" that brings devices into your Solution.
@@ -101,8 +102,8 @@ public class VehicleSimulator {
                 .authenticationConfiguration(credentialsAuthenticationConfiguration)
                 .build();
 
-        TwinConfiguration.OptionalTwinConfigurationStep configurationStep = ThingsClientFactory
-                .twinConfigurationBuilder()
+        CommonConfiguration.OptionalConfigurationStep configurationStep = ThingsClientFactory
+                .configurationBuilder()
                 .apiToken(apiToken)
                 .defaultNamespace(defaultNamespace)
                 .providerConfiguration(thingsWsMessagingProviderConfiguration);
@@ -114,7 +115,7 @@ public class VehicleSimulator {
                     .build());
         }
 
-        IntegrationClient client = ThingsClientFactory.newInstance(configurationStep.build());
+        ThingsClient client = ThingsClientFactory.newInstance(configurationStep.build());
 
 
         TreeSet<String> activeThings = new TreeSet<>();
@@ -124,7 +125,7 @@ public class VehicleSimulator {
         System.out.println("Active things: " + activeThings);
 
 
-        client.things().registerForThingChanges("lifecycle", change -> {
+        client.twin().registerForThingChanges("lifecycle", change -> {
             if (change.getAction() == ChangeAction.CREATED && change.isFull()) {
                 activeThings.add(change.getThingId());
                 writeActiveThings(activeThings);
@@ -140,7 +141,7 @@ public class VehicleSimulator {
                 for (String thingId : activeThings) {
 
                     try {
-                        Thing thing = client.things().forId(thingId)
+                        Thing thing = client.twin().forId(thingId)
                                 .retrieve(JsonFactory.newFieldSelector("thingId",
                                         "features/geolocation/properties/geoposition"))
                                 .get(5, TimeUnit.SECONDS);
@@ -164,7 +165,7 @@ public class VehicleSimulator {
                                         .set("longitude", longitude + (random.nextDouble() - 0.5) / 250)
                                         .build();
 
-                        client.things()
+                        client.twin()
                                 .forFeature(thingId, "geolocation")
                                 .putProperty("geoposition", newGeoposition)
                                 .get(5, TimeUnit.SECONDS);

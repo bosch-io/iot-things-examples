@@ -32,35 +32,31 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonFieldSelector;
+import org.eclipse.ditto.json.JsonPointer;
+import org.eclipse.ditto.json.JsonValue;
+import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
+import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
+import org.eclipse.ditto.model.things.Feature;
+import org.eclipse.ditto.model.things.Permission;
+import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.json.JsonFieldSelector;
-import com.bosch.cr.json.JsonPointer;
-import com.bosch.cr.json.JsonValue;
-import com.bosch.cr.model.acl.Permission;
-import com.bosch.cr.model.authorization.AuthorizationModelFactory;
-import com.bosch.cr.model.things.Feature;
-import com.bosch.cr.model.things.Thing;
-import com.bosch.cr.model.things.ThingsModelFactory;
-
 /**
- * This example shows how a {@code ThingIntegration} or {@code ThingHandle} can be used to perform CRUD (Create, Read,
- * Update, and Delete) operations on {@code Thing}(s).
+ * This example shows how a {@code Twin} or {@code ThingHandle} can be used to perform CRUD (Create, Read, Update, and
+ * Delete) operations on {@code Thing}(s).
  */
 public class ManageThings extends ExamplesBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageThings.class);
-    private static CountDownLatch countDownLatch;
     private final String complexThingId;
 
-
-    public ManageThings() {
+    ManageThings() {
         super();
-
-        countDownLatch = new CountDownLatch(2);
-        complexThingId = ":complexThing_" + UUID.randomUUID().toString();
+        complexThingId = generateRandomThingId("complexThing_");
     }
 
     /**
@@ -75,13 +71,14 @@ public class ManageThings extends ExamplesBase {
      * @throws InterruptedException if the executing thread is interrupted while waiting for a response.
      */
     public void createReadUpdateDelete() throws InterruptedException, ExecutionException, TimeoutException {
+        LOGGER.info("Starting: createReadUpdateDelete()");
         client.twin().create(myThingId)
                 .thenCompose(createdThing -> myThing.putAttribute(JsonFactory.newPointer("address/city"), "Berlin"))
-                .thenCompose(changedSuccessfully -> myThing.retrieve()).thenCompose(retrievedThing ->
-        {
-            LOGGER.info("My thing as persisted: {}", retrievedThing);
-            return myThing.delete();
-        }).get(10, TimeUnit.SECONDS);
+                .thenCompose(changedSuccessfully -> myThing.retrieve())
+                .thenCompose(retrievedThing -> {
+                    LOGGER.info("My thing as persisted: {}", retrievedThing);
+                    return myThing.delete();
+                }).get(10, TimeUnit.SECONDS);
     }
 
     /**
@@ -95,19 +92,22 @@ public class ManageThings extends ExamplesBase {
      * @throws InterruptedException if the executing thread is interrupted while waiting for a response.
      */
     public void createAComplexThing() throws InterruptedException, ExecutionException, TimeoutException {
-      /* Create a new thing with acls, features, attributes and define handlers for success and failure */
-        final Thing complexThing = ThingsModelFactory.newThingBuilder().setId(complexThingId)
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(CLIENT_ID),
-                        ThingsModelFactory.allPermissions())
-                .setPermissions(AuthorizationModelFactory.newAuthSubject("userId"), ThingsModelFactory.allPermissions())
-                .setPermissions(AuthorizationModelFactory.newAuthSubject("anotherUserId"), Permission.READ)
-                .setFeatureProperty("featureId", JsonFactory.newPointer("propertyName"), JsonFactory.newValue("value"))
-                .setAttribute(JsonFactory.newPointer("attributeName"), JsonFactory.newValue("value")).build();
-
-        client.twin().create(complexThing).whenComplete((thing, throwable) ->
-        {
+        LOGGER.info("Starting: createAComplexThing()");
+        /* Create a new thing with acls, features, attributes and define handlers for success and failure */
+        client.twin().create(complexThingId).thenCompose(created -> {
+            final Thing updated =
+                    created.toBuilder()
+                            .setPermissions(AuthorizationModelFactory.newAuthSubject(CLIENT_ID),
+                                    ThingsModelFactory.allPermissions())
+                            .setPermissions(AuthorizationModelFactory.newAuthSubject("anotherUserId"), Permission.READ)
+                            .setFeatureProperty("featureId", JsonFactory.newPointer("propertyName"),
+                                    JsonFactory.newValue("value"))
+                            .setAttribute(JsonFactory.newPointer("attributeName"), JsonFactory.newValue("value"))
+                            .build();
+            return client.twin().update(updated);
+        }).whenComplete((thing, throwable) -> {
             if (throwable == null) {
-                LOGGER.info("Thing created: {}", thing);
+                LOGGER.info("Thing created: {}", complexThingId);
             } else {
                 LOGGER.error("Create Thing Failed: {}", throwable);
             }
@@ -126,14 +126,14 @@ public class ManageThings extends ExamplesBase {
      * @throws InterruptedException if the executing thread is interrupted while waiting for a response.
      */
     public void retrieveThings() throws InterruptedException, ExecutionException, TimeoutException {
-      /* Retrieve a Single Thing*/
+        LOGGER.info("Starting: retrieveThings()");
+        /* Retrieve a Single Thing*/
         client.twin().forId(complexThingId).retrieve().thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
                 .get(1, TimeUnit.SECONDS);
 
-      /* Retrieve a List of Things */
-        client.twin().retrieve(myThingId, complexThingId).thenAccept(things ->
-        {
-            if (things.size() == 0) {
+        /* Retrieve a List of Things */
+        client.twin().retrieve(myThingId, complexThingId).thenAccept(things -> {
+            if (things.isEmpty()) {
                 LOGGER.info(
                         "The requested things were not found, or you don't have sufficient permission to read them.");
             } else {
@@ -141,58 +141,58 @@ public class ManageThings extends ExamplesBase {
             }
         }).get(1, TimeUnit.SECONDS);
 
-      /* Retrieve a List of Things with field selectors */
+        /* Retrieve a List of Things with field selectors */
         client.twin().retrieve(JsonFieldSelector.newInstance("attributes"), myThingId, complexThingId)
-                .thenAccept(things ->
-                {
-                    if (things.size() == 0) {
-                        LOGGER
-                                .info("The requested things were not found, or you don't have sufficient permission to read them.");
+                .thenAccept(things -> {
+                    if (things.isEmpty()) {
+                        LOGGER.info(
+                                "The requested things were not found, or you don't have sufficient permission to read them.");
                     } else {
-                        things.stream()
-                                .forEach(thing -> LOGGER.info("Thing {} has attributes {}.", thing,
-                                        thing.getAttributes()));
+                        things.forEach(
+                                thing -> LOGGER.info("Thing {} has attributes {}.", thing, thing.getAttributes()));
                     }
                 }).get(1, TimeUnit.SECONDS);
     }
 
-    public void updateThing() throws InterruptedException, ExecutionException, TimeoutException {
-        final String thingId = "com.bosch.cr.example:" + UUID.randomUUID().toString();
+    public void updateThing() throws InterruptedException, TimeoutException, ExecutionException {
+        LOGGER.info("Starting: updateThing()");
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        final String thingId = "com.bosch.iot.example:" + UUID.randomUUID().toString();
         final JsonPointer attributeJsonPointer = JsonFactory.newPointer("foo");
         final JsonValue attributeJsonValue = JsonFactory.newValue("bar");
-        final Thing thing = ThingsModelFactory.newThingBuilder() //
-                .setId(thingId) //
-                .setAttribute(attributeJsonPointer, attributeJsonValue) //
+        final Thing thing = ThingsModelFactory.newThingBuilder()
+                .setId(thingId)
+                .setAttribute(attributeJsonPointer, attributeJsonValue)
                 .build();
 
-        client.twin().forId(thingId).registerForThingChanges(UUID.randomUUID().toString(), change ->
-        {
+        LOGGER.info("Registering for changes of thing {}", thingId);
+        client.twin().forId(thingId).registerForThingChanges(UUID.randomUUID().toString(), change -> {
             LOGGER.info("Received Event: {} -> {}", change.getAction(), change.getValue());
             countDownLatch.countDown();
         });
 
-        client.twin().create(thing) //
-                .thenCompose(created ->
-                {
+        LOGGER.info("Creating thing {}", thing);
+        client2.twin().create(thing)
+                .thenCompose(created -> {
+                    LOGGER.info("Thing created: {}", created.toJsonString(JsonSchemaVersion.V_1));
+
                     final Feature feature = ThingsModelFactory.newFeature("myFeature");
-                    final Thing updated = created.toBuilder() //
-                            .removeAllAttributes() //
-                            .setFeature(feature) //
+                    final Thing updated = created.toBuilder()
+                            .removeAllAttributes()
+                            .setFeature(feature)
                             .build();
 
-                    return client.twin().update(updated);
-                }) //
-                .whenComplete((aVoid, throwable) ->
-                {
-                    if (null != throwable) {
-                        LOGGER.info("Update failed: '{}'", throwable.getMessage());
-                    }
-                });
-    }
+                    LOGGER.info("Updating thing {}", updated);
+                    return client2.twin().update(updated);
+                }).whenComplete((aVoid, throwable) -> {
+            if (null != throwable) {
+                LOGGER.info("Update failed: '{}'", throwable.getMessage());
+            } else {
+                LOGGER.info("Update successful!");
+            }
+        }).get(2, TimeUnit.SECONDS);
 
-    public void destroy() throws InterruptedException {
         boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
         LOGGER.info("All events received: {}", allMessagesReceived);
-        client.destroy();
     }
 }

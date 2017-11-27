@@ -31,8 +31,18 @@
 public class ExampleLauncher {
 
     public static void main(final String... args) throws Exception {
-        final ManageAttributes manageFeatures = new ManageAttributes();
-        manageFeatures.crudAttributes();
-        manageFeatures.terminate();
+        RegisterForAndEmitLiveEvents registerForAndEmitLiveEvents = new RegisterForAndEmitLiveEvents();
+        try {
+            registerForAndEmitLiveEvents.registerForAndEmitLiveEvents();
+        } finally {
+            registerForAndEmitLiveEvents.terminate();
+        }
+
+        final RegisterForAndSendLiveCommands registerForAndSendLiveCommands = new RegisterForAndSendLiveCommands();
+        try {
+            registerForAndSendLiveCommands.registerForAndSendLiveCommands();
+        } finally {
+            registerForAndSendLiveCommands.terminate();
+        }
     }
 }

@@ -35,12 +35,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
@@ -63,10 +68,13 @@ import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConf
 import com.bosch.cr.integration.client.configuration.TwinConfiguration;
 import com.bosch.cr.integration.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
 import com.bosch.cr.integration.things.ChangeAction;
+import com.bosch.cr.integration.things.FeatureChange;
 import com.bosch.cr.json.JsonArray;
+import com.bosch.cr.json.JsonFactory;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.json.JsonPointer;
 import com.bosch.cr.json.JsonValue;
+import com.bosch.cr.model.things.Feature;
 import com.bosch.cr.model.things.Thing;
 
 /**
@@ -81,10 +89,13 @@ public class Collector implements Runnable {
     /**
      * Backlog of change values for each property
      */
-    private static final int HISTORY_SIZE = 1000;
-
+    private static final int DEFAULT_HISTORY_SIZE = 1000;
+    private static final int MAX_HISTORY_SIZE = 100000;
+    
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    private final Map<String,Feature> historianConfigCache = Collections.synchronizedMap(new Cache<>(1000));
 
     private static class History {
 
@@ -121,6 +132,8 @@ public class Collector implements Runnable {
         Thread thread = new Thread(this);
         thread.start();
 
+        Executors.newScheduledThreadPool(1).schedule(historianConfigCache::clear, 5, TimeUnit.MINUTES);
+
         LOGGER.info("Historian collector started");
     }
 
@@ -140,13 +153,15 @@ public class Collector implements Runnable {
             if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
                 LOGGER.debug("Change: {}", change);
 
+                final int historySize = getHistorySize(client, change);
+
                 // collect list of individual property changes
                 List<History> target = new LinkedList<>();
                 collectChanges(target, change.getThingId(), change.getFeature().getId(),
                         JsonPointer.newInstance(), change.getValue().get());
 
                 // write them all the the MongoDB
-                target.stream().forEachOrdered(h -> storeHistory(h));
+                target.stream().forEachOrdered(h -> storeHistory(h, historySize));
             }
         });
 
@@ -154,10 +169,43 @@ public class Collector implements Runnable {
         client.twin().startConsumption();
     }
 
+    /** Get history size limit (either default or configured by feature). */
+    private int getHistorySize(final IntegrationClient client, final FeatureChange change) {
+        Optional<Feature> historianConfig;
+        if (historianConfigCache.containsKey(change.getThingId())) {
+            historianConfig = Optional.ofNullable(historianConfigCache.get(change.getThingId()));
+        } else  {
+            try {
+                historianConfig =
+                        Optional.of(client.twin().forId(change.getThingId())
+                        .forFeature("HistorianConfig").retrieve().get(5, TimeUnit.SECONDS));
+                LOGGER.debug("Retrieved HistorianConfig for thing {}: {}", change.getThingId(), historianConfig);
+                historianConfigCache.put(change.getThingId(), historianConfig.get());
+            }
+            catch (ExecutionException e) {
+                historianConfig = Optional.empty();
+            }
+            catch (TimeoutException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        final int historySize;
+        if (!historianConfig.isPresent()) {
+            historySize = DEFAULT_HISTORY_SIZE;
+        } else {
+            historySize  = Math.min(MAX_HISTORY_SIZE, 
+                historianConfig.get().getProperty(JsonFactory.newPointer("historySize"))
+                    .orElse(JsonFactory.newValue(DEFAULT_HISTORY_SIZE)).asInt());
+            LOGGER.trace("Using custom history size {}", historySize);
+        }
+        return historySize;
+    }
+
     /**
      * Write history to the the MongoDB
      */
-    private void storeHistory(History h) {
+    private void storeHistory(History h, int historySize) {
         LOGGER.trace("Store history: {}", h);
 
         // do combined update query: add newest value+timestamp to the array property and slice array if too long
@@ -165,10 +213,10 @@ public class Collector implements Runnable {
         Update update = new Update()
                 .push("values",
                         new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
-                                .append("$slice", -HISTORY_SIZE))
+                                .append("$slice", -historySize))
                 .push("timestamps",
                         new BasicDBObject("$each", Arrays.asList(h.timestamp))
-                                .append("$slice", -HISTORY_SIZE));
+                                .append("$slice", -historySize));
 
         // update or create document for this specific property in this thing/feature
         mongoTemplate.upsert(

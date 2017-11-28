@@ -177,6 +177,7 @@ public class Collector implements Runnable {
             }
             catch (ExecutionException e) {
                 LOGGER.debug("HistorianConfig for thing {} not found or errors during retrieve: {}", change.getThingId(), e.getMessage());
+                historianConfigCache.put(change.getThingId(), null);
                 historianConfig = Optional.empty();
             }
             catch (TimeoutException | InterruptedException e) {

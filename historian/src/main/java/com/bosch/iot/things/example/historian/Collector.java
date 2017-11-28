@@ -141,13 +141,6 @@ public class Collector implements Runnable {
     public void run() {
         IntegrationClient client = setupClient();
 
-        try {
-            Thing t = client.twin().retrieve("demo:dev20170523").get(10, TimeUnit.SECONDS).get(0);
-            LOGGER.info("Thing: {}", t);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         client.twin().registerForFeatureChanges("changes", change -> {
             final ChangeAction action = change.getAction();
             if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
@@ -183,6 +176,7 @@ public class Collector implements Runnable {
                 historianConfigCache.put(change.getThingId(), historianConfig.get());
             }
             catch (ExecutionException e) {
+                LOGGER.debug("HistorianConfig for thing {} not found or errors during retrieve: {}", change.getThingId(), e.getMessage());
                 historianConfig = Optional.empty();
             }
             catch (TimeoutException | InterruptedException e) {
@@ -197,7 +191,6 @@ public class Collector implements Runnable {
             historySize  = Math.min(MAX_HISTORY_SIZE, 
                 historianConfig.get().getProperty(JsonFactory.newPointer("historySize"))
                     .orElse(JsonFactory.newValue(DEFAULT_HISTORY_SIZE)).asInt());
-            LOGGER.trace("Using custom history size {}", historySize);
         }
         return historySize;
     }
@@ -206,7 +199,7 @@ public class Collector implements Runnable {
      * Write history to the the MongoDB
      */
     private void storeHistory(History h, int historySize) {
-        LOGGER.trace("Store history: {}", h);
+        LOGGER.trace("Store history (max {}): {}", historySize, h);
 
         // do combined update query: add newest value+timestamp to the array property and slice array if too long
         String id = h.thingId + "/features/" + h.featureId + h.path;

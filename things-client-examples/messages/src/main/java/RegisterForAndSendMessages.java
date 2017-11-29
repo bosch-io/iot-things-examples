@@ -158,7 +158,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         /* not used */
         fromThingHandle.registerForMessage(MY_THING_RAW_MESSAGE, "rawMessage", message -> {
             String subject = message.getSubject();
-            Optional<ByteBuffer> payload = message.getPayload();
+            Optional<ByteBuffer> payload = message.getRawPayload();
             final String payloadAsString = payload.map(p -> StandardCharsets.UTF_8.decode(p).toString()).orElse(null);
             LOGGER.info("Match Raw Messages for fromThingId: message for subject {} with payload {} received", subject,
                     payloadAsString);

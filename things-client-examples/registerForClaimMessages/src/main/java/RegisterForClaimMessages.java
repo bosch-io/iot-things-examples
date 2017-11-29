@@ -25,7 +25,6 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
-import java.nio.ByteBuffer;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,7 +108,7 @@ public final class RegisterForClaimMessages extends ExamplesBase {
                 .thenApply(created -> client.live().forId(thingId));
     }
 
-    private void handleMessage(final RepliableMessage<ByteBuffer, Object> message) {
+    private void handleMessage(final RepliableMessage<?, Object> message) {
         final AuthorizationContext authorizationContext = message.getAuthorizationContext();
         final Optional<AuthorizationSubject> firstAuthorizationSubject =
                 authorizationContext.getFirstAuthorizationSubject();

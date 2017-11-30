@@ -43,7 +43,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -235,7 +236,7 @@ public class Controller {
         }
 
         String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") +
-                "/properties/" + propertyPath;
+                "/properties/" + encodeURIComponent(propertyPath);
         HttpGet thingsRequest = new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl")
                 + "/cr/1/things/" + httpid);
 
@@ -383,5 +384,15 @@ public class Controller {
 
         return result;
     }
+
+    /** Replacement for URLEncoder.encode(s, "UTF-8") with same sementics as JavaScript encodeURIComponent. */
+    private static String encodeURIComponent(String s) {
+        try {
+			return new URI(null, null, s, null).getRawPath();
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+    }    
+
 
 }

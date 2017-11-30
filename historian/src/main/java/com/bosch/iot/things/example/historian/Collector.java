@@ -254,7 +254,7 @@ public class Collector implements Runnable {
                 }
             }
         } else if (v.isBoolean()) {
-            return v.asBoolean();
+            return v.asBoolean() ? 1 : 0;
         } else if (v.isString()) {
             return v.asString();
         } else if (v.isArray()) {

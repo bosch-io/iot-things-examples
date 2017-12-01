@@ -1,6 +1,6 @@
 # Bosch IoT Things - Example JWT Authentication
 
-This example shows how to create a simple user interface to authenticate with JWT and list your things.
+This example shows how to create a simple user interface to authenticate with OpenID Connect and use JSON Web Tokens (JWT) to access your things.
 
 # Create a Solution
 

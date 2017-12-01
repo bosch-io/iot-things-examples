@@ -15,9 +15,24 @@ Inspire yourself for using the Bosch IoT Things service by looking at the follow
 
 The examples currently on cover some selected aspects of the functionality and do not provide a full overview of the possibilites. If you want to learn more please look at the provided background information or get in contact with us.
 
+### Example "hello-word-java-client"
+
+### Example "hello-word-webui"
+
 ### Example "inventory-browser"
 
 This example shows how to create a simple user interface to list things and their details and show the things on a map.
+
+Integrated into the inventory-browser examples are two more examples "device-simulator" and "historian".
+
+### Example "device-simulator"
+
+This example implements a simple web application to simulate a device by using a sensor information of a modern mobile phone/tablet.
+
+### Example "historian"
+
+This example shows how to collect and use data history of property values.
+It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a time series chart.
 
 ### Example "postman-collection"
 
@@ -25,17 +40,21 @@ This is a list of prepared REST call examples to demonstrate typical usages of t
 
 The provided files can be used in Google Chrome browser extension "Postman". This extension can be downloaded here: <https://www.getpostman.com/>
 
-### Example "cr-integration-api-examples"
-
-This example shows how to use the CR-Integration Client for Java. The CR-Integration Client for Java will be replaced by the upcoming Things Client for Java.
-
 ### Example "things-client-examples"
 
-This example shows how to use the upcoming of the Things Client for Java. The Things Client for Java is currently a release candidate.
+This example shows how to use the upcoming of the Things Client for Java.
 
-### Example "things-rest-angular""
+### Example "things-rest-examples"
 
-Implements a simple web application with angular.js and bootstrap to show how to use the Bosch IoT Things REST API with JavaScript.
+This example shows how to use the HTTP API within Java using the Signature Authentication.
+
+### Example "openid-jwt-login"
+
+This example shows how to create a simple user interface to authenticate with OpenID Connect and use JSON Web Tokens (JWT) to access your things.
+
+### Example "openid-browser-automation"
+
+Example application to automate a browser-based login for a _Bosch Account_ to get OpenId Connect JWT token without human interaction.
 
 ## Preparation for Java Developers
 
@@ -88,5 +107,3 @@ We also provide an OSGi-bundle:
 ## License
 
 The examples are made available under the terms of Bosch SI Example Code License. See individual files for details.
-
-As an exception the file "iframeResizer.contentWindow.min.js" is made available under the terms of the MIT License.

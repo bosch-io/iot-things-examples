@@ -1,7 +1,7 @@
 
-# openid-browser-login
+# openid-browser-automation
 
-Example application to simulate browser-based login for _Bosch Account_ to get OpenId Connect JWT token without human interaction.
+Example application to automate a browser-based login for a _Bosch Account_ to get OpenId Connect JWT token without human interaction.
 
 **IMPORTANT:**
 This example tool does only communicate with the official Bosch endpoints https://identity.bosch.com and https://accounts.bosch.com  

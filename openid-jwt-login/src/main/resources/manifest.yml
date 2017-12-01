@@ -25,10 +25,10 @@
 
 ---
 applications:
-- name: jwt-authentication
+- name: openid-jwt-login
   memory: 256M
   disk_quota: 256M
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
   domain: internal.bosch-iot-cloud.com
-  host: jwt-authentication
-  path: jwt-authentication-${project.version}
+  host: openid-jwt-login
+  path: openid-jwt-login-${project.version}

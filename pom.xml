@@ -45,12 +45,9 @@
         <module>hello-world-webui</module>
         <module>historian</module>
         <module>inventory-browser</module>
-        <module>jwt-authentication</module>
+        <module>openid-jwt-login</module>
         <module>things-client-examples</module>
-        <module>things-rest-angular</module>
         <module>things-rest-examples</module>
-        <module>track-my-phone</module>
-        <module>vehicle-simulator</module>
     </modules>
 
     <properties>

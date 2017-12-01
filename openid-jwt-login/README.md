@@ -45,14 +45,14 @@ mvn clean package
 
 Use the following command to run the server.
 ```
-java -jar target/jwt-authentication.jar
+java -jar target/openid-jwt-login.jar
 ```
 
 # Usage
 
 Browse to the Bosch IoT Things Dashboard: <https://things.apps.bosch-iot-cloud.com/> to create a demo user.
 
-Browse to the example web app: <http://localhost:8080/jwt-authentication/> and click on "Create" in the UI to create an empty Thing.
+Browse to the example web app: <http://localhost:8080/openid-jwt-login/> and click on "Create" in the UI to create an empty Thing.
 
 # License
 

@@ -38,7 +38,7 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>jwt-authentication</artifactId>
+    <artifactId>openid-jwt-login</artifactId>
     <packaging>war</packaging>
     <name>Bosch IoT Things :: JWT Example</name>
     <description>JWT (Json Web Token) Example for Bosch IoT Things</description>
@@ -96,7 +96,7 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <finalName>jwt-authentication.jar</finalName>
+                            <finalName>openid-jwt-login.jar</finalName>
                         </configuration>
                     </execution>
                 </executions>

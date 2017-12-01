@@ -49,7 +49,7 @@ import com.bosch.cr.examples.jwt.ConfigurationProperty;
 
 /**
  * Servlet which handles callbacks from google during oauth flow. You have to register
- * https://your.domain/jwt-authentication/oauth2callback/google as callback uri in your google account.
+ * https://your.domain/openid-jwt-login/oauth2callback/google as callback uri in your google account.
  */
 @WebServlet("/oauth2callback/google")
 public class GoogleCallbackServlet extends HttpServlet {

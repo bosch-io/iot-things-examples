@@ -38,25 +38,69 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>things-client-examples</artifactId>
-    <packaging>pom</packaging>
-    <name>Bosch IoT Things :: Java Client Examples</name>
-    <description>Things Client Examples for Bosch IoT Things</description>
+    <artifactId>things-rest-examples</artifactId>
+    <name>Bosch IoT Things :: REST API Examples for Java</name>
+    <description>Bosch IoT Things REST API Examples</description>
+
+    <properties>
+        <jackson.version>2.5.4</jackson.version>
+        <async-http-client.version>2.0.37</async-http-client.version>
+        <junit.version>4.12</junit.version>
+    </properties>
 
     <dependencies>
+        <!-- JSON -->
         <dependency>
-            <groupId>com.bosch.iot.things.client</groupId>
-            <artifactId>things-client</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
-        <!--Logging-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version>
         </dependency>
+
+        <!-- REST Client -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
+            <groupId>org.asynchttpclient</groupId>
+            <artifactId>async-http-client</artifactId>
+            <version>${async-http-client.version}</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.bosch.iot.things.example.http.SignatureAuthenticationExample</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

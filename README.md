@@ -15,9 +15,13 @@ Inspire yourself for using the Bosch IoT Things service by looking at the follow
 
 The examples currently on cover some selected aspects of the functionality and do not provide a full overview of the possibilites. If you want to learn more please look at the provided background information or get in contact with us.
 
-### Example "hello-word-java-client"
+### Example "mini-device-integration"
 
-### Example "hello-word-webui"
+This example shows how to create a minimal device integration example that uses the Things Client for managing your first thing.
+
+### Example "mini-webui"
+
+This example shows how to create a simple web user interface to display your first thing.
 
 ### Example "inventory-browser"
 
@@ -44,7 +48,7 @@ The provided files can be used in Google Chrome browser extension "Postman". Thi
 
 This example shows how to use the upcoming of the Things Client for Java.
 
-### Example "things-rest-examples"
+### Example "things-http-java-examples"
 
 This example shows how to use the HTTP API within Java using the Signature Authentication.
 

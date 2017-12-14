@@ -81,6 +81,8 @@ $(document).ready(function () {
                     link.click(function () {
                         openPopupHistory(historyBaseUrl + (path + prop).replace("\.", "/"));
                     });
+                    var icon = $("<span>").addClass("glyphicon").addClass("glyphicon-time").css("padding-left", ".5em");
+                    link.append(icon);
                     row.append($("<td>").html(link));
                 } else {
                     row.append($("<td>").text(JSON.stringify(value, null, 3)));
@@ -90,10 +92,36 @@ $(document).ready(function () {
 
     };
 
+    function findNestedProperty(obj, key) {
+        if (obj == null) {
+            return undefined;
+        }
+        for (var prop in obj) {
+           if (obj.hasOwnProperty(prop)) {
+               var val = obj[prop];
+               if (prop === key) {
+                   return val;
+               }
+               if (val instanceof Array) {
+                   for (var i = 0; i < val.length; i++) {
+                       var result =  findNestedProperty(val[i], key);
+                       if (result != undefined) {
+                           return result;
+                       }
+                   }
+               }
+               if (typeof val === 'object') {
+                return findNestedProperty(obj[prop], key);
+            }
+         }
+        }
+        return undefined;
+    }
+
     // --- Click handler for refreshing details
     var refreshDetails = function () {
         var thingId = $("#details").attr("thingId");
-        $.getJSON("api/1/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified")
+        $.getJSON("api/2/things/" + thingId + "?fields=attributes%2Cfeatures%2C_modified%2C_policy")
             .done(function (thing, status) {
 
                 // --- clear table content and remember thingId
@@ -105,7 +133,7 @@ $(document).ready(function () {
                 var row = $("<tr>");
                 tablebody.append(row);
                 row.append($("<td>").text("Last modified"));
-                row.append($("<td>").text(thing._modified));
+                row.append($("<td>").text(new Date(thing._modified).toLocaleString()));
 
                 if ("attributes" in thing) {
                     // --- for each attribute put row in details table
@@ -117,6 +145,9 @@ $(document).ready(function () {
                     populateDetails(cell, thing.attributes);
                 }
                 if ("features" in thing) {
+
+                    var hasHistory = findNestedProperty(thing._policy, "iot-things:b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian") != undefined;
+
                     // --- for each feature property put row in details table
                     Object.getOwnPropertyNames(thing.features).sort().forEach(function (featureId) {
                         var feature = thing.features[featureId];
@@ -126,8 +157,8 @@ $(document).ready(function () {
                             row.append($("<td>").text("Feature \"" + featureId + "\""));
                             var cell = $("<td>");
                             row.append(cell);
-                            populateDetails(cell, feature.properties,
-                                "https://demos.apps.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/");
+                            var historyUrl = hasHistory ? "https://demos.s-apps.de1.bosch-iot-cloud.com/historian/history/embeddedview/" + thingId + "/features/" + featureId + "/properties/" : undefined;
+                            populateDetails(cell, feature.properties, historyUrl);
                         }
                     });
                 }
@@ -145,7 +176,7 @@ $(document).ready(function () {
     // --- Click handler for refreshing list and map of things
     var refreshTable = function () {
 
-        $.getJSON("api/1/search/things"
+        $.getJSON("api/2/search/things"
             + "?fields=thingId,features/description,features/geolocation,features/orientation,features/xdk-sensors"
             + "&option=limit(0,200),sort(%2BthingId)")
             .fail(failHandler)
@@ -253,33 +284,53 @@ $(document).ready(function () {
     var createThing = function () {
 
         var created = function(thing, status) {
-            // include WRITE ACL for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688)
-            $.ajax("api/1/things/" + thing.thingId + "/acl/1d138250-49a8-11e6-826c-c2ae337e6688", {
+            // include WRITE permissions for simulator-user (1d138250-49a8-11e6-826c-c2ae337e6688) via implictly created policy for new Thing
+            $.ajax("api/2/policies/" + thing.thingId + "/entries/simulator", {
                 method: "PUT",
                 data: JSON.stringify({
-                    READ: false,
-                    WRITE: true,
-                    ADMINISTRATE: false
+                    subjects: { "iot-permissions:1d138250-49a8-11e6-826c-c2ae337e6688": { type: "iot-permissions-userid" } },
+                    resources: {
+                        "thing:/": {
+                            grant: [ "WRITE" ],
+                            revoke: []
+                        }
+                    }
                 })
             })
             .fail(failHandler)
             .done(function () {
-                $("#details").attr("thingId", thing.thingId);
-                refreshDetails();
-            });
+                // include READ permissions for historian-client (b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian) via implictly created policy for new Thing
+                $.ajax("api/2/policies/" + thing.thingId + "/entries/historian", {
+                    method: "PUT",
+                    data: JSON.stringify({
+                        subjects: { "iot-things:b7778cac-e89d-40e8-b5c2-2716c4031cf3:historian": { type: "iot-things-clientid" } },
+                        resources: {
+                            "thing:/": {
+                                grant: [ "READ" ],
+                                revoke: []
+                            }
+                        }
+                    })
+                })
+                .fail(failHandler)
+                .done(function () {
+                    $("#details").attr("thingId", thing.thingId);
+                    refreshDetails();
+                });
+            })
         };
 
         var thingId = window.prompt("Please enter Thing Id (e.g. \"com.acme:mydevice123\" or leave it empty to generate an id).\n\n"
-            +"You will have full access rights and the device simulator will have write access.");
+            +"You will have full access rights, the device simulator write access and historian read access.");
         if (thingId == "") {
-            $.ajax("api/1/things", {
+            $.ajax("api/2/things", {
                 method: "POST",
                 data: JSON.stringify({})
             })
             .fail(failHandler)
             .done(created);
         } else if (thingId != null) {
-            $.ajax("api/1/things/" + thingId, {
+            $.ajax("api/2/things/" + thingId, {
                 method: "PUT",
                 data: JSON.stringify({})
             })
@@ -290,7 +341,7 @@ $(document).ready(function () {
     // --- Click handler for showing simulator popup
     var simulateThing = function () {
         var thingId = $("#details").attr("thingId");
-        openPopupSimulator("https://demos.apps.bosch-iot-cloud.com/device-simulator?thingId=" + thingId);
+        openPopupSimulator("https://demos.s-apps.de1.bosch-iot-cloud.com/device-simulator2/?thingId=" + thingId);
     };
 
     // --- create map

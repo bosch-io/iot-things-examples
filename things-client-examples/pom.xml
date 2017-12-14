@@ -39,19 +39,23 @@
     </parent>
 
     <artifactId>things-client-examples</artifactId>
-    <packaging>pom</packaging>
     <name>Bosch IoT Things :: Java Client Examples</name>
     <description>Things Client Examples for Bosch IoT Things</description>
 
-    <modules>
-        <module>messages</module>
-        <module>common</module>
-        <module>manageThings</module>
-        <module>registerForChanges</module>
-        <module>manageFeatures</module>
-        <module>registerForClaimMessages</module>
-        <module>manageAttributes</module>
-        <module>live</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>com.bosch.iot.things</groupId>
+            <artifactId>things-client</artifactId>
+        </dependency>
+        <!--Logging-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

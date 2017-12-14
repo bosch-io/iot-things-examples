@@ -1,0 +1,11 @@
+.checkstyle
+.classpath
+.idea
+*.iml
+.project
+.settings
+*.swp
+target/
+META-INF/
+/ThingsClient.jks
+/config.properties

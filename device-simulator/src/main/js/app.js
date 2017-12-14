@@ -129,9 +129,10 @@
                 updateFeaturePropertiesRaw(thingId, featureId, properties)
                     .then(resolve, function onError(data) {
                         if (data.status == 404) {
+                            // on NOT FOUND create feature first and then retry updating values
                             $.ajax({
                                        type: 'PUT',
-                                       url: 'api/1/things/' + thingId + '/features/' + featureId,
+                                       url: 'api/2/things/' + thingId + '/features/' + featureId,
                                        data: JSON.stringify({}),
                                        contentType: 'application/json; charset=UTF-8'
                                    })
@@ -154,7 +155,7 @@
     function updateFeaturePropertiesRaw(thingId, featureId, properties) {
         return $.ajax({
                           type: 'PUT',
-                          url: 'api/1/things/' + thingId + '/features/' + featureId + '/properties',
+                          url: 'api/2/things/' + thingId + '/features/' + featureId + '/properties',
                           data: JSON.stringify(properties),
                           contentType: 'application/json; charset=UTF-8'
                       });

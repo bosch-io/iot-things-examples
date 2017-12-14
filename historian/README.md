@@ -51,7 +51,7 @@ Create file "config.properties" in folder "src/main/resources". _Please change t
 
 ```
 thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
-clientId=###your historian solution id ###
+clientId=###your solution id ###\:historian
 apiToken=###your historian solution API token###
 defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
@@ -60,12 +60,6 @@ keyAliasPassword=#### your key alias password ###
 http.proxyHost=#### your http proxy host, if you need one ###
 http.proxyPort=#### your http proxy host, if you need one ###
 ```
-
-Normally you should use
-```
-clientId=###your solution id ###\:historian
-```
-but this does not work due to a open bug (CR-4237) in the Things Client 3.0.0-RC9.
 
 ## Install and start a local MongoDB
 
@@ -98,6 +92,26 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
          "READ": true,
          "WRITE": false,
          "ADMINISTRATE": false
+      }
+   }
+   ...
+}
+```
+
+## Optionally configure history size for your thing
+
+If you want to define a custom history size for a thing you can do so by adding a special feature to this thing.
+Add a feature "HistoryConfig" with a property "historySize" in order to configure the custom size of the history.
+
+```
+{
+   ...
+   "features": {
+      ...
+      "HistoryConfig": {
+         "properties": {
+            "historySize": 5000
+         }
       }
    }
    ...

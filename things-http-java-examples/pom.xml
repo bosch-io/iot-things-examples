@@ -38,9 +38,9 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>things-rest-examples</artifactId>
-    <name>Bosch IoT Things :: REST API Examples for Java</name>
-    <description>Bosch IoT Things REST API Examples</description>
+    <artifactId>things-http-java-examples</artifactId>
+    <name>Bosch IoT Things :: HTTP Examples for Java</name>
+    <description>Bosch IoT Things HTTP Examples for Java</description>
 
     <properties>
         <jackson.version>2.5.4</jackson.version>

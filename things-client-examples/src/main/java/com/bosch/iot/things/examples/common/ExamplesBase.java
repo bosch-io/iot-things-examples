@@ -124,7 +124,7 @@ public abstract class ExamplesBase {
 
         final String keystoreLocationProperty = props.getProperty("keystoreLocation");
         try {
-            this.keystoreLocation = new File(keystoreLocationProperty).toURI().toURL();
+            this.keystoreLocation = getClass().getClassLoader().getResource(keystoreLocationProperty);
         } catch (Exception e) {
             throw new IllegalArgumentException(
                     "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " + e.getMessage());

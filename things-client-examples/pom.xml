@@ -39,7 +39,6 @@
     </parent>
 
     <artifactId>things-client-examples</artifactId>
-    <packaging>pom</packaging>
     <name>Bosch IoT Things :: Java Client Examples</name>
     <description>Things Client Examples for Bosch IoT Things</description>
 

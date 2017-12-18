@@ -30,15 +30,10 @@ import static java.util.Optional.of;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
@@ -200,7 +195,6 @@ public abstract class ExamplesBase {
         final CommonConfiguration.OptionalConfigurationStep configuration =
                 ThingsClientFactory.configurationBuilder()
                         .apiToken(apiToken)
-                        .defaultNamespace(namespace)
                         .providerConfiguration(thingsWsMessagingProviderConfiguration);
 
         proxyConfiguration().ifPresent(configuration::proxyConfiguration);
@@ -231,7 +225,6 @@ public abstract class ExamplesBase {
         final CommonConfiguration.OptionalConfigurationStep configuration =
                 ThingsClientFactory.configurationBuilder()
                         .apiToken(apiToken)
-                        .defaultNamespace(namespace)
                         .providerConfiguration(thingsWsMessagingProviderConfiguration)
                         .serializerConfiguration(serializerConfiguration);
 

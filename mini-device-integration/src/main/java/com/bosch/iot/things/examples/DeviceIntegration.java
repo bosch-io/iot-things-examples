@@ -166,7 +166,6 @@ public class DeviceIntegration {
         final CommonConfiguration.OptionalConfigurationStep twinConfiguration =
                 ThingsClientFactory.configurationBuilder()
                         .apiToken(apiToken)
-                        .defaultNamespace(namespace)
                         .providerConfiguration(thingsWsMessagingProviderConfiguration);
         proxyConfiguration().ifPresent(twinConfiguration::proxyConfiguration);
         return ThingsClientFactory.newInstance(twinConfiguration.build());

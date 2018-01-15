@@ -166,7 +166,7 @@ public abstract class ExamplesBase {
 
     private Properties loadConfigurationFromFile() {
         final Properties props = new Properties(System.getProperties());
-        try (InputStream in = getClass().getResourceAsStream(CONFIG_PROPERTIES_FILE)) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_PROPERTIES_FILE)) {
             props.load(in);
         } catch (IOException ioe) {
             throw new IllegalStateException(

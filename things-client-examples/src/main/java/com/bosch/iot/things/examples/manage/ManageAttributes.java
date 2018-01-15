@@ -89,7 +89,6 @@ public class ManageAttributes extends ExamplesBase {
         final ManageAttributes manageAttributes = new ManageAttributes();
         try {
             manageAttributes.crudAttributes();
-            manageAttributes.terminate();
         } finally {
             manageAttributes.terminate();
         }

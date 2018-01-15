@@ -146,7 +146,7 @@ public final class RegisterForChanges extends ExamplesBase {
     public void destroy() throws InterruptedException {
         boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
         LOGGER.info("All changes received: {}", allMessagesReceived);
-        client.destroy();
+        terminate();
     }
 
     public static void main(final String... args) throws Exception {

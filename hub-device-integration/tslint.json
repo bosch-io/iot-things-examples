@@ -1,0 +1,7 @@
+{
+    "extends": "tslint-config-standard",
+    "rules": {
+        "no-floating-promises": false,
+        "space-before-function-paren": false
+    }
+}

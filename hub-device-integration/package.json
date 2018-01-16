@@ -1,0 +1,42 @@
+{
+  "name": "hub-device-integration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run serve",
+    "build": "npm run build-ts && npm run tslint",
+    "serve": "node dist",
+    "watch-node": "nodemon dist",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"typescript,node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "test": "jest --forceExit --coverage --verbose",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "debug": "npm run build && npm run watch-debug",
+    "serve-debug": "nodemon --inspect dist",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"typescript,node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "7.0.22",
+    "@types/request-promise-native": "1.0.10",
+    "mqtt": "2.15.1",
+    "prune": "0.0.2",
+    "request-promise-native": "1.0.5",
+    "sha.js": "2.4.9"
+  },
+  "devDependencies": {
+    "@types/jest": "22.0.1",
+    "@types/supertest": "2.0.4",
+    "typescript": "2.6.2",
+    "tslint": "5.9.1",
+    "tslint-config-standard": "7.0.0",
+    "concurrently": "3.5.1",
+    "jest": "22.0.5",
+    "nodemon": "1.11.0",
+    "supertest": "3.0.0"
+  }
+}

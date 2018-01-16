@@ -6,3 +6,7 @@ target/
 .project
 .settings
 .vscode
+**/coverage
+**/node_modules
+**/dist
+**/npm-debug.log

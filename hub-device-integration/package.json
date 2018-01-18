@@ -21,7 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "7.0.22",
+    "@types/node": "9.3.0",
     "@types/request-promise-native": "1.0.10",
     "mqtt": "2.15.1",
     "prune": "0.0.2",
@@ -35,8 +35,8 @@
     "tslint": "5.9.1",
     "tslint-config-standard": "7.0.0",
     "concurrently": "3.5.1",
-    "jest": "22.0.5",
-    "nodemon": "1.11.0",
+    "jest": "22.1.2",
+    "nodemon": "1.14.11",
     "supertest": "3.0.0"
   }
 }

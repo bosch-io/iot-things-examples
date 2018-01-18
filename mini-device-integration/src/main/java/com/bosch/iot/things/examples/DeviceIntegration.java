@@ -130,7 +130,7 @@ public class DeviceIntegration {
         // Create a new Things Client instance to start interacting with Bosch IoT Things service
         thingsClient = initializeThingsClient();
 
-        thingId = namespace + UUID.randomUUID().toString();
+        thingId = namespace + ":" + UUID.randomUUID().toString();
 
         // Create a new twin client for managing things
         twin = thingsClient.twin();
@@ -304,7 +304,7 @@ public class DeviceIntegration {
 
     private Properties loadConfigurationFromFile() {
         final Properties props = new Properties(System.getProperties());
-        try (InputStream in = getClass().getResourceAsStream(CONFIG_PROPERTIES_FILE)) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_PROPERTIES_FILE)) {
             props.load(in);
         } catch (IOException ioe) {
             throw new IllegalStateException(

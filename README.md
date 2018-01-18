@@ -9,14 +9,6 @@ Further background information regarding the platform is also available at the [
 
 The example code provided here shows a selection of the Bosch IoT Things service functionality. However, the examples do not cover the complete service offering. If you need more information, please visit the links above or contact us.
 
-### Example "mini-device-integration"
-
-This example shows how to create a minimal device integration application with our Things Client.
-
-### Example "mini-webui"
-
-Learn how to create your own to UI to display the _Thing_ generated via our Java client, with the "mini-device-integration" example.
-
 ### Example "inventory-browser"
 
 This example shows how to create a simple user interface to list things and their details. Additionally, the inventory browser can show the things on a map, given that the thing provides “geolocation” information.
@@ -59,6 +51,14 @@ This example creates a web application with a login dialog. Upon successful auth
 
 Use this example in case you need to work with a OpenId Connect JWT token issued by Bosch-ID. The application mimics a browser-based login, for a Bosch account.
 
+### Example "mini-device-integration"
+
+This example shows how to create a minimal device integration application with our Things Client.
+
+### Example "mini-webui"
+
+Learn how to create your own to UI to display the _Thing_ generated via our Java client, with the "mini-device-integration" example.
+
 ## Preparation for Java Developers
 
 ### Maven Repository
@@ -92,7 +92,7 @@ After adding the public repository as described above, you can simply use the Th
 
 ```
 <dependency>
-   <groupId>com.bosch.iot.things</groupId>
+   <groupId>com.bosch.iot.things.client</groupId>
    <artifactId>things-client</artifactId>
    <version>3.0.0</version>
 </dependency>
@@ -102,7 +102,7 @@ We also provide an OSGi-bundle:
 
 ```
 <dependency>
-   <groupId>com.bosch.iot.things</groupId>
+   <groupId>com.bosch.iot.things.client</groupId>
       <artifactId>things-client-osgi</artifactId>
    <version>3.0.0</version>
 </dependency>

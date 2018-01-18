@@ -238,7 +238,7 @@ public class Controller {
         String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") +
                 "/properties/" + encodeURIComponent(propertyPath);
         HttpGet thingsRequest = new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl")
-                + "/cr/1/things/" + httpid);
+                + "/api/2/things/" + httpid);
 
         // fill in apiToken if not provided
         String apiToken = getConfig().getProperty("apiToken");

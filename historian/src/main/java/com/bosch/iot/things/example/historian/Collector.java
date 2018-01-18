@@ -35,26 +35,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
 import org.eclipse.ditto.json.JsonArray;
-import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
-import org.eclipse.ditto.model.things.Feature;
+import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -74,7 +68,6 @@ import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfigur
 import com.bosch.iot.things.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
 import com.bosch.iot.things.clientapi.ThingsClient;
 import com.bosch.iot.things.clientapi.things.ChangeAction;
-import com.bosch.iot.things.clientapi.things.FeatureChange;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -85,16 +78,11 @@ public class Collector implements Runnable {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Collector.class);
 
-    /**
-     * Backlog of change values for each property
-     */
-    private static final int DEFAULT_HISTORY_SIZE = 1000;
-    private static final int MAX_HISTORY_SIZE = 100000;
-    
+    /** Backlog of change values for each property */
+    private static final int HISTORY_SIZE = 1000;
+
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    private final Map<String,Feature> historianConfigCache = Collections.synchronizedMap(new Cache<>(1000));
 
     private static class History {
 
@@ -131,8 +119,6 @@ public class Collector implements Runnable {
         Thread thread = new Thread(this);
         thread.start();
 
-        Executors.newScheduledThreadPool(1).schedule(historianConfigCache::clear, 5, TimeUnit.MINUTES);
-
         LOGGER.info("Historian collector started");
     }
 
@@ -145,15 +131,13 @@ public class Collector implements Runnable {
             if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
                 LOGGER.debug("Change: {}", change);
 
-                final int historySize = getHistorySize(client, change);
-
                 // collect list of individual property changes
                 List<History> target = new LinkedList<>();
                 collectChanges(target, change.getThingId(), change.getFeature().getId(),
                         JsonPointer.empty(), change.getValue().get());
 
                 // write them all the the MongoDB
-                target.stream().forEachOrdered(h -> storeHistory(h, historySize));
+                target.stream().forEachOrdered(h -> storeHistory(h));
             }
         });
 
@@ -161,55 +145,21 @@ public class Collector implements Runnable {
         client.twin().startConsumption();
     }
 
-    /** Get history size limit (either default or configured by feature). */
-    private int getHistorySize(final ThingsClient client, final FeatureChange change) {
-        Optional<Feature> historianConfig;
-        if (historianConfigCache.containsKey(change.getThingId())) {
-            historianConfig = Optional.ofNullable(historianConfigCache.get(change.getThingId()));
-        } else  {
-            try {
-                historianConfig =
-                        Optional.of(client.twin().forId(change.getThingId())
-                        .forFeature("HistorianConfig").retrieve().get(5, TimeUnit.SECONDS));
-                LOGGER.debug("Retrieved HistorianConfig for thing {}: {}", change.getThingId(), historianConfig);
-                historianConfigCache.put(change.getThingId(), historianConfig.get());
-            }
-            catch (ExecutionException e) {
-                LOGGER.debug("HistorianConfig for thing {} not found or errors during retrieve: {}", change.getThingId(), e.getMessage());
-                historianConfigCache.put(change.getThingId(), null);
-                historianConfig = Optional.empty();
-            }
-            catch (TimeoutException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        final int historySize;
-        if (!historianConfig.isPresent()) {
-            historySize = DEFAULT_HISTORY_SIZE;
-        } else {
-            historySize  = Math.min(MAX_HISTORY_SIZE, 
-                historianConfig.get().getProperty(JsonFactory.newPointer("historySize"))
-                    .orElse(JsonFactory.newValue(DEFAULT_HISTORY_SIZE)).asInt());
-        }
-        return historySize;
-    }
-
     /**
      * Write history to the the MongoDB
      */
-    private void storeHistory(History h, int historySize) {
-        LOGGER.trace("Store history (max {}): {}", historySize, h);
+    private void storeHistory(History h) {
+        LOGGER.trace("Store history (max {}): {}", h);
 
         // do combined update query: add newest value+timestamp to the array property and slice array if too long
         String id = h.thingId + "/features/" + h.featureId + h.path;
         Update update = new Update()
                 .push("values",
                         new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
-                                .append("$slice", -historySize))
+                                .append("$slice", -HISTORY_SIZE))
                 .push("timestamps",
                         new BasicDBObject("$each", Arrays.asList(h.timestamp))
-                                .append("$slice", -historySize));
+                                .append("$slice", -HISTORY_SIZE));
 
         // update or create document for this specific property in this thing/feature
         mongoTemplate.upsert(
@@ -288,10 +238,9 @@ public class Collector implements Runnable {
         String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
         String clientId = props.getProperty("clientId");
         String apiToken = props.getProperty("apiToken");
-        String defaultNamespace = props.getProperty("defaultNamespace");
         URI keystoreUri;
         try {
-            keystoreUri = Collector.class.getResource("/CRClient.jks").toURI();
+            keystoreUri = Collector.class.getResource("/things-client.jks").toURI();
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }

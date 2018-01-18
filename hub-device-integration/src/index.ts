@@ -63,18 +63,30 @@ class HubDeviceIntegration {
     await this.registerThing()
     await this.registerDeviceConnection()
 
+    const PROPERTY_PATH = '/features/temperature/properties/status/sensorValue'
+
     const msg = {
       topic: THINGS_NAMESPACE + '/' + THINGS_LOCAL_THING_ID + '/things/twin/commands/modify',
-      path: '/features/temperature/properties/status/sensorValue',
+      path: PROPERTY_PATH,
       value: 0,
       headers: { 'response-required': false }
     }
 
-    msg.value = Math.random() * 20 + 10
-    await this.sendDataHttp(msg)
+    try {
+      msg.value = Math.random() * 20 + 10
+      await this.sendDataMqtt(msg)
+      await this.checkUpdate(PROPERTY_PATH, msg.value)
+    } catch (e) {
+      console.log(`ignored error in mqtt roundtrip: ${e}\n`)
+    }
 
-    msg.value = Math.random() * 20 + 10
-    await this.sendDataMqtt(msg)
+    try {
+      msg.value = Math.random() * 20 + 10
+      await this.sendDataHttp(msg)
+      await this.checkUpdate(PROPERTY_PATH, msg.value)
+    } catch (e) {
+      console.log(`ignored error in http roundtrip: ${e}\n`)
+    }
   }
 
   async registerThing() {
@@ -198,7 +210,7 @@ class HubDeviceIntegration {
             if (err) {
               reject(err)
             } else {
-              console.log(`successfully sent telemtry data over mqtt\n`)
+              console.log(`successfully sent telemtry data over mqtt`)
               resolve()
             }
           })
@@ -209,7 +221,7 @@ class HubDeviceIntegration {
 
   async sendDataHttp(msg): Promise<void> {
 
-    const r = await requestPromise({
+    await requestPromise({
       url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
       auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
       method: 'PUT',
@@ -217,7 +229,27 @@ class HubDeviceIntegration {
       body: msg
     })
 
-    console.log(`successfully sent telemtry data over http; result ${r}\n`)
+    console.log(`successfully sent telemtry data over http`)
+  }
+
+  async checkUpdate(path: string, referenceValue: any): Promise<void> {
+
+    // wait for some time ...
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    // receive value from twin
+    let result = await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
+      url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + THING_ID + path,
+      method: 'GET'
+    }))
+    let resultObj = JSON.parse(result)
+
+    if (referenceValue === resultObj) {
+      console.log('twin value is updated correctly\n')
+    } else {
+      throw new Error('twin value is not successfully updated (yet)')
+    }
+
   }
 
   // cleanup (delete) existing device/thing for proper re-registration
@@ -270,4 +302,5 @@ class HubDeviceIntegration {
 
 }
 
+console.log('\nstarting ...\n')
 new HubDeviceIntegration().start().then(() => console.log('done'), (e) => console.log(`failed: ${e}`))

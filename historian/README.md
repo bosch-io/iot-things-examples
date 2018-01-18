@@ -53,7 +53,6 @@ Create file "config.properties" in folder "src/main/resources". _Please change t
 thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
 clientId=###your solution id ###\:historian
 apiToken=###your historian solution API token###
-defaultNamespace=###the default namespace of your solution###
 keyAlias=CR
 keyStorePassword=#### your key password ###
 keyAliasPassword=#### your key alias password ###

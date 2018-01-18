@@ -1,7 +1,8 @@
 # Bosch IoT Things - Minimal device integration example
 
 This example shows how to create and use the Things Client for managing a thing entity.
-Find detailed instructions in our [tutorial](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:client:client)</a>
+
+Find detailed instructions in our [tutorial](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:client:client).
 
 ## Configure your settings
 

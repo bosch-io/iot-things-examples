@@ -24,7 +24,7 @@
  * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
-package com.bosch.cr.integration.helloworld;
+package com.bosch.iot.things.tutorial.ui;
 
 import java.io.File;
 import java.io.FileReader;
@@ -85,7 +85,7 @@ public class ProxyServlet extends HttpServlet {
         }
         System.out.println("Config: " + props);
         targetHost = HttpHost.create(
-                props.getProperty("thingsServiceEndpointUrl", "https://things.apps.bosch-iot-cloud.com"));
+                props.getProperty("thingsServiceEndpointUrl", "https://things.s-apps.de1.bosch-iot-cloud.com"));
     }
 
     @Override
@@ -136,16 +136,16 @@ public class ProxyServlet extends HttpServlet {
         if (httpClient == null) {
             HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
-            if (props.getProperty("http.proxyHost") != null) {
-                httpClientBuilder.setProxy(new HttpHost(props.getProperty("http.proxyHost"),
-                        Integer.parseInt(props.getProperty("http.proxyPort"))));
+            if (props.getProperty("proxyHost") != null) {
+                httpClientBuilder.setProxy(new HttpHost(props.getProperty("proxyHost"),
+                        Integer.parseInt(props.getProperty("proxyPort"))));
             }
 
-            if (props.getProperty("http.proxyUser") != null) {
+            if (props.getProperty("proxyUser") != null) {
                 CredentialsProvider credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(new AuthScope(targetHost),
-                        new UsernamePasswordCredentials(props.getProperty("http.proxyUser"),
-                                props.getProperty("http.proxyPwd")));
+                        new UsernamePasswordCredentials(props.getProperty("proxyUser"),
+                                props.getProperty("proxyPwd")));
                 httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
             }
 

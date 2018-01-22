@@ -49,6 +49,12 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.ditto.json.JsonArray;
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.json.JsonPointer;
+import org.eclipse.ditto.json.JsonValue;
+import org.eclipse.ditto.model.things.Feature;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -60,22 +66,15 @@ import org.springframework.stereotype.Component;
 
 import com.mongodb.BasicDBObject;
 
-import com.bosch.cr.integration.IntegrationClient;
-import com.bosch.cr.integration.client.ThingsClientFactory;
-import com.bosch.cr.integration.client.configuration.ProviderConfiguration;
-import com.bosch.cr.integration.client.configuration.ProxyConfiguration;
-import com.bosch.cr.integration.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.cr.integration.client.configuration.TwinConfiguration;
-import com.bosch.cr.integration.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
-import com.bosch.cr.integration.things.ChangeAction;
-import com.bosch.cr.integration.things.FeatureChange;
-import com.bosch.cr.json.JsonArray;
-import com.bosch.cr.json.JsonFactory;
-import com.bosch.cr.json.JsonObject;
-import com.bosch.cr.json.JsonPointer;
-import com.bosch.cr.json.JsonValue;
-import com.bosch.cr.model.things.Feature;
-import com.bosch.cr.model.things.Thing;
+import com.bosch.iot.things.client.ThingsClientFactory;
+import com.bosch.iot.things.client.configuration.CommonConfiguration;
+import com.bosch.iot.things.client.configuration.ProviderConfiguration;
+import com.bosch.iot.things.client.configuration.ProxyConfiguration;
+import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
+import com.bosch.iot.things.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
+import com.bosch.iot.things.clientapi.ThingsClient;
+import com.bosch.iot.things.clientapi.things.ChangeAction;
+import com.bosch.iot.things.clientapi.things.FeatureChange;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -139,7 +138,7 @@ public class Collector implements Runnable {
 
     @Override
     public void run() {
-        IntegrationClient client = setupClient();
+        ThingsClient client = setupClient();
 
         client.twin().registerForFeatureChanges("changes", change -> {
             final ChangeAction action = change.getAction();
@@ -151,7 +150,7 @@ public class Collector implements Runnable {
                 // collect list of individual property changes
                 List<History> target = new LinkedList<>();
                 collectChanges(target, change.getThingId(), change.getFeature().getId(),
-                        JsonPointer.newInstance(), change.getValue().get());
+                        JsonPointer.empty(), change.getValue().get());
 
                 // write them all the the MongoDB
                 target.stream().forEachOrdered(h -> storeHistory(h, historySize));
@@ -163,7 +162,7 @@ public class Collector implements Runnable {
     }
 
     /** Get history size limit (either default or configured by feature). */
-    private int getHistorySize(final IntegrationClient client, final FeatureChange change) {
+    private int getHistorySize(final ThingsClient client, final FeatureChange change) {
         Optional<Feature> historianConfig;
         if (historianConfigCache.containsKey(change.getThingId())) {
             historianConfig = Optional.ofNullable(historianConfigCache.get(change.getThingId()));
@@ -271,7 +270,7 @@ public class Collector implements Runnable {
         }
     }
 
-    private static IntegrationClient setupClient() throws RuntimeException, NumberFormatException {
+    private static ThingsClient setupClient() throws RuntimeException, NumberFormatException {
         Properties props = new Properties(System.getProperties());
         try {
             if (new File("config.properties").exists()) {
@@ -321,9 +320,8 @@ public class Collector implements Runnable {
                 .authenticationConfiguration(authenticationConfiguration)
                 .build();
 
-        TwinConfiguration.OptionalTwinConfigurationStep configSettable = TwinConfiguration.newBuilder()
+        CommonConfiguration.OptionalConfigurationStep configSettable = CommonConfiguration.newBuilder()
                 .apiToken(apiToken)
-                .defaultNamespace(defaultNamespace)
                 .providerConfiguration(providerConfig);
 
         if (proxyHost != null && proxyPort != null) {
@@ -334,9 +332,7 @@ public class Collector implements Runnable {
                             .build());
         }
 
-        IntegrationClient client = ThingsClientFactory.newInstance(configSettable.build());
-
-        return client;
+        return ThingsClientFactory.newInstance(configSettable.build());
     }
 
 }

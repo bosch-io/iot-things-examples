@@ -120,6 +120,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.4.4.RELEASE</version>
                 <configuration>
                     <mainClass>com.bosch.iot.things.example.historian.Application</mainClass>
                 </configuration>

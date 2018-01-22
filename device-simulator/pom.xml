@@ -62,7 +62,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
                         <id>copy-app</id>
@@ -74,11 +74,11 @@
                             <outputDirectory>${project.build.directory}/dist</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main</directory>
+                                    <directory>${project.basedir}/src/main</directory>
                                     <filtering>false</filtering>
                                 </resource>
                                 <resource>
-                                    <directory>/</directory>
+                                    <directory>${project.basedir}</directory>
                                     <filtering>true</filtering>
                                     <include>nginx.conf</include>
                                 </resource>

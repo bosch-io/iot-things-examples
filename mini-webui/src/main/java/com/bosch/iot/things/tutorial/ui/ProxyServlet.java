@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.Properties;
 
 import javax.servlet.ServletConfig;
@@ -107,8 +108,7 @@ public class ProxyServlet extends HttpServlet {
 
             String user = "";
             if (auth.toUpperCase().startsWith("BASIC ")) {
-                String userpassDecoded =
-                        new String(new sun.misc.BASE64Decoder().decodeBuffer(auth.substring("BASIC ".length())));
+                String userpassDecoded = new String(Base64.getDecoder().decode(auth.substring("BASIC ".length())));
                 user = userpassDecoded.substring(0, userpassDecoded.indexOf(':'));
                 String pass = userpassDecoded.substring(userpassDecoded.indexOf(':') + 1);
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user, pass);

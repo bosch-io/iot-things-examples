@@ -95,7 +95,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>/</directory>
+                                    <directory>${project.basedir}</directory>
                                     <filtering>true</filtering>
                                     <include>**/*.yml</include>
                                 </resource>

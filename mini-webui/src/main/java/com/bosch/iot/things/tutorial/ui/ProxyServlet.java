@@ -58,7 +58,7 @@ import org.apache.http.message.BasicHttpRequest;
 @WebServlet(ProxyServlet.URL_PATTERN)
 public class ProxyServlet extends HttpServlet {
 
-    private static final String URL_PREFIX = "/cr";
+    private static final String URL_PREFIX = "/api";
     static final String URL_PATTERN = URL_PREFIX + "/*";
 
     private HttpHost targetHost;

@@ -49,7 +49,7 @@ $(document).ready(function () {
     };
 
     var refreshDetails = function () {
-        var path = "cr/1/things/" + thingId + "/features/counter/properties/value";
+        var path = "api/2/things/" + thingId + "/features/counter/properties/value";
 
         // Get thing
         $.getJSON(path).done(function (value) {

@@ -258,7 +258,7 @@ class HubDeviceIntegration {
     try {
       const r = await requestPromise({
         url: 'https://device-registry.bosch-iot-hub.com/credentials/' + HUB_TENANT
-          + '?device-id=X' + HUB_DEVICE_ID + '&auth-id=' + HUB_DEVICE_AUTH_ID + '&type=' + 'hashed-password',
+          + '?device-id=' + HUB_DEVICE_ID + '&auth-id=' + HUB_DEVICE_AUTH_ID + '&type=' + 'hashed-password',
         method: 'DELETE'
         // auth: { username: username, password: password }
       })

@@ -3,7 +3,10 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true
   },
   "files": [
     "./node_modules/@types/node/index.d.ts"

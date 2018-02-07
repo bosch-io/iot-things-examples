@@ -1,0 +1,31 @@
+{
+  "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
+  "websocketHeaders": {
+    "x-cr-api-token": "<<<your-api-token>>>"
+  },
+  "accessories": {
+    "subject": "iot-permissions:<<<your-accessories-userid>>>",
+    "username": "<<<your-accessories-username>>>",
+    "password": "<<<your-accessories-password>>>"
+  },
+  "deviceCommissioning": {
+    "subject": "iot-permissions:<<<your-deviceCommissioning-userid>>>",
+    "username": "<<<your-deviceCommissioning-username>>>",
+    "password": "<<<your-deviceCommissioning-password>>>"
+  },
+  "deviceSimulation": {
+    "subject": "iot-permissions:<<<your-deviceSimulation-userid>>>",
+    "username": "<<<your-deviceSimulation-username>>>",
+    "password": "<<<your-deviceSimulation-password>>>"
+  },
+  "frontend": {
+    "username": "<<<your-frontend-username>>>",
+    "password": "<<<your-frontend-password>>>"
+    "apitoken": "<<<your-api-token>>>",
+    "baseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
+    "thingId": "<<<your-thingid>>>",
+    "policyId": "<<<your-policyid>>>",
+    "hubTenant": "<<<your-hub-tenant>>>",
+    "hubDevicePassword": "<<<your-desired-hub-device-password>>>"
+  }
+}

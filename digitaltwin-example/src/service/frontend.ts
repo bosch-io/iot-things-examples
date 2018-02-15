@@ -24,6 +24,7 @@ export class Frontend {
   }
 
   async start(): Promise<void> {
+    console.log()
     console.log('[Frontend] start')
 
     await this.recreateEntities()
@@ -222,7 +223,7 @@ export class Frontend {
   }
 
   async commission() {
-    console.log('[Frontend] commission')
+    console.log('[Frontend] trigger commission')
 
     const commissionRequest = {
       hubTenant: HUB_TENANT,
@@ -281,7 +282,7 @@ export class Frontend {
   }
 
   async retrieveSupportedAccessories() {
-    console.log('[Frontend] retrieveSupportedAccessories')
+    console.log('[Frontend] trigger retrieveSupportedAccessories')
     const options = {
       ...DEFAULT_OPTIONS,
       url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID + '/features/Accessories/inbox/messages/retrieveSupportedAccessories',

@@ -31,14 +31,17 @@ export class DeviceCommissioning {
         this.ws = ws
 
         this.ws.on('message', (data) => {
-          if (data.toString().startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(data.toString()) as ThingMessageInfo))
+          const dataString = data.toString()
+          if (dataString.startsWith('{')) {
+            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              // ignore START-SEND-*:ACK
           } else {
             console.log('[Commissioning] unprocessed non-json data: ' + data)
           }
         })
 
-        this.ws.send('START-SEND-MESSAGES', (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'START-SEND-MESSAGES websocket send ok')))
+        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[Commissioning] websocket send error ${err}`) })
       })
   }
 
@@ -47,7 +50,7 @@ export class DeviceCommissioning {
     if (m.channel === 'live' && m.criterion === 'messages' && m.action === 'commission'
       && m.path === '/features/Commissioning/inbox/messages/commission') {
 
-      const requestValue = JSON.parse(m.value.toString()) as {
+      const requestValue = m.value as {
         hubTenant: string,
         hubDevicePasswordHashed: string
       }
@@ -67,7 +70,7 @@ export class DeviceCommissioning {
 
     // ##################################### CURRENTLY NO COMMISSIONING TO BOSCH IOT HUB
     // tslint:disable-next-line:no-constant-condition
-    if (1 > 0) return 'NOP-COMMISSIONING'
+    if (1 > 0) return 'DUMMY COMMISSIONING DONE'
 
     const hubDeviceId = p.localThingId
     const hubDeviceAuthId = hubDeviceId

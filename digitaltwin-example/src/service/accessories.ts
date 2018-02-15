@@ -27,14 +27,17 @@ export class Accessories {
         this.ws = ws
 
         this.ws.on('message', (data) => {
-          if (data.toString().startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(data.toString()) as ThingMessageInfo))
+          const dataString = data.toString()
+          if (dataString.startsWith('{')) {
+            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              // ignore START-SEND-*:ACK
           } else {
             console.log('[Accessories] unprocessed non-json data: ' + data)
           }
         })
 
-        this.ws.send('START-SEND-MESSAGES', (err) => console.log('[Accessories] ' + (err ? 'START-SEND-MESSAGES websocket send error ' + err : 'START-SEND-MESSAGES websocket send ok')))
+        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[Accessories] websocket send error ${err}`) })
       })
   }
 
@@ -45,7 +48,7 @@ export class Accessories {
 
       const subject = m.path.substr('/features/Accessories/inbox/messages/'.length)
 
-      const requestValue = JSON.parse(m.value.toString())
+      const requestValue = m.value
       const input = { ...requestValue, thingId: m.thingId, localThingId: m.localThingId }
       console.log(`[Accessories] received request ${subject}`)
 
@@ -64,7 +67,7 @@ export class Accessories {
   }
 
   private async retrieveSupportedAccessories(p: { thingId, localThingId }): Promise<string> {
-    return 'NO ACCESSORIES'
+    return 'HERE ARE THE ACCESSORIES'
   }
 
 }

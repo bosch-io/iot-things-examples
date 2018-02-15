@@ -18,7 +18,7 @@ export namespace util {
   }
 
   /** Opens WebSocket and prepares automatic re-open and keep-alive (heartbeat) mechanism. */
-  export function openWebSocket(url: string, options, timeout, onOpenCallback: (ws: NodeWebSocket) => void) {
+  export function openWebSocket(url: string, options: any, timeout: number, onOpenCallback: (ws: NodeWebSocket) => void) {
 
     let ws = new NodeWebSocket(url, options)
 
@@ -31,7 +31,7 @@ export namespace util {
 
     ws.on('close', () => {
       console.log('websocket closed; trying to re-open')
-      setTimeout(() => openWebSocket(url, options, onOpenCallback, timeout), timeout)
+      setTimeout(() => openWebSocket(url, options, timeout, onOpenCallback), timeout)
     })
 
     ws.on('error', (err) => {

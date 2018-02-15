@@ -42,17 +42,20 @@ export class DeviceSimulation {
         this.ws = ws
 
         this.ws.on('message', (data) => {
-          if (data.toString().startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(data.toString()) as ThingMessageInfo))
+          const dataString = data.toString()
+          if (dataString.startsWith('{')) {
+            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              // ignore START-SEND-*:ACK
           } else {
             console.log('[DeviceSimulation] unprocessed non-json data: ' + data)
           }
         })
 
-        this.ws.send('START-SEND-EVENTS', (err) => console.log('[DeviceSimulation] ' + (err ? 'START-SEND-EVENTS websocket send error ' + err : 'START-SEND-EVENTS websocket send ok')))
-        this.ws.send('START-SEND-MESSAGES', (err) => console.log('[DeviceSimulation] ' + (err ? 'START-SEND-MESSAGES websocket send error ' + err : 'START-SEND-MESSAGES websocket send ok')))
-        this.ws.send('START-SEND-LIVE-COMMANDS', (err) => console.log('[DeviceSimulation] ' + (err ? 'START-SEND-LIVE-COMMANDS websocket send error ' + err : 'START-SEND-LIVE-COMMANDS websocket send ok')))
-        this.ws.send('START-SEND-LIVE-EVENTS', (err) => console.log('[DeviceSimulation] ' + (err ? 'START-SEND-LIVE-EVENTS websocket send error ' + err : 'START-SEND-LIVE-EVENTS websocket send ok')))
+        this.ws.send('START-SEND-EVENTS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+        this.ws.send('START-SEND-LIVE-COMMANDS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+        this.ws.send('START-SEND-LIVE-EVENTS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
 
         setInterval(() => this.updateStatus(), 4000)
       })

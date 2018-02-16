@@ -61,8 +61,8 @@ export class Frontend {
       },
       features: {
         Device: {
+          definition: ['com.acme:D100:2.1.0'],
           properties: {
-            definition: ['com.acme:D100:2.1.0'],
             config: {
               threshold: 11
             },
@@ -71,13 +71,11 @@ export class Frontend {
           }
         },
         Commissioning: {
-          properties: {
-            definition: ['org.ditto:HonoCommissioning:1.0.0']
-          }
+          definition: ['org.ditto:HonoCommissioning:1.0.0']
         },
         Description: {
+          definition: ['org.eclipse.vorto.standard:Descriptive:1.0.0'],
           properties: {
-            definition: ['org.eclipse.vorto.standard:Descriptive:1.0.0'],
             config: {
               displayName: 'My D100A device'
             }
@@ -92,8 +90,8 @@ export class Frontend {
           }
         },
         Accessories: {
+          definition: ['com.bosch.catalog:Accessories:2.0.0'],
           properties: {
-            definition: ['com.bosch.catalog:Accessories:2.0.0'],
             xyz: 123
           }
         }

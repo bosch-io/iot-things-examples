@@ -1,0 +1,29 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Properties validation of definition <com.acme.device:D100:2.1.0>",
+	"type": "object",
+	"properties": {
+		"configuration": {
+			"type": "object",
+			"properties": {
+				"threshold": {
+					"description": "Lower bound threshold for reporting new temperature values",
+					"type": "number"
+				}
+			},
+			"required": ["threshold"]
+		},
+		"status": {
+			"type": "object",
+			"properties": {
+				"temperature": {
+					"description": "Current temperature if Celsius",
+					"type": "number",
+					"minimum": -273.15
+				}
+			},
+			"required": []
+		}
+	},
+	"required" : ["config"]
+}

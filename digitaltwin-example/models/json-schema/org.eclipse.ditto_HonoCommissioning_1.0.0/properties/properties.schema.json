@@ -1,0 +1,7 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Properties validation of definition <org.eclipse.ditto:HonoCommissioning:1.0.0>",
+	"type": "object",
+	"properties": {
+	}
+}

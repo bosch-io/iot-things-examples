@@ -31,34 +31,47 @@ export class DeviceSimulation {
     threshold?: number
   } = {}
 
-  // constructor() {
-  // }
+  start(): Promise<void> {
+    return new Promise((resolve, reject): void => {
+      console.log('[DeviceSimulation] start')
 
-  start() {
-    console.log('[DeviceSimulation] start')
+      let pendingAcks: Array<string> = []
 
-    util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
-      (ws) => {
-        this.ws = ws
+      // timeout if we cannot start within 10 secs
+      setTimeout(() => reject(`DeviceSimulation start timeout; pending acks: ${pendingAcks}`), 10000)
 
-        this.ws.on('message', (data) => {
-          const dataString = data.toString()
-          if (dataString.startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
-          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
-              // ignore START-SEND-*:ACK
-          } else {
-            console.log('[DeviceSimulation] unprocessed non-json data: ' + data)
-          }
+      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+        (ws) => {
+          this.ws = ws
+
+          setInterval(() => this.updateStatus(), 4000)
+
+          this.ws.on('message', (data) => {
+            const dataString = data.toString()
+            if (dataString.startsWith('{')) {
+              this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+            } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              let i = pendingAcks.indexOf(dataString)
+              if (i > -1) {
+                pendingAcks.splice(i, 1)
+                if (pendingAcks.length === 0) {
+                  console.log('[DeviceSimulation] started')
+                  resolve()
+                }
+              } else {
+                console.log('[DeviceSimulation] excessive ACK ignored: ' + data)
+              }
+            } else {
+              console.log('[DeviceSimulation] unprocessed non-json data: ' + data)
+            }
+          })
+
+          this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+          this.ws.send('START-SEND-LIVE-COMMANDS', (err) => { pendingAcks.push('START-SEND-LIVE-COMMANDS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+          this.ws.send('START-SEND-LIVE-EVENTS', (err) => { pendingAcks.push('START-SEND-LIVE-EVENTS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
         })
-
-        this.ws.send('START-SEND-EVENTS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-        this.ws.send('START-SEND-LIVE-COMMANDS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-        this.ws.send('START-SEND-LIVE-EVENTS', (err) => { if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-
-        setInterval(() => this.updateStatus(), 4000)
-      })
+    })
   }
 
   private process(m: ThingMessage) {

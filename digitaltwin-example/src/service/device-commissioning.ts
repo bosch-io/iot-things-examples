@@ -26,29 +26,45 @@ export class DeviceCommissioning {
 
   private ws?: NodeWebSocket
 
-  async start(): Promise<void> {
-    console.log('[Commissioning] start')
+  start(): Promise<void> {
+    return new Promise((resolve, reject): void => {
+      console.log('[Commissioning] start')
 
-    // DEBUG
-    // await this.commission({ thingId: 'abc:xxx', localThingId: 'xxx:', hubTenant: 'xxx', hubDevicePasswordHashed: 'xxx' })
+      let pendingAcks: Array<string> = []
 
-    util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
-      (ws) => {
-        this.ws = ws
+      // timeout if we cannot start within 10 secs
+      setTimeout(() => reject(`Commissioning start timeout; pending acks: ${pendingAcks}`), 10000)
 
-        this.ws.on('message', (data) => {
-          const dataString = data.toString()
-          if (dataString.startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
-          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
-            // ignore START-SEND-*:ACK
-          } else {
-            console.log('[Commissioning] unprocessed non-json data: ' + data)
-          }
+      // DEBUG
+      // await this.commission({ thingId: 'abc:xxx', localThingId: 'xxx:', hubTenant: 'xxx', hubDevicePasswordHashed: 'xxx' })
+
+      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+        (ws) => {
+          this.ws = ws
+
+          this.ws.on('message', (data) => {
+            const dataString = data.toString()
+            if (dataString.startsWith('{')) {
+              this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+            } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              let i = pendingAcks.indexOf(dataString)
+              if (i > -1) {
+                pendingAcks.splice(i, 1)
+                if (pendingAcks.length === 0) {
+                  console.log('[Commissioning] started')
+                  resolve()
+                }
+              } else {
+                console.log('[Commissioning] excessive ACK ignored: ' + data)
+              }
+            } else {
+              console.log('[Commissioning] unprocessed non-json data: ' + data)
+            }
+          })
+
+          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[Commissioning] websocket send error ${err}`) })
         })
-
-        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[Commissioning] websocket send error ${err}`) })
-      })
+    })
   }
 
   private process(m: ThingMessage) {

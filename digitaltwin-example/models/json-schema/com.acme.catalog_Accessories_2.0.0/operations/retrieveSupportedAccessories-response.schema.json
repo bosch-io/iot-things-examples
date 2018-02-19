@@ -1,0 +1,26 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Return Type Validation",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"properties": {
+			"name": {
+				"description": "",
+				"type": "string"
+			},
+			"manufacturer": {
+				"description": "",
+				"type": "string"
+			},
+			"gtin": {
+				"description": "",
+				"type": "string",
+				"pattern": "^[0-9]{8,14}$"
+			}
+		},
+		"required": [
+			"name"
+		]
+	}
+}

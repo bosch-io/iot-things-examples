@@ -19,26 +19,42 @@ export class Accessories {
 
   private ws?: NodeWebSocket
 
-  async start(): Promise<void> {
-    console.log('[Accessories] start')
+  start(): Promise<void> {
+    return new Promise((resolve, reject): void => {
+      console.log('[Accessories] start')
 
-    util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
-      (ws) => {
-        this.ws = ws
+      let pendingAcks: Array<string> = []
 
-        this.ws.on('message', (data) => {
-          const dataString = data.toString()
-          if (dataString.startsWith('{')) {
-            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
-          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
-            // ignore START-SEND-*:ACK
-          } else {
-            console.log('[Accessories] unprocessed non-json data: ' + data)
-          }
+      // timeout if we cannot start within 10 secs
+      setTimeout(() => reject(`Accessories start timeout; pending acks: ${pendingAcks}`), 10000)
+
+      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+        (ws) => {
+          this.ws = ws
+
+          this.ws.on('message', (data) => {
+            const dataString = data.toString()
+            if (dataString.startsWith('{')) {
+              this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+            } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+              let i = pendingAcks.indexOf(dataString)
+              if (i > -1) {
+                pendingAcks.splice(i, 1)
+                if (pendingAcks.length === 0) {
+                  console.log('[Accessories] started')
+                  resolve()
+                }
+              } else {
+                console.log('[Accessories] excessive ACK ignored: ' + data)
+              }
+            } else {
+              console.log('[Accessories] unprocessed non-json data: ' + data)
+            }
+          })
+
+          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[Accessories] websocket send error ${err}`) })
         })
-
-        this.ws.send('START-SEND-MESSAGES', (err) => { if (err) console.log(`[Accessories] websocket send error ${err}`) })
-      })
+    })
   }
 
   private process(m: ThingMessage) {

@@ -31,7 +31,7 @@ export class Accessories {
           if (dataString.startsWith('{')) {
             this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
           } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
-              // ignore START-SEND-*:ACK
+            // ignore START-SEND-*:ACK
           } else {
             console.log('[Accessories] unprocessed non-json data: ' + data)
           }
@@ -66,8 +66,12 @@ export class Accessories {
     console.log('[Accessories] unprocessed data: ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
-  private async retrieveSupportedAccessories(p: { thingId, localThingId }): Promise<string> {
-    return 'HERE ARE THE ACCESSORIES'
+  private async retrieveSupportedAccessories(p: { thingId, localThingId })
+    : Promise<Array<{ name: string, manufacturer: string, gtin: string }>> {
+    return [
+      { name: 'Recharger', manufacturer: 'ACME', gtin: '12345678' },
+      { name: 'Bag', manufacturer: 'Binford', gtin: '12345678901234999' }
+    ]
   }
 
 }

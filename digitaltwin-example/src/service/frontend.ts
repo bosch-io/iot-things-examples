@@ -2,6 +2,7 @@
 import * as fs from 'fs'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
+import * as Ajv from 'ajv'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
@@ -15,6 +16,12 @@ const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
   auth: { user: CONFIG.frontend.username, pass: CONFIG.frontend.password },
   headers: { 'x-cr-api-token': CONFIG.frontend.apitoken }
 }
+
+const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
+  .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
+
+const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/com.acme.catalog_Accessories_2.0.0/operations/retrieveSupportedAccessories-response.schema.json', 'utf8')))
+const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commission-response.schema.json', 'utf8')))
 
 export class Frontend {
   // express: any
@@ -61,7 +68,7 @@ export class Frontend {
       },
       features: {
         Device: {
-          definition: ['com.acme:D100:2.1.0'],
+          definition: ['com.acme.device:D100:2.1.0'],
           properties: {
             config: {
               threshold: 11
@@ -71,7 +78,7 @@ export class Frontend {
           }
         },
         Commissioning: {
-          definition: ['org.ditto:HonoCommissioning:1.0.0']
+          definition: ['org.eclipse.ditto:HonoCommissioning:1.0.0']
         },
         Description: {
           definition: ['org.eclipse.vorto.standard:Descriptive:1.0.0'],
@@ -90,10 +97,7 @@ export class Frontend {
           }
         },
         Accessories: {
-          definition: ['com.bosch.catalog:Accessories:2.0.0'],
-          properties: {
-            xyz: 123
-          }
+          definition: ['com.acme.catalog:Accessories:2.0.0']
         }
       }
     }
@@ -224,8 +228,8 @@ export class Frontend {
     console.log('[Frontend] trigger commission')
 
     const commissionRequest = {
-      hubTenant: HUB_TENANT,
-      hubDevicePasswordHashed: shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64')
+      tenantId: HUB_TENANT,
+      devicePasswordHashed: shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64')
     }
 
     const options = {
@@ -243,6 +247,13 @@ export class Frontend {
     try {
       const response = await requestPromise(options)
       console.log(`[Frontend] commissioning response: ${JSON.stringify(response)}`)
+
+      if (COMMISSION_RESPONSE_VALIDATION(response)) {
+        console.log(`[Frontend] commissioning response valid`)
+        return response
+      } else {
+        console.log(`[Frontend] commissioning response validation faild: ${JSON.stringify(COMMISSION_RESPONSE_VALIDATION.errors)}`)
+      }
     } catch (e) {
       console.log(`[Frontend] commissioning failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
     }
@@ -279,7 +290,7 @@ export class Frontend {
     }
   }
 
-  async retrieveSupportedAccessories() {
+  async retrieveSupportedAccessories(): Promise<any> {
     console.log('[Frontend] trigger retrieveSupportedAccessories')
     const options = {
       ...DEFAULT_OPTIONS,
@@ -290,9 +301,17 @@ export class Frontend {
     try {
       const response = await requestPromise(options)
       console.log(`[Frontend] retrieveSupportedAccessories response: ${JSON.stringify(response)}`)
+
+      if (ACCESSORIES_RESPONSE_VALIDATION(response)) {
+        console.log(`[Frontend] retrieveSupportedAccessories response valid`)
+        return response
+      } else {
+        console.log(`[Frontend] retrieveSupportedAccessories response validation faild: ${JSON.stringify(ACCESSORIES_RESPONSE_VALIDATION.errors)}`)
+      }
     } catch (e) {
       console.log(`[Frontend] retrieveSupportedAccessories failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
     }
+    return undefined
   }
 
 }

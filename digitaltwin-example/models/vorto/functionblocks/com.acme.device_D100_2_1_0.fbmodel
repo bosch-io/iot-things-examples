@@ -1,0 +1,23 @@
+namespace com.acme.device
+version 2.1.0
+displayname "D100"
+description "Function block model for D100"
+category example	
+using examples.datatypes.measurement.units.TemperatureUnit; 1.0.0
+
+functionblock D100 {
+
+	configuration{ 
+		mandatory threshold as double "Lower bound threshold for reporting new temperature values"
+	}
+
+	status{ 
+		optional temperature as double <MIN -273.15> "Current temperature if Celsius"
+	}
+
+	fault{
+	}
+
+	operations{
+	}
+}	

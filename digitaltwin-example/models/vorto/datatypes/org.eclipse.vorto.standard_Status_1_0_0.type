@@ -1,0 +1,10 @@
+namespace org.eclipse.vorto.standard
+version 1.0.0
+displayname "Status"
+description "Type for Status"
+category general
+		
+entity Status {
+	mandatory code as int <MIN 100, MAX 599> "Status code according to HTTP status code information; see https://tools.ietf.org/html/rfc7231#section-6"
+	text as string "Optional text description of status"
+}

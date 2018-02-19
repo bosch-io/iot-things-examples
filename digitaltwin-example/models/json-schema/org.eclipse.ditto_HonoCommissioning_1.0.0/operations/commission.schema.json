@@ -1,0 +1,17 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Operation payload validation of definition <org.eclipse.ditto:HonoCommissioning:1.0.0> for message subject (operation name) <commission>",
+	"description": "Perform commissioning of new device to enable device connectivity via Eclipse Hono. Please note that the Eclipse Hono 'device-id' and 'auth-id' are derived from the thing-id used in Eclipse Ditto.",
+	"type": "object",
+	"properties": {
+		"tenantId": {
+			"description": "Tenant information for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			"type": "string"
+		},
+		"devicePasswordHashed": {
+			"description": "SHA-512 hashed device password for Eclipse Hono; see https://www.eclipse.org/hono/api/credentials-api/",
+			"type": "string"
+		}
+	},
+	"required" : ["tenantId","devicePasswordHashed"]
+}

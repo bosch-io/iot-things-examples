@@ -3,16 +3,15 @@ import { DeviceCommissioning } from './service/device-commissioning'
 import { DeviceSimulation } from './service/device-simulation'
 import { Accessories } from './service/accessories'
 
-// async function sleep(milliseconds): Promise<void> {
-//   return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
-// }
-
 async function startAll() {
-  await new Accessories().start()
-  await new DeviceCommissioning().start()
-  await new DeviceSimulation().start()
+  // start all supporting services
+  await Promise.all([
+    new Accessories().start(),
+    new DeviceCommissioning().start(),
+    new DeviceSimulation().start()])
 
+  // start Frontend
   await new Frontend().start()
 }
 
-startAll().catch(console.log)
+startAll().catch(e => console.log(`[Index] Start failed: ${e}`))

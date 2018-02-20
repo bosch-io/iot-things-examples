@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
 import * as Ajv from 'ajv'
+import { util } from '../util/util'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
@@ -30,7 +31,7 @@ export class Frontend {
     // this.express = express()
   }
 
-  async start(): Promise<void> {
+  async start() {
     console.log()
     console.log('[Frontend] start')
 
@@ -124,7 +125,9 @@ export class Frontend {
           }
         },
         device: {
-          subjects: {}, // will be set programmatically further down
+          subjects: {
+            [CONFIG.deviceSimulation.subject]: { type: 'any' }
+          },
           resources: {
             'thing:/features/Device/properties/status': {
               grant: ['WRITE'],
@@ -137,20 +140,24 @@ export class Frontend {
           }
         },
         accessories: {
-          subjects: {}, // will be set programmatically further down
+          subjects: {
+            [CONFIG.accessories.subject]: { type: 'any' }
+          },
           resources: {
-            'thing:/features/Accessories': {
+            'message:/features/Accessories/inbox/messages': {
               grant: ['READ', 'WRITE'],
               revoke: []
             },
-            'message:/features/Accessories/inbox/messages': {
-              grant: ['READ', 'WRITE'],
+            'thing:/features/Productinfo': {
+              grant: ['READ', ''],
               revoke: []
             }
           }
         },
         commissiong: {
-          subjects: {}, // will be set programmatically further down
+          subjects: {
+            [CONFIG.deviceCommissioning.subject]: { type: 'any' }
+          },
           resources: {
             'message:/features/Commissioning/inbox/messages/commission': {
               grant: ['READ'],
@@ -161,36 +168,25 @@ export class Frontend {
       }
     }
 
-    policy.entries.device.subjects[CONFIG.deviceSimulation.subject] = { type: 'any' }
-    policy.entries.accessories.subjects[CONFIG.accessories.subject] = { type: 'any' }
-    policy.entries.commissiong.subjects[CONFIG.deviceCommissioning.subject] = { type: 'any' }
-
     let cleanup: Array<() => void> = []
 
     // delete old Thing / Policy
 
-    // #####################################
+    cleanup.push(() => requestPromise({
+      ...DEFAULT_OPTIONS,
+      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID,
+      method: 'DELETE'
+    }))
+    cleanup.push(() => requestPromise({
+      ...DEFAULT_OPTIONS,
+      url: CONFIG.frontend.baseUrl + '/api/2/policies/' + POLICY_ID,
+      method: 'DELETE'
+    }))
 
-    // cleanup.push(() => requestPromise({
-    //   ...DEFAULT_OPTIONS,
-    //   url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID,
-    //   method: 'DELETE'
-    // }))
-    // cleanup.push(() => requestPromise({
-    //   ...DEFAULT_OPTIONS,
-    //   url: CONFIG.frontend.baseUrl + '/api/2/policies/' + POLICY_ID,
-    //   method: 'DELETE'
-    // }))
-
-    // console.log('[Frontend] cleanup')
-    // cleanup.forEach(async (f, i, a) => {
-    //   try {
-    //     await f()
-    //   } catch (e) {
-    //     console.log(`[Frontend] ignore failed cleanup ${e}`)
-    //   }
-    //   a.splice(i)
-    // })
+    console.log('[Frontend] cleanup')
+    util.processAll(cleanup, '[Frontend] ignore failed cleanup')
+    // wait some time as cleanup can take a bit in a CAP-theorem-driven world
+    await util.sleep(2000)
 
     // create Policy
 
@@ -219,7 +215,8 @@ export class Frontend {
         body: thing
       })
     } catch (e) {
-      cleanup.forEach((f, i, a) => { f(); a.splice(i) })
+      util.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
+      throw e
     }
 
   }

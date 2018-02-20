@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
+import * as requestPromise from 'request-promise-native'
 import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
 import { util } from '../util/util'
 
@@ -14,6 +15,12 @@ const WEBSOCKET_OPTIONS = {
   }
 }
 const WEBSOCKET_REOPEN_TIMEOUT = 1000
+
+const REQUEST_OPTIONS: requestPromise.RequestPromiseOptions = {
+  json: true,
+  auth: { user: CONFIG.accessories.username, pass: CONFIG.accessories.password },
+  headers: { 'x-cr-api-token': CONFIG.frontend.apitoken }
+}
 
 export class Accessories {
 
@@ -84,10 +91,22 @@ export class Accessories {
 
   private async retrieveSupportedAccessories(p: { thingId, localThingId })
     : Promise<Array<{ name: string, manufacturer: string, gtin: string }>> {
-    return [
-      { name: 'Recharger', manufacturer: 'ACME', gtin: '12345678' },
-      { name: 'Bag', manufacturer: 'Binford', gtin: '12345678901234999' }
-    ]
+
+    const productinfo = await requestPromise({
+      ...REQUEST_OPTIONS,
+      url: CONFIG.frontend.baseUrl + '/api/2/things/' + p.thingId + '/features/Productinfo/properties/config',
+      method: 'GET'
+    })
+    console.log(`[Accessories] lookup product info: ${JSON.stringify(productinfo)}`)
+
+    if (productinfo.model === 'D100A' && productinfo.manufacturer === 'ACME') {
+      return [
+        { name: 'Recharger', manufacturer: 'ACME', gtin: '12345678' },
+        { name: 'Bag', manufacturer: 'Binford', gtin: '12345678901234' }
+      ]
+    } else {
+      return []
+    }
   }
 
 }

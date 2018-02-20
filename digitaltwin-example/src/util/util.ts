@@ -66,4 +66,19 @@ export namespace util {
     } as ThingMessageInfo)
   }
 
+  export function processAll(a: Array<() => void>, logprefix) {
+    a.forEach(async (f, i, a) => {
+      try {
+        await f()
+      } catch (e) {
+        console.log(`${logprefix}: ${JSON.stringify(e.error || e)}`)
+      }
+      a.splice(i)
+    })
+  }
+
+  export async function sleep(milliseconds): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
+  }
+
 }

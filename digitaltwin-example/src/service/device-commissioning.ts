@@ -1,3 +1,30 @@
+/*
+ *                                            Bosch SI Example Code License
+ *                                              Version 1.0, January 2016
+ *
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ * disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+ * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+ * BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+ * LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+ * THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+ * UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+ * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+ * EMPLOYEES, REPRESENTATIVES AND ORGANS.
+ */
+
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
@@ -11,7 +38,7 @@ const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 const WEBSOCKET_OPTIONS = {
   agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
   headers: {
-    ...CONFIG.websocketHeaders,
+    ...CONFIG.httpHeaders,
     'Authorization': 'Basic ' + new Buffer(CONFIG.deviceCommissioning.username + ':' + CONFIG.deviceCommissioning.password).toString('base64')
   }
 }
@@ -21,6 +48,13 @@ const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
   .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
 
 const COMMISSION_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commission.schema.json', 'utf8')))
+
+interface CommissionRequest {
+  tenantId: string,
+  deviceId: string,
+  optionalAuthId?: string,
+  optionalPwdHash?: string
+}
 
 export class DeviceCommissioning {
 
@@ -79,11 +113,7 @@ export class DeviceCommissioning {
         return
       }
 
-      const requestValue = m.value as {
-        tenantId: string,
-        devicePasswordHashed: string
-      }
-      const input = { ...requestValue, thingId: m.thingId, localThingId: m.localThingId }
+      const input = { ...m.value, thingId: m.thingId }
 
       util.processWithResponse(m, this.commission, input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'websocket send response ok')))
@@ -94,81 +124,104 @@ export class DeviceCommissioning {
     console.log('[Commissioning] unprocessed data: ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
-  private async commission(p: { thingId, localThingId, tenantId, devicePasswordHashed })
+  private async commission(p: CommissionRequest & { thingId: string })
     : Promise<{ code: number, text?: string }> {
 
-    // ##################################### CURRENTLY NO COMMISSIONING TO BOSCH IOT HUB
-    // tslint:disable-next-line:no-constant-condition
-    if (1 > 0) return { code: 200, text: 'Dummy Commissioning OK' }
+    console.log(`[Commissioning] register hub device ${JSON.stringify({ p, ...{ optionalPwdHash: 'xxx' } })}`)
 
-    const hubTenant = p.tenantId
-    const hubDeviceId = p.localThingId
-    const hubDeviceAuthId = hubDeviceId
+    // ### Snippet for Dummy Commissioning
+    // tslint:disable-next-line:no-constant-condition
+    // if (1 > 0) return { code: 200, text: 'Dummy Commissioning OK' }
 
     let cleanup: Array<() => void> = []
 
+    if (p.optionalAuthId) {
+      cleanup.push(() => requestPromise({
+        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId
+          + '?device-id=' + p.deviceId + '&auth-id=' + p.optionalAuthId + '&type=' + 'hashed-password',
+        method: 'DELETE'
+      }))
+    }
     cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/credentials/' + hubTenant
-        + '?device-id=' + hubDeviceId + '&auth-id=' + hubDeviceAuthId + '&type=' + 'hashed-password',
-      method: 'DELETE'
-    }))
-    cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + hubTenant + '/' + hubDeviceId,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId + '/' + p.deviceId,
       method: 'DELETE'
     }))
     console.log('[Commissioning] cleanup')
-    cleanup.forEach(async (f, i, a) => {
-      try {
-        await f()
-      } catch (e) {
-        console.log(`[Commissioning] ignore failed cleanup ${e}`)
-      }
-      a.splice(i)
-    })
+    await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
 
-    console.log(`[Commissioning] register hub device ${JSON.stringify(p)} hubDeviceId: ${hubDeviceId}, hubDeviceAuthId: ${hubDeviceAuthId}`)
+    console.log(`[Commissioning] register hub device ${p.tenantId} ${p.deviceId}`)
     const r = await requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + hubTenant,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId,
       method: 'POST',
       json: true,
+      resolveWithFullResponse: true,
       body: {
-        'device-id': hubDeviceId
+        'device-id': p.deviceId
       }
     })
-    console.log(`[Commissioning]   result ${r}`)
+    console.log(`[Commissioning] result ${r.statusCode} ${r.headers.location}`)
 
     cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + hubTenant + '/' + hubDeviceId,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId + '/' + p.deviceId,
+      method: 'DELETE'
+    }))
+
+    if (p.optionalAuthId) {
+      try {
+        console.log(`[Commissioning] register hub device credential ${p.tenantId} ${p.deviceId} ${p.optionalAuthId}`)
+        const r2 = await requestPromise({
+          url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId,
+          method: 'POST',
+          json: true,
+          resolveWithFullResponse: true,
+          body: {
+            'device-id': p.deviceId,
+            'auth-id': p.optionalAuthId,
+            'type': 'hashed-password',
+            'secrets': [{
+              'hash-function': 'sha-512',
+              'pwd-hash': p.optionalPwdHash
+            }]
+          }
+        })
+        console.log(`[Commissioning] credential result ${r2.statusCode} ${r2.headers.location}`)
+      } catch (e) {
+        await util.processAll(cleanup, '[Commissioning] cleanup credential registration')
+        throw e
+      }
+    }
+
+    cleanup.push(() => requestPromise({
+      url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId
+        + '?device-id=' + p.deviceId + '&auth-id=' + p.optionalAuthId + '&type=' + 'hashed-password',
       method: 'DELETE'
     }))
 
     try {
-      console.log(`[Commissioning] register hub device credential`)
-      const r2 = await requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + hubTenant,
-        method: 'POST',
-        json: true,
-        body: {
-          'device-id': hubDeviceId,
-          'auth-id': hubDeviceAuthId,
-          'type': 'hashed-password',
-          'secrets': [{
-            'hash-function': 'sha-512',
-            'pwd-hash': p.devicePasswordHashed
-          }]
+      let body: any = {
+        status: {
+          date: new Date(),
+          hubTenantId: p.tenantId,
+          hubDeviceId: p.deviceId
         }
-      })
-      console.log(`[Commissioning]   result ${r2}`)
-    } catch (err) {
-      cleanup.forEach((f, i, a) => { f(); a.splice(i) })
-      throw err
-    }
+      }
+      if (p.optionalAuthId) {
+        body.status.hubAuthId = p.optionalAuthId
+      }
 
-    cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/credentials/' + hubTenant
-        + '?device-id=' + hubDeviceId + '&auth-id=' + hubDeviceAuthId + '&type=' + 'hashed-password',
-      method: 'DELETE'
-    }))
+      await requestPromise({
+        url: CONFIG.httpBaseUrl + '/api/2/things/' + p.thingId + '/features/Commissioning/properties',
+        method: 'PUT',
+        json: true,
+        auth: { user: CONFIG.deviceCommissioning.username, pass: CONFIG.deviceCommissioning.password },
+        headers: CONFIG.httpHeaders,
+        body: body
+      })
+      console.log('[Commissioning] update commissioning info successful')
+    } catch (e) {
+      console.log(`[Commissioning] update commissioning info failed ${e}`)
+      throw e
+    }
 
     return { code: 200, text: 'Hub Commissioning OK' }
   }

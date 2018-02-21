@@ -5,13 +5,21 @@
 	"type": "object",
 	"properties": {
 		"tenantId": {
-			"description": "Tenant information for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			"description" : "Tenant information for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
 			"type": "string"
 		},
-		"devicePasswordHashed": {
-			"description": "SHA-512 hashed device password for Eclipse Hono; see https://www.eclipse.org/hono/api/credentials-api/",
+		"deviceId": {
+			"description" : "Device-Id for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			"type": "string"
+		},
+		"optionalAuthId": {
+			"description" : "Device specific Auth-Id or empty if another existing Auth-Id will be used; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			"type": "string"
+		},
+		"optionalPwdHash": {
+			"description" : "SHA-512 hashed device password for Eclipse Hono; see https://www.eclipse.org/hono/api/credentials-api/",
 			"type": "string"
 		}
 	},
-	"required" : ["tenantId","devicePasswordHashed"]
+	"required" : ["tenantId", "deviceId", "optionalAuthId", "optionalPwdHash"]
 }

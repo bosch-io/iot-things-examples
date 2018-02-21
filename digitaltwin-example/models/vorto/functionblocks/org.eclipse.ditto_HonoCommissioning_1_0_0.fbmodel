@@ -19,7 +19,9 @@ functionblock HonoCommissioning {
 	operations{
 		commission(
 			tenantId as string "Tenant information for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
-			devicePasswordHashed as string "SHA-512 hashed device password for Eclipse Hono; see https://www.eclipse.org/hono/api/credentials-api/"
+			deviceId as string "Device-Id for Eclipse Hono; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			optionalAuthId as string "Device specific Auth-Id or empty if another existing Auth-Id will be used; see https://www.eclipse.org/hono/user-guide/device-registry/",
+			optionalPwdHash as string "SHA-512 hashed device password for Eclipse Hono; see https://www.eclipse.org/hono/api/credentials-api/"
 			// todo: add "salt" and other credential infos in parameters
 		) returns Status
 		"Perform commissioning of new device to enable device connectivity via Eclipse Hono. Please note that the Eclipse Hono 'device-id' and 'auth-id' are derived from the thing-id used in Eclipse Ditto."

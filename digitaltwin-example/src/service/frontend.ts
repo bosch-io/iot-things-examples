@@ -1,4 +1,30 @@
-// import * as express from 'express'
+/*
+ *                                            Bosch SI Example Code License
+ *                                              Version 1.0, January 2016
+ *
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ * disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+ * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+ * BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+ * LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+ * THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+ * UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+ * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+ * EMPLOYEES, REPRESENTATIVES AND ORGANS.
+ */
+
 import * as fs from 'fs'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
@@ -10,12 +36,14 @@ const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 const THING_ID = CONFIG.frontend.thingId
 const POLICY_ID = CONFIG.frontend.policyId
 const HUB_TENANT = CONFIG.frontend.hubTenant
+const HUB_DEVICE_ID = CONFIG.frontend.hubDeviceId
+const HUB_AUTH_ID = CONFIG.frontend.hubAuthId
 const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
 
 const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
   json: true,
   auth: { user: CONFIG.frontend.username, pass: CONFIG.frontend.password },
-  headers: { 'x-cr-api-token': CONFIG.frontend.apitoken }
+  headers: CONFIG.httpHeaders
 }
 
 const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
@@ -25,11 +53,6 @@ const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse
 const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commission-response.schema.json', 'utf8')))
 
 export class Frontend {
-  // express: any
-
-  constructor() {
-    // this.express = express()
-  }
 
   async start() {
     console.log()
@@ -43,22 +66,7 @@ export class Frontend {
     setInterval(await this.retrieveSupportedAccessories, 7000)
 
     setInterval(await this.configureThreshold, 15000)
-
-    // this.express.listen(8080, (err: any) => {
-    //   if (err) {
-    //     return console.log('Frontend] ' + err)
-    //   }
-    //   return console.log(`[Frontend] listening on 8080`)
-    // })
-    // this.mountRoutes()
   }
-
-  // private mountRoutes(): void {
-  //   const router = express.Router()
-  //   router.get('/', (req, res) => {
-  //   })
-  //   this.express.use('/', router)
-  // }
 
   async recreateEntities() {
 
@@ -126,7 +134,8 @@ export class Frontend {
         },
         device: {
           subjects: {
-            [CONFIG.deviceSimulation.subject]: { type: 'any' }
+            [CONFIG.deviceSimulation.subject]: { type: 'any' },
+            [CONFIG.frontend.hubThingsIntegrationSubject]: { type: 'any' }
           },
           resources: {
             'thing:/features/Device/properties/status': {
@@ -149,18 +158,22 @@ export class Frontend {
               revoke: []
             },
             'thing:/features/Productinfo': {
-              grant: ['READ', ''],
+              grant: ['READ'],
               revoke: []
             }
           }
         },
-        commissiong: {
+        commissioning: {
           subjects: {
             [CONFIG.deviceCommissioning.subject]: { type: 'any' }
           },
           resources: {
             'message:/features/Commissioning/inbox/messages/commission': {
               grant: ['READ'],
+              revoke: []
+            },
+            'thing:/features/Commissioning': {
+              grant: ['READ', 'WRITE'],
               revoke: []
             }
           }
@@ -174,17 +187,17 @@ export class Frontend {
 
     cleanup.push(() => requestPromise({
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID,
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID,
       method: 'DELETE'
     }))
     cleanup.push(() => requestPromise({
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/policies/' + POLICY_ID,
+      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
       method: 'DELETE'
     }))
 
     console.log('[Frontend] cleanup')
-    util.processAll(cleanup, '[Frontend] ignore failed cleanup')
+    await util.processAll(cleanup, '[Frontend] ignore failed cleanup')
     // wait some time as cleanup can take a bit in a CAP-theorem-driven world
     await util.sleep(2000)
 
@@ -193,14 +206,14 @@ export class Frontend {
     console.log('[Frontend] create/update policy')
     await requestPromise({
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/policies/' + POLICY_ID,
+      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
       method: 'PUT',
       body: policy
     })
 
     cleanup.push(() => requestPromise({
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/policies/' + POLICY_ID,
+      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
       method: 'DELETE'
     }))
 
@@ -210,12 +223,12 @@ export class Frontend {
       console.log('[Frontend] create/update thing')
       await requestPromise({
         ...DEFAULT_OPTIONS,
-        url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID,
+        url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID,
         method: 'PUT',
         body: thing
       })
     } catch (e) {
-      util.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
+      await util.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
       throw e
     }
 
@@ -226,12 +239,14 @@ export class Frontend {
 
     const commissionRequest = {
       tenantId: HUB_TENANT,
-      devicePasswordHashed: shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64')
+      deviceId: HUB_DEVICE_ID,
+      optionalAuthId: HUB_AUTH_ID,
+      optionalPwdHash: HUB_DEVICE_PASSWORD ? shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64') : ''
     }
 
     const options = {
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID + '/features/Commissioning/inbox/messages/commission',
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Commissioning/inbox/messages/commission',
       method: 'POST',
       json: true,
       headers: {
@@ -258,10 +273,11 @@ export class Frontend {
 
   async configureThreshold() {
     let threshold = 18 + Math.random() * 10
+
     console.log(`[Frontend] configureThreshold ${threshold}`)
     const options = {
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/config/threshold',
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/config/threshold',
       method: 'PUT',
       body: threshold
     }
@@ -276,7 +292,7 @@ export class Frontend {
   async retrieveDeviceTwinState() {
     const options = {
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/status',
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/status',
       method: 'GET'
     }
     try {
@@ -291,7 +307,7 @@ export class Frontend {
     console.log('[Frontend] trigger retrieveSupportedAccessories')
     const options = {
       ...DEFAULT_OPTIONS,
-      url: CONFIG.frontend.baseUrl + '/api/2/things/' + THING_ID + '/features/Accessories/inbox/messages/retrieveSupportedAccessories',
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Accessories/inbox/messages/retrieveSupportedAccessories',
       method: 'POST',
       body: {}
     }

@@ -28,6 +28,7 @@
     "ajv": "6.1.1",
     "express": "4.16.2",
     "https-proxy-agent": "2.1.1",
+    "request": "2.83.0",
     "request-promise-native": "1.0.5",
     "sha.js": "2.4.10",
     "ws": "4.0.0"
@@ -42,5 +43,9 @@
     "jest": "22.1.2",
     "nodemon": "1.14.11",
     "supertest": "3.0.0"
+  },
+  "engines": {
+    "npm": "^5.4.0",
+    "node": "^8.8.0"
   }
 }

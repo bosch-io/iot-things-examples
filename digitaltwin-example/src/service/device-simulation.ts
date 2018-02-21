@@ -1,6 +1,34 @@
+/*
+ *                                            Bosch SI Example Code License
+ *                                              Version 1.0, January 2016
+ *
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ * disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+ * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+ * BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+ * LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+ * THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+ * UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+ * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+ * EMPLOYEES, REPRESENTATIVES AND ORGANS.
+ */
+
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
+import * as requestPromise from 'request-promise-native'
 import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
 import { util } from '../util/util'
 import { setInterval } from 'timers'
@@ -10,14 +38,18 @@ const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 const WEBSOCKET_OPTIONS = {
   agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
   headers: {
-    ...CONFIG.websocketHeaders,
+    ...CONFIG.httpHeaders,
     'Authorization': 'Basic ' + new Buffer(CONFIG.deviceSimulation.username + ':' + CONFIG.deviceSimulation.password).toString('base64')
   }
 }
 const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
-const THING_ID = CONFIG.deviceSimulation.thingId
+const THING_ID = CONFIG.frontend.thingId
 const THING_ID_PATH = THING_ID.replace(':', '/')
+const HUB_TENANT = CONFIG.frontend.hubTenant
+const HUB_DEVICE_ID = CONFIG.frontend.hubDeviceId
+const HUB_DEVICE_AUTH_ID = CONFIG.frontend.hubAuthId
+const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
 
 export class DeviceSimulation {
 
@@ -105,7 +137,17 @@ export class DeviceSimulation {
         headers: { 'response-required': false /*, 'correlation-id': '123'*/ }
       })
 
-      this.ws!.send(JSON.stringify(update), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
+      // publish update to Hub via HTTP
+      requestPromise({
+        url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
+        auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
+        method: 'PUT',
+        json: true,
+        body: update
+      })
+
+      // ### alternativly: publich directly to Things via WebSocket
+      // this.ws!.send(JSON.stringify(update), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
     }
   }
 

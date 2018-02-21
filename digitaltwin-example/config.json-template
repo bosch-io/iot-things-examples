@@ -1,6 +1,7 @@
 {
   "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
-  "websocketHeaders": {
+  "httpBaseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
+  "httpHeaders": {
     "x-cr-api-token": "<<<your-api-token>>>"
   },
   "accessories": {
@@ -22,10 +23,12 @@
     "username": "<<<your-frontend-username>>>",
     "password": "<<<your-frontend-password>>>"
     "apitoken": "<<<your-api-token>>>",
-    "baseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
     "thingId": "<<<your-thingid>>>",
     "policyId": "<<<your-policyid>>>",
     "hubTenant": "<<<your-hub-tenant>>>",
-    "hubDevicePassword": "<<<your-desired-hub-device-password>>>"
+    "hubDeviceId": "<<<your-favored-hub-device-id>>>",
+    "hubAuthId": "<<<your-favored-hub-auth-id>>>",
+    "hubDevicePassword": "<<<your-favored-hub-device-password>>>"
+    "hubThingsIntegrationSubject": "<<<your-hub-things-integration-subject>>>"
   }
 }

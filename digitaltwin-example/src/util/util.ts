@@ -75,6 +75,7 @@ export namespace util {
     } catch (e) {
       response = { error: e.toString() }
       status = 400
+      // console.log(`processWithResponse error ${e}`)
     }
 
     return new ThingMessage({

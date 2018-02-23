@@ -1,0 +1,6 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Operation payload validation of definition <org.eclipse.ditto:HonoCommissioning:1.0.0> for message subject (operation name) <commissionDevice>",
+	"description": "Perform commissioning of new device with own connectivity credential. Additional commisioning information is attempted to be derived from the context/environment.",
+	"type": "string"
+}

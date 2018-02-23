@@ -13,6 +13,8 @@
     "subject": "iot-permissions:<<<your-deviceCommissioning-userid>>>",
     "username": "<<<your-deviceCommissioning-username>>>",
     "password": "<<<your-deviceCommissioning-password>>>"
+    "hubTenant": "<<<your-hub-tenant>>>",
+    "hubDeviceId": "<<<your-favored-hub-device-id>>>",
   },
   "deviceSimulation": {
     "subject": "iot-permissions:<<<your-deviceSimulation-userid>>>",
@@ -25,9 +27,6 @@
     "apitoken": "<<<your-api-token>>>",
     "thingId": "<<<your-thingid>>>",
     "policyId": "<<<your-policyid>>>",
-    "hubTenant": "<<<your-hub-tenant>>>",
-    "hubDeviceId": "<<<your-favored-hub-device-id>>>",
-    "hubAuthId": "<<<your-favored-hub-auth-id>>>",
     "hubDevicePassword": "<<<your-favored-hub-device-password>>>"
     "hubThingsIntegrationSubject": "<<<your-hub-things-integration-subject>>>"
   }

@@ -98,8 +98,7 @@ export class Accessories {
 
       const subject = m.path.substr('/features/Accessories/inbox/messages/'.length)
 
-      const requestValue = m.value
-      const input = { ...requestValue, thingId: m.thingId, localThingId: m.localThingId }
+      const input = { ...m.value, thingId: m.thingId, localThingId: m.localThingId }
       console.log(`[Accessories] received request ${subject}`)
 
       let processor = (p: any): Promise<any> => { throw new Error(`Unsupport message subject ${subject}`) }

@@ -44,11 +44,11 @@ const WEBSOCKET_OPTIONS = {
 }
 const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
-const THING_ID = CONFIG.frontend.thingId
+const THING_ID: string = CONFIG.frontend.thingId
 const THING_ID_PATH = THING_ID.replace(':', '/')
-const HUB_TENANT = CONFIG.frontend.hubTenant
-const HUB_DEVICE_ID = CONFIG.frontend.hubDeviceId
-const HUB_DEVICE_AUTH_ID = CONFIG.frontend.hubAuthId
+const HUB_TENANT = CONFIG.deviceCommissioning.hubTenant
+const HUB_DEVICE_ID = THING_ID.substr(THING_ID.indexOf(':') + 1)
+const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID
 const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
 
 export class DeviceSimulation {
@@ -76,7 +76,7 @@ export class DeviceSimulation {
         (ws) => {
           this.ws = ws
 
-          setInterval(() => this.updateStatus(), 4000)
+          setTimeout(() => setInterval(() => this.updateStatus(), 4000), 10000)
 
           this.ws.on('message', (data) => {
             const dataString = data.toString()
@@ -124,7 +124,7 @@ export class DeviceSimulation {
     console.log('[DeviceSimulation] unprocessed data: ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
-  private updateStatus() {
+  private async updateStatus() {
     this.status.temperature = 18 + Math.random() * 10
 
     if (!this.config.threshold || this.status.temperature > this.config.threshold) {
@@ -138,13 +138,18 @@ export class DeviceSimulation {
       })
 
       // publish update to Hub via HTTP
-      requestPromise({
+      const options = {
         url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
         auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
         method: 'PUT',
         json: true,
         body: update
-      })
+      }
+      try {
+        await requestPromise(options)
+      } catch (e) {
+        console.log(`[DeviceSimulation] send update ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
+      }
 
       // ### alternativly: publich directly to Things via WebSocket
       // this.ws!.send(JSON.stringify(update), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })

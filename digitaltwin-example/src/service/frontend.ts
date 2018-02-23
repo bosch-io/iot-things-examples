@@ -35,10 +35,6 @@ const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 const THING_ID = CONFIG.frontend.thingId
 const POLICY_ID = CONFIG.frontend.policyId
-const HUB_TENANT = CONFIG.frontend.hubTenant
-const HUB_DEVICE_ID = CONFIG.frontend.hubDeviceId
-const HUB_AUTH_ID = CONFIG.frontend.hubAuthId
-const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
 
 const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
   json: true,
@@ -50,7 +46,7 @@ const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
   .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
 
 const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/com.acme.catalog_Accessories_2.0.0/operations/retrieveSupportedAccessories-response.schema.json', 'utf8')))
-const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commission-response.schema.json', 'utf8')))
+const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionDevice-response.schema.json', 'utf8')))
 
 export class Frontend {
 
@@ -68,7 +64,7 @@ export class Frontend {
     setInterval(await this.configureThreshold, 15000)
   }
 
-  async recreateEntities() {
+  private async recreateEntities() {
 
     const thing = {
       policyId: POLICY_ID,
@@ -168,7 +164,7 @@ export class Frontend {
             [CONFIG.deviceCommissioning.subject]: { type: 'any' }
           },
           resources: {
-            'message:/features/Commissioning/inbox/messages/commission': {
+            'message:/features/Commissioning/inbox/messages': {
               grant: ['READ'],
               revoke: []
             },
@@ -198,7 +194,7 @@ export class Frontend {
 
     console.log('[Frontend] cleanup')
     await util.processAll(cleanup, '[Frontend] ignore failed cleanup')
-    // wait some time as cleanup can take a bit in a CAP-theorem-driven world
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
     await util.sleep(2000)
 
     // create Policy
@@ -217,6 +213,9 @@ export class Frontend {
       method: 'DELETE'
     }))
 
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await util.sleep(1000)
+
     // create Thing
 
     try {
@@ -232,28 +231,26 @@ export class Frontend {
       throw e
     }
 
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await util.sleep(1000)
   }
 
-  async commission() {
+  private async commission() {
     console.log('[Frontend] trigger commission')
 
-    const commissionRequest = {
-      tenantId: HUB_TENANT,
-      deviceId: HUB_DEVICE_ID,
-      optionalAuthId: HUB_AUTH_ID,
-      optionalPwdHash: HUB_DEVICE_PASSWORD ? shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64') : ''
-    }
+    // request body is pwdHash as literal; should be object with pwdHash property if more parameters are added
+    const body = shajs('sha512').update(CONFIG.frontend.hubDevicePassword).digest('base64')
 
     const options = {
       ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Commissioning/inbox/messages/commission',
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Commissioning/inbox/messages/commissionDevice',
       method: 'POST',
       json: true,
       headers: {
         ...DEFAULT_OPTIONS.headers,
         'content-type': 'application/json'
       },
-      body: commissionRequest
+      body: body
     }
 
     try {
@@ -271,7 +268,7 @@ export class Frontend {
     }
   }
 
-  async configureThreshold() {
+  private async configureThreshold() {
     let threshold = 18 + Math.random() * 10
 
     console.log(`[Frontend] configureThreshold ${threshold}`)
@@ -289,7 +286,7 @@ export class Frontend {
     }
   }
 
-  async retrieveDeviceTwinState() {
+  private async retrieveDeviceTwinState() {
     const options = {
       ...DEFAULT_OPTIONS,
       url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/status',
@@ -303,7 +300,7 @@ export class Frontend {
     }
   }
 
-  async retrieveSupportedAccessories(): Promise<any> {
+  private async retrieveSupportedAccessories(): Promise<any> {
     console.log('[Frontend] trigger retrieveSupportedAccessories')
     const options = {
       ...DEFAULT_OPTIONS,

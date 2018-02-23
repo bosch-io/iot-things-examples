@@ -164,7 +164,7 @@ export class Frontend {
             [CONFIG.deviceCommissioning.subject]: { type: 'any' }
           },
           resources: {
-            'message:/features/Commissioning/inbox/messages': {
+            'message:/features/Commissioning/inbox': {
               grant: ['READ'],
               revoke: []
             },

@@ -47,14 +47,8 @@ const WEBSOCKET_REOPEN_TIMEOUT = 1000
 const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
   .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
 
-const COMMISSION_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commission.schema.json', 'utf8')))
-
-interface CommissionRequest {
-  tenantId: string,
-  deviceId: string,
-  optionalAuthId?: string,
-  optionalPwdHash?: string
-}
+const COMMISSION_DEVICE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionDevice.schema.json', 'utf8')))
+const COMMISSION_GATEWAY_DEVICE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionGatewayDevice.schema.json', 'utf8')))
 
 export class DeviceCommissioning {
 
@@ -103,19 +97,42 @@ export class DeviceCommissioning {
 
   private process(m: ThingMessage) {
 
-    if (m.channel === 'live' && m.criterion === 'messages' && m.action === 'commission'
-      && m.path === '/features/Commissioning/inbox/messages/commission') {
+    if (m.channel === 'live' && m.criterion === 'messages'
+      && m.path.startsWith('/features/Commissioning/inbox/messages/')) {
 
-      if (COMMISSION_VALIDATION(m.value)) {
+      const subject = m.path.substr('/features/Commissioning/inbox/messages/'.length)
+      let input = m.value
+
+      let processor: (p) => Promise<any>
+      let validator: Ajv.ValidateFunction
+      switch (subject) {
+        case 'commissionDevice':
+          processor = (p) => this.commissionDevice(p)
+          validator = COMMISSION_DEVICE_VALIDATION
+          // wrap single-parameter input in correct object
+          input = { pwdHash: m.value }
+          break
+        case 'commissionGateway':
+          processor = (p) => this.commissionGatewayDevice(p)
+          validator = COMMISSION_GATEWAY_DEVICE_VALIDATION
+          // wrap single-parameter input in correct object
+          input = { optionalGatewayId: m.value }
+          break
+        default:
+          processor = () => { throw new Error(`Unsupport message subject ${subject}`) }
+          validator = () => true
+      }
+
+      if (validator(m.value)) {
         console.log(`[Commissioning] received valid request`)
       } else {
-        console.log(`[Commissioning] request validation faild: ${JSON.stringify(COMMISSION_VALIDATION.errors)}`)
+        console.log(`[Commissioning] request validation faild: ${JSON.stringify(validator.errors)}`)
         return
       }
 
-      const input = { ...m.value, thingId: m.thingId }
+      input = { ...input, thingId: m.thingId, localThingId: m.localThingId }
 
-      util.processWithResponse(m, this.commission, input).then(r => {
+      util.processWithResponse(m, processor, input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'websocket send response ok')))
       })
       return
@@ -124,93 +141,133 @@ export class DeviceCommissioning {
     console.log('[Commissioning] unprocessed data: ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
-  private async commission(p: CommissionRequest & { thingId: string })
+  private commissionDevice(p: { pwdHash: string, thingId: string, localThingId: string })
     : Promise<{ code: number, text?: string }> {
 
-    console.log(`[Commissioning] register hub device ${JSON.stringify({ p, ...{ optionalPwdHash: 'xxx' } })}`)
+    console.log(`[Commissioning] commissiong device ${JSON.stringify({ ...p, ...{ pwdHash: 'xxx' } })} ${this}`)
+
+    return this.commission(p.thingId, CONFIG.deviceCommissioning.hubTenant, p.localThingId, p.localThingId, p.pwdHash)
+  }
+
+  private commissionGatewayDevice(p: { optionalGatewayId: string, thingId: string, localThingId: string })
+    : Promise<{ code: number, text?: string }> {
+
+    console.log(`[Commissioning] commissiong gateway device ${JSON.stringify(p)}`)
+
+    if (p.optionalGatewayId && p.optionalGatewayId !== CONFIG.deviceCommissioning.hubGatewayId) {
+      throw new Error(`Gateway-Id ${p.optionalGatewayId} invalid; only ${CONFIG.deviceCommissioning.hubGatewayId} allowed`)
+    }
+
+    return this.commission(p.thingId, CONFIG.deviceCommissioning.hubTenant, p.localThingId, undefined, undefined, p.optionalGatewayId)
+  }
+
+  private async commission(thingId, tenantId, deviceId, authId?, pwdHash?, viaGatewayId?)
+    : Promise<{ code: number, text?: string }> {
 
     // ### Snippet for Dummy Commissioning
     // tslint:disable-next-line:no-constant-condition
     // if (1 > 0) return { code: 200, text: 'Dummy Commissioning OK' }
 
+    // TODO include BASIC auth for Hub tenant as soon as required
+
     let cleanup: Array<() => void> = []
 
-    if (p.optionalAuthId) {
+    // cleanup existing device+credentials
+    // TODO check if this cleanup is a potential security risk to replace credentials
+
+    if (authId) {
       cleanup.push(() => requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId
-          + '?device-id=' + p.deviceId + '&auth-id=' + p.optionalAuthId + '&type=' + 'hashed-password',
+        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + encodeURIComponent(tenantId)
+          + '?device-id=' + encodeURIComponent(deviceId)
+          + '&auth-id=' + encodeURIComponent(authId)
+          + '&type=' + 'hashed-password',
         method: 'DELETE'
       }))
     }
     cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId + '/' + p.deviceId,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId) + '/' + encodeURIComponent(deviceId),
       method: 'DELETE'
     }))
     console.log('[Commissioning] cleanup')
     await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
 
-    console.log(`[Commissioning] register hub device ${p.tenantId} ${p.deviceId}`)
-    const r = await requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId,
+    // register device
+
+    console.log(`[Commissioning] register device ${tenantId} ${deviceId}`)
+    const body: any = {
+      'device-id': deviceId
+    }
+    if (viaGatewayId) {
+      body.data = {
+        via: viaGatewayId
+      }
+    }
+    const rd = await requestPromise({
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId),
       method: 'POST',
       json: true,
       resolveWithFullResponse: true,
-      body: {
-        'device-id': p.deviceId
-      }
+      body: body
     })
-    console.log(`[Commissioning] result ${r.statusCode} ${r.headers.location}`)
+    console.log(`[Commissioning] result ${rd.statusCode} ${rd.headers.location}`)
 
     cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + p.tenantId + '/' + p.deviceId,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId) + '/' + encodeURIComponent(deviceId),
       method: 'DELETE'
     }))
 
-    if (p.optionalAuthId) {
+    // register credential
+
+    if (authId && pwdHash) {
       try {
-        console.log(`[Commissioning] register hub device credential ${p.tenantId} ${p.deviceId} ${p.optionalAuthId}`)
-        const r2 = await requestPromise({
-          url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId,
+        console.log(`[Commissioning] register device credential ${tenantId} ${deviceId} ${authId}`)
+        const rc = await requestPromise({
+          url: 'https://device-registry.bosch-iot-hub.com/credentials/' + encodeURIComponent(tenantId),
           method: 'POST',
           json: true,
           resolveWithFullResponse: true,
           body: {
-            'device-id': p.deviceId,
-            'auth-id': p.optionalAuthId,
+            'device-id': deviceId,
+            'auth-id': authId,
             'type': 'hashed-password',
             'secrets': [{
               'hash-function': 'sha-512',
-              'pwd-hash': p.optionalPwdHash
+              'pwd-hash': pwdHash
             }]
           }
         })
-        console.log(`[Commissioning] credential result ${r2.statusCode} ${r2.headers.location}`)
+        console.log(`[Commissioning] credential result ${rc.statusCode} ${rc.headers.location}`)
       } catch (e) {
         await util.processAll(cleanup, '[Commissioning] cleanup credential registration')
         throw e
       }
+
+      cleanup.push(() => requestPromise({
+        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + encodeURIComponent(tenantId)
+          + '?device-id=' + encodeURIComponent(deviceId)
+          + '&auth-id=' + encodeURIComponent(authId)
+          + '&type=' + 'hashed-password',
+        method: 'DELETE'
+      }))
     }
 
-    cleanup.push(() => requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/credentials/' + p.tenantId
-        + '?device-id=' + p.deviceId + '&auth-id=' + p.optionalAuthId + '&type=' + 'hashed-password',
-      method: 'DELETE'
-    }))
+    // update Commissioning feature in Thing
 
     try {
       let body: any = {
         status: {
           date: new Date(),
-          hubTenantId: p.tenantId,
-          hubDeviceId: p.deviceId
+          tenantId: tenantId,
+          deviceId: deviceId,
+          authId: authId
         }
       }
-      if (p.optionalAuthId) {
-        body.status.hubAuthId = p.optionalAuthId
+      if (viaGatewayId) {
+        body.status.gatewayId = viaGatewayId
       }
 
       await requestPromise({
-        url: CONFIG.httpBaseUrl + '/api/2/things/' + p.thingId + '/features/Commissioning/properties',
+        url: CONFIG.httpBaseUrl + '/api/2/things/' + thingId + '/features/Commissioning/properties',
         method: 'PUT',
         json: true,
         auth: { user: CONFIG.deviceCommissioning.username, pass: CONFIG.deviceCommissioning.password },
@@ -220,6 +277,7 @@ export class DeviceCommissioning {
       console.log('[Commissioning] update commissioning info successful')
     } catch (e) {
       console.log(`[Commissioning] update commissioning info failed ${e}`)
+      await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
       throw e
     }
 

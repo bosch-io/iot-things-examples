@@ -53,7 +53,7 @@ export namespace util {
       onOpenCallback(ws)
 
       // Heartbeat messages
-      setInterval(() => ws.ping(), 60000)
+      setInterval(() => { if (ws.readyState === NodeWebSocket.OPEN) ws.ping() }, 60000)
     })
 
     ws.on('close', () => {

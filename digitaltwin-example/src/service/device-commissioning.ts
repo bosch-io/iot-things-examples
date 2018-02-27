@@ -112,7 +112,7 @@ export class DeviceCommissioning {
           // wrap single-parameter input in correct object
           input = { pwdHash: m.value }
           break
-        case 'commissionGateway':
+        case 'commissionGatewayDevice':
           processor = (p) => this.commissionGatewayDevice(p)
           validator = COMMISSION_GATEWAY_DEVICE_VALIDATION
           // wrap single-parameter input in correct object
@@ -133,7 +133,7 @@ export class DeviceCommissioning {
       input = { ...input, thingId: m.thingId, localThingId: m.localThingId }
 
       util.processWithResponse(m, processor, input).then(r => {
-        this.ws!.send(JSON.stringify(r), (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'websocket send response ok')))
+        this.ws!.send(JSON.stringify(r), (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'websocket send response')))
       })
       return
     }
@@ -154,11 +154,12 @@ export class DeviceCommissioning {
 
     console.log(`[Commissioning] commissiong gateway device ${JSON.stringify(p)}`)
 
-    if (p.optionalGatewayId && p.optionalGatewayId !== CONFIG.deviceCommissioning.hubGatewayId) {
+    const gatewayId = p.optionalGatewayId || CONFIG.deviceCommissioning.hubGatewayId
+    if (gatewayId !== CONFIG.deviceCommissioning.hubGatewayId) {
       throw new Error(`Gateway-Id ${p.optionalGatewayId} invalid; only ${CONFIG.deviceCommissioning.hubGatewayId} allowed`)
     }
 
-    return this.commission(p.thingId, CONFIG.deviceCommissioning.hubTenant, p.localThingId, undefined, undefined, p.optionalGatewayId)
+    return this.commission(p.thingId, CONFIG.deviceCommissioning.hubTenant, p.localThingId, undefined, undefined, gatewayId)
   }
 
   private async commission(thingId, tenantId, deviceId, authId?, pwdHash?, viaGatewayId?)
@@ -173,6 +174,7 @@ export class DeviceCommissioning {
     let cleanup: Array<() => void> = []
 
     // cleanup existing device+credentials
+
     // TODO check if this cleanup is a potential security risk to replace credentials
 
     if (authId) {
@@ -181,12 +183,14 @@ export class DeviceCommissioning {
           + '?device-id=' + encodeURIComponent(deviceId)
           + '&auth-id=' + encodeURIComponent(authId)
           + '&type=' + 'hashed-password',
-        method: 'DELETE'
+        method: 'DELETE',
+        auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword }
       }))
     }
     cleanup.push(() => requestPromise({
       url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId) + '/' + encodeURIComponent(deviceId),
-      method: 'DELETE'
+      method: 'DELETE',
+      auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword }
     }))
     console.log('[Commissioning] cleanup')
     await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
@@ -198,22 +202,22 @@ export class DeviceCommissioning {
       'device-id': deviceId
     }
     if (viaGatewayId) {
-      body.data = {
-        via: viaGatewayId
-      }
+      body.via = viaGatewayId
     }
     const rd = await requestPromise({
       url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId),
       method: 'POST',
+      auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword },
       json: true,
-      resolveWithFullResponse: true,
-      body: body
+      body: body,
+      resolveWithFullResponse: true
     })
     console.log(`[Commissioning] result ${rd.statusCode} ${rd.headers.location}`)
 
     cleanup.push(() => requestPromise({
       url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId) + '/' + encodeURIComponent(deviceId),
-      method: 'DELETE'
+      method: 'DELETE',
+      auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword }
     }))
 
     // register credential
@@ -224,8 +228,8 @@ export class DeviceCommissioning {
         const rc = await requestPromise({
           url: 'https://device-registry.bosch-iot-hub.com/credentials/' + encodeURIComponent(tenantId),
           method: 'POST',
+          auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword },
           json: true,
-          resolveWithFullResponse: true,
           body: {
             'device-id': deviceId,
             'auth-id': authId,
@@ -234,7 +238,8 @@ export class DeviceCommissioning {
               'hash-function': 'sha-512',
               'pwd-hash': pwdHash
             }]
-          }
+          },
+          resolveWithFullResponse: true
         })
         console.log(`[Commissioning] credential result ${rc.statusCode} ${rc.headers.location}`)
       } catch (e) {
@@ -247,7 +252,8 @@ export class DeviceCommissioning {
           + '?device-id=' + encodeURIComponent(deviceId)
           + '&auth-id=' + encodeURIComponent(authId)
           + '&type=' + 'hashed-password',
-        method: 'DELETE'
+        method: 'DELETE',
+        auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword }
       }))
     }
 

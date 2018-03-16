@@ -1,0 +1,15 @@
+{
+  "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
+  "httpHeaders": {
+    "x-cr-api-token": "<<<your-things-api-token>>>"
+  },
+  "things": {
+    "username": "<<<name-of-user-with-access-to-things>>>",
+    "password": "<<<password>>>"
+  },
+  "influxdb": {
+    "writeUrl": "<<<influx-url:e.g. http://localhost:8086/write?db=mydb>>>",
+    "username": "<<<influx-username>>>",
+    "password": "<<<influx-password>>>"
+  }
+}

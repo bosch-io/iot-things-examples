@@ -29,7 +29,7 @@ functionblock HonoCommissioning {
 		"Perform commissioning of new device with own connectivity credential. Additional commisioning information is attempted to be derived from the context/environment."
 
 		commissionGatewayDevice(
-			optionalGatewayId as string "Device-Id of gateway which acts on behalf of device. If not provided the Id Additional commisioning information is attempted to be derived from the context/environment."
+			optionalGatewayId as string "Device-Id of gateway which acts on behalf of device. If not provided the gateway information is attempted to be derived from the context/environment."
 		) returns Status
 		"Perform commissioning of new device with connectivity via a gateway. Additional commisioning information is attempted to be derived from the context/environment."
 	}

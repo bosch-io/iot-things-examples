@@ -27,12 +27,19 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
-import { HistoryCollector } from './service/history-collector'
+import { Historian } from './service/history-collector'
+import * as fs from 'fs'
 
 async function start(args: string[]) {
 
-  await new HistoryCollector().start()
+  // read config either as single configuration or as array of configurations
+  let configs = JSON.parse(fs.readFileSync('config.json', 'utf8'))
+  if (!Array.isArray(configs)) {
+    configs = [configs]
+  }
 
+  // start one historian instance for each configuration
+  configs.forEach(c => new Historian(c).start().catch(console.log))
 }
 
 start(process.argv.slice(2)).catch(e => console.log(`Start failed: ${e}`))

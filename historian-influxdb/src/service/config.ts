@@ -27,9 +27,7 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
-import * as fs from 'fs'
-
-interface Config {
+export interface Config {
   websocketBaseUrl: string,
   httpHeaders: [string],
   things: {
@@ -37,11 +35,16 @@ interface Config {
     password: string
   },
   influxdb: {
-    writeUrl: string,
-    username: string,
-    password: string,
-    ignoreProperties?: string[]
+    write: {
+      url: string,
+      username: string,
+      password: string,
+      ignoreProperties?: string[]
+    },
+    read: {
+      url: string,
+      username: string,
+      password: string
+    }
   }
 }
-
-export const CONFIG: Config = JSON.parse(fs.readFileSync('config.json', 'utf8'))

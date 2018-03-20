@@ -32,29 +32,36 @@ import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
 import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
 import { util } from '../util/util'
-import { CONFIG } from './config'
+import { Config } from './config'
 
-const WEBSOCKET_OPTIONS = {
-  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
-  headers: {
-    ...CONFIG.httpHeaders,
-    'Authorization': 'Basic ' + new Buffer(CONFIG.things.username + ':' + CONFIG.things.password).toString('base64')
-  }
-}
-const WEBSOCKET_REOPEN_TIMEOUT = 1000
+const WEBSOCKET_REOPEN_TIMEOUT = 5000
 
 /**
- * History collector service that listens to thing modifications via WebSocket and pushes them as measurements to an InfluxDB.
+ * Historian service that listens to thing signals via WebSocket and either pushes them as measurements to an InfluxDB or executes queries.
  */
-export class HistoryCollector {
+export class Historian {
 
+  private config: Config
   private ws?: NodeWebSocket
+
+  private websocketOptions
+
+  constructor(config: Config) {
+    this.config = config
+    this.websocketOptions = {
+      agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
+      headers: {
+        ...this.config.httpHeaders,
+        'Authorization': 'Basic ' + new Buffer(this.config.things.username + ':' + this.config.things.password).toString('base64')
+      }
+    }
+  }
 
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
-      console.log('start')
+      console.log(`start for user ${this.config.things.username}`)
 
-      // if your InfluxDB instance uses a self-signed certificate
+      // WARNING: use this only for testing - if your InfluxDB instance uses a self-signed certificate
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
       let pendingAcks: Array<string> = []
@@ -62,7 +69,7 @@ export class HistoryCollector {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+      util.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -75,7 +82,7 @@ export class HistoryCollector {
               if (i > -1) {
                 pendingAcks.splice(i, 1)
                 if (pendingAcks.length === 0) {
-                  console.log('started')
+                  console.log(`started for user ${this.config.things.username}`)
                   resolve()
                 }
               } else {
@@ -87,6 +94,7 @@ export class HistoryCollector {
           })
 
           this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`websocket send error ${err}`) })
+          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`websocket send error ${err}`) })
         })
     })
   }
@@ -96,31 +104,46 @@ export class HistoryCollector {
     if (m.channel === 'twin' && m.criterion === 'events' && m.action === 'modified'
       && m.path.startsWith('/features')) {
 
-      const modifiedThing = util.partial(m.path, m.value)
-      const data = this.collectMeasurements(modifiedThing.features, m.thingId)
+      this.processModification(m.thingId, m.path, m.value)
+      return
+    }
 
-      if (data) {
-        console.log(`thing ${m.thingId} modified: ${JSON.stringify(modifiedThing)}`)
+    if (m.channel === 'live' && m.criterion === 'messages'
+      && m.path.startsWith('/features/') && m.path.endsWith('/inbox/messages/historianQuery')) {
 
-        let r = requestPromise({
-          url: CONFIG.influxdb.writeUrl,
-          method: 'POST',
-          auth: { sendImmediately: true, user: CONFIG.influxdb.username, pass: CONFIG.influxdb.password },
-          json: false,
-          resolveWithFullResponse: true,
-          body: data
-        } as requestPromise.Options)
-        try {
-          await r
-        } catch (e) {
-          console.log(`write error ${e.toString()} ${JSON.stringify(r)}`)
-        }
-      }
+      const input = { ...m.value, thingId: m.thingId }
 
+      util.processWithResponse(m, (p) => this.historianQuery(p), input).then(r => {
+        this.ws!.send(JSON.stringify(r), (err) => console.log('[HistorianQuery] ' + (err ? 'websocket send error ' + err : 'websocket send response')))
+      })
       return
     }
 
     // console.log('unprocessed data: ' + m.topic + ' ' + m.thingId)
+  }
+
+  /** Pushes modifications as InfluxDB measurements. */
+  private async processModification(thingId: string, path: string, value: any) {
+    const modifiedThing = util.partial(path, value)
+    const data = this.collectMeasurements(modifiedThing.features, thingId)
+
+    if (data) {
+      console.log(`thing ${thingId} modified: ${JSON.stringify(modifiedThing)}`)
+
+      let r = requestPromise({
+        url: this.config.influxdb.write.url,
+        method: 'POST',
+        auth: { sendImmediately: true, user: this.config.influxdb.write.username, pass: this.config.influxdb.write.password },
+        json: false,
+        resolveWithFullResponse: true,
+        body: data
+      } as requestPromise.Options)
+      try {
+        await r
+      } catch (e) {
+        console.log(`write error ${e.toString()} ${JSON.stringify(r)}`)
+      }
+    }
   }
 
   private collectMeasurements(obj: any, id: string, parentpath: string | undefined = undefined): string {
@@ -129,7 +152,7 @@ export class HistoryCollector {
       const value = obj[prop]
       const path = parentpath ? parentpath + '.' + prop : prop
       if (typeof value === 'number') {
-        if (!CONFIG.influxdb.ignoreProperties || CONFIG.influxdb.ignoreProperties.indexOf(prop) < 0) {
+        if (!this.config.influxdb.write.ignoreProperties || this.config.influxdb.write.ignoreProperties.indexOf(prop) < 0) {
           const shortenedPath = path.replace('.properties.', '.')
           // append InfluxDB write line
           r += `${shortenedPath},id=${id} value=${value}\n`
@@ -139,6 +162,40 @@ export class HistoryCollector {
       }
     }
     return r
+  }
+
+  /** Execute InfluxDB query scoped to the provided thingId */
+  private async historianQuery(p: { thingId: string, from: string, fields: string, where: string, groupBy: string, orderBy: string, limit: string })
+    : Promise<string> {
+
+    if (!p.from) {
+      return JSON.stringify({ statusCode: 400, error: '"from" required' })
+    }
+    if (p.from.trim().startsWith('(')) {
+      return JSON.stringify({ statusCode: 400, error: 'subqueries not allowed' })
+    }
+
+    let q = 'SELECT ' + (p.fields ? p.fields : '*')
+      + ' FROM ' + p.from
+      + ' WHERE (id = \'' + p.thingId + '\')' + (p.where ? ' AND (' + p.where + ')' : '')
+      + (p.groupBy ? ' GROUP BY ' + p.groupBy : '')
+      + (p.orderBy ? ' ORDER BY ' + p.orderBy : '')
+
+    console.log(`InfluxDB query: ${q}`)
+
+    let r = requestPromise({
+      url: this.config.influxdb.read.url + encodeURI(q),
+      method: 'GET',
+      auth: { sendImmediately: true, user: this.config.influxdb.read.username, pass: this.config.influxdb.read.password },
+      resolveWithFullResponse: true
+    } as requestPromise.Options)
+    try {
+      let o = await r
+      return o.body
+    } catch (e) {
+      console.log(`InfluxDB query error ${e.toString()}`)
+      return JSON.stringify({ statusCode: e.statusCode, error: e.error })
+    }
   }
 
 }

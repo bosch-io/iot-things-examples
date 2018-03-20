@@ -1,0 +1,24 @@
+namespace org.eclipse.ditto
+version 1.0.0
+displayname "Historian"
+description
+"Function block model for Historian. For Features marked with this Functionblock all history data of properties can be collected and access to the history is provided using defined operations."
+category eclipse
+using org.eclipse.ditto.InfluxDbQuery ; 1.0.0
+
+functionblock Historian {
+	configuration {
+	}
+
+	status {
+	}
+
+	fault {
+	}
+
+	operations {
+		historianQuery(query as InfluxDbQuery) returns string
+		"Query collected history data for this Thing. Supports InfluxDB query syntax. See https://docs.influxdata.com/influxdb/v1.5/query_language/data_exploration/ "
+	}
+
+}

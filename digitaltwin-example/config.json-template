@@ -12,9 +12,9 @@
   "deviceCommissioning": {
     "subject": "iot-permissions:<<<your-deviceCommissioning-userid>>>",
     "username": "<<<your-deviceCommissioning-username>>>",
-    "password": "<<<your-deviceCommissioning-password>>>"
+    "password": "<<<your-deviceCommissioning-password>>>",
     "hubTenant": "<<<your-hub-tenant>>>",
-    "hubDeviceId": "<<<your-favored-hub-device-id>>>",
+    "hubDeviceId": "<<<your-favored-hub-device-id>>>"
   },
   "deviceSimulation": {
     "subject": "iot-permissions:<<<your-deviceSimulation-userid>>>",
@@ -23,11 +23,11 @@
   },
   "frontend": {
     "username": "<<<your-frontend-username>>>",
-    "password": "<<<your-frontend-password>>>"
+    "password": "<<<your-frontend-password>>>",
     "apitoken": "<<<your-api-token>>>",
     "thingId": "<<<your-thingid>>>",
     "policyId": "<<<your-policyid>>>",
-    "hubDevicePassword": "<<<your-favored-hub-device-password>>>"
-    "hubThingsIntegrationSubject": "<<<your-hub-things-integration-subject>>>"
+    "hubDevicePassword": "<<<your-favored-hub-device-password>>>",
+    "integrationSubject": "<<<your-hub-things-integration-subject>>>"
   }
 }

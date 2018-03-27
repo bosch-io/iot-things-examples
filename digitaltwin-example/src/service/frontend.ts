@@ -130,8 +130,8 @@ export class Frontend {
         },
         device: {
           subjects: {
-            [CONFIG.deviceSimulation.subject]: { type: 'any' },
-            [CONFIG.frontend.hubThingsIntegrationSubject]: { type: 'any' }
+            [CONFIG.frontend.integrationSubject]: { type: 'any' },
+            [CONFIG.deviceSimulation.subject]: { type: 'any' }
           },
           resources: {
             'thing:/features/Device/properties/status': {

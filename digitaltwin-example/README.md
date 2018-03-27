@@ -51,7 +51,7 @@ Shown all these aspects in the general conceptual model gives the following pict
 The example implementation includes all the microservices that provide the features of the Digital Twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-:info: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by a appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by a appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
 
 Following the deployment model from above this looks like this:
 
@@ -71,7 +71,7 @@ You will need users for following roles:
 
 Book the Bosch IoT Things cloud service: see [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking)
 
-## Only required device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
+## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 
 Use the Sandbox of Bosch IoT Hub or request your own evaluation tenant. See [http://docs.bosch-iot-hub.com/] for details.
 
@@ -81,11 +81,11 @@ See [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=00
 ## Prepare users (subjects) for each microservice
 
 As described above the microservices of a Digital Twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/permissions/).
-For evaluation/example scenarios you can alternativly setup some evaluation users as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser)
+For evaluation/example scenarios you can alternativly setup some evaluation users as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser).
 
 ## Configure your settings
 
-Set your credentials in the file "config.json". You can copy "config.json-template" as template and fill out the placeholders.
+Set your credentials in a file called "config.json". You can copy "config.json-template" as template and fill out the placeholders.
 
 # Build and Run
 

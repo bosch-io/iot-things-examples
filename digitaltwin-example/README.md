@@ -6,8 +6,8 @@ This example shows a simple End-to-End scenario for Digital Twins based on Eclip
 
 ## Introduction
 
-A digital twin is an orchestration of many (all) aspects of an IoT device/product asset in order to get to a unified and simplified model and API to work with this IoT asset.
-Each digital twin is represented as Thing in Eclipe Ditto and the aspects a represented as Features within this Thing.\
+A digital twin is an orchestration of many (all) aspects of an IoT device/product asset in order to get to an unified and simplified model and API to work with this IoT asset.
+Each digital twin is represented as Thing in Eclipse Ditto and the aspects a represented as Features within this Thing.\
 Some of these Features represent a state with properties, others represent an interface to some functionality (e.g. operations or events), and some are both.
 
 Normally there are "contracts" that define the structure of the state and/or the interfaces of functionality. These contracts are defined using Eclipse Vorto by describing Function Blocks. Some Features may also be "free form", i.e. there is no "written" contract that defines its state/functionality.
@@ -25,7 +25,7 @@ The user of a Digital Twin (e.g. Business Application, Frontend) can interact wi
 
 All custom microservices that implement functionality of one/multiple Features can be integrated into the Digital Twin by using the Eclipse Ditto protocol via multiple protocol bindings. You can use either a WebSocket binding oder AMQP 1.0 or AMQP 0.91 (RabbitMQ) binding, depending on what is best suited regarding technology and non-functional requirements.
 
-The most important aspect of a Digital Twin is the representation of state and the functionality of the physical device that is connected to the Internet. This integration is done using the same approach and explicitly preapred for integration with Eclipse Hono.
+The most important aspect of a Digital Twin is the representation of state and the functionality of the physical device that is connected to the Internet. This integration is done using the same approach and explicitly prepared for integration with Eclipse Hono.
 
 The following diagram shows deployment options for Digital Twin with Eclipse Ditto:
 
@@ -37,8 +37,8 @@ The following diagram shows deployment options for Digital Twin with Eclipse Dit
 
 This example tries to illustrate the implementation of a Digital Twin with some typical aspects:
 - **Device**: a feature that represents the state of a connected device. The device regularly measures a temperature value and has a configured threshold value to adjust the minimum temperature that should be reported to the Digital Twin.\
-The example contract is defined in: [vorto.eclipse.org/#/details/com.acme.device/D100/2.1.0]
-- **Commissioning**: a feature (separate to _Device_) that abstracts the "workflow" to execute all preparation steps for a new device, so that it can be connected afterwards. The workflow interface is included in the Digital Twin in order to be part of the overall orchestration including access control and to support reflecting status of the commissioning process within the Digital win. In the example the commissioning implements the registration of the device in Eclipse Hono.\
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device/D100/2.1.0]
+- **Commissioning**: a feature (separate to _Device_) that abstracts the "workflow" to execute all preparation steps for a new device, so that it can be connected afterwards. The workflow interface is included in the Digital Twin in order to be part of the overall orchestration including access control and to support reflecting status of the commissioning process within the Digital win. In the example, the commissioning implements the registration of the device in Eclipse Hono.\
 The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto/HonoCommissioning/1.0.0]
 - **Accessories**: a custom functionality to determine supported accessory products that can be combined with the device (e.g. batteries, spare parts). In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
 The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog/Accessories/2.0.0]
@@ -55,7 +55,7 @@ Shown all these aspects in the general conceptual model gives the following pict
 The example implementation includes all the microservices that provide the features of the Digital Twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-INFO: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by a appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
 
 Following the deployment model from above this looks like this:
 

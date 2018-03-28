@@ -1,20 +1,20 @@
 # Bosch IoT Things - End-to-End Digital Twin Example
 
-This example shows a simple End-to-End scenario for Digital Twins based on Eclipse Ditto / Bosch IoT Things.
+This example shows a simple End-to-End scenario for Digital Twins based on Bosch IoT Things / Eclipse Ditto.
 
 # General concept
 
 ## Introduction
 
 A digital twin is an orchestration of many (all) aspects of an IoT device/product asset in order to get to an unified and simplified model and API to work with this IoT asset.
-Each digital twin is represented as Thing in Eclipse Ditto and the aspects a represented as Features within this Thing.\
+Each digital twin is represented as Thing and the aspects a represented as Features within this Thing.\
 Some of these Features represent a state with properties, others represent an interface to some functionality (e.g. operations or events), and some are both.
 
 Normally there are "contracts" that define the structure of the state and/or the interfaces of functionality. These contracts are defined using Eclipse Vorto by describing Function Blocks. Some Features may also be "free form", i.e. there is no "written" contract that defines its state/functionality.
 
-Finally, there needs to be a place where the orchestration is described. Policies are used in Eclipse Ditto to manage the orchestration. They include the roles and access rights and by this directly define the responsibility of these roles.
+Finally, there needs to be a place where the orchestration is described. Policies are used to manage the orchestration. They include the roles and access rights and by this directly define the responsibility of these roles.
 
-The following conceptual model describe the composition of a Digital Twin in Eclipse Ditto:
+The following conceptual model describe the composition of a Digital Twin:
 
 ![concept](doc/digitaltwin-concept.png)
 
@@ -27,7 +27,7 @@ All custom microservices that implement functionality of one/multiple Features c
 
 The most important aspect of a Digital Twin is the representation of state and the functionality of the physical device that is connected to the Internet. This integration is done using the same approach and explicitly prepared for integration with Eclipse Hono.
 
-The following diagram shows deployment options for Digital Twin with Eclipse Ditto:
+The following diagram shows deployment options for Digital Twin with Bosch IoT Things / Eclipse Ditto:
 
 ![deployment](doc/digitaltwin-deployment.png)
 
@@ -55,7 +55,7 @@ Shown all these aspects in the general conceptual model gives the following pict
 The example implementation includes all the microservices that provide the features of the Digital Twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-INFO: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The last one is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it for both channels.
 
 Following the deployment model from above this looks like this:
 
@@ -77,9 +77,9 @@ Book the Bosch IoT Things cloud service: see [here](https://things.s-apps.de1.bo
 
 ## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 
-Use the Sandbox of Bosch IoT Hub or request your own evaluation tenant. See [http://docs.bosch-iot-hub.com/] for details.
+Request your own tenant for the Bosch IoT Hub (beta): see [http://docs.bosch-iot-hub.com/] for details.
 
-After you have both instances (Things and Hub) in place, you can setup the integration between the tww.
+After you have both instances (Things and Hub) in place, you can setup the integration between the two.
 See [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:006_message:007_protocol_bindings:amqp10_binding) for background information.
 
 ## Prepare users (subjects) for each microservice
@@ -100,6 +100,10 @@ npm run start
 ```
 
 If you need to access the Internet using a Proxy configuration, please make sure to set the environment variable HTTPS_PROXY.
+
+# Extensions / Further reading
+
+A lot of usage scenarios of Digital Twins require the integration of **history data** of properties of one or more Features of a Digital Twins. Therefore we provide an example implementation of a general-purpose historian service that can be easily plugged into any Digital Twin to provide a managed way for collecting and accessing history data. See this example for details: [https://github.com/bsinno/iot-things-examples/tree/dev/historian-influxdb]
 
 # License
 See the iot-things-examples top level README.md file for license details.

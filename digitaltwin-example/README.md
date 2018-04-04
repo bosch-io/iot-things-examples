@@ -85,7 +85,7 @@ See [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=00
 ## Prepare users (subjects) for each microservice
 
 As described above the microservices of a Digital Twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/permissions/).
-For evaluation/example scenarios you can alternativly setup some evaluation users as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser).
+For evaluation/example scenarios you can alternatively setup some evaluation users as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser).
 
 ## Configure your settings
 

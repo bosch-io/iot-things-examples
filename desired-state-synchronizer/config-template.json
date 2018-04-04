@@ -1,0 +1,14 @@
+[
+  {
+    "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
+    "httpBaseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
+    "httpHeaders": {
+      "x-cr-api-token": "<<<your-things-api-token>>>"
+    },
+    "subject": "<<<subject-id-of-user",
+    "username": "<<<username>>>",
+    "password": "<<<password>>>",
+    "thingId": "<<<namespace:local-thing-id>>>",
+    "policyId": "<<<namespace:local-thing-id>>>"
+  }
+]

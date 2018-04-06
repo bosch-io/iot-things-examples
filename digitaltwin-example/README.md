@@ -12,6 +12,7 @@
 - [Prepare](#prepare)
 - [Build and Run](#build-and-run)
 - [Extensions / Further-reading](#extensions--further-reading)
+- [License](#license)
 
 # Introduction
 

@@ -12,7 +12,7 @@ functionblock D100 {
 	}
 
 	status{ 
-		optional temperature as double <MIN -273.15> "Current temperature if Celsius"
+		optional temperature as double <MIN -273.15> "Current temperature in Celsius"
 	}
 
 	fault{

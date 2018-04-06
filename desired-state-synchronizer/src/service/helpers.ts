@@ -27,6 +27,9 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
+import * as NodeWebSocket from 'ws'
+
+/** Interface to describe Bosch IoT Things / Eclipse Ditto protocol message. */
 export interface ThingMessageInfo {
   topic: string
   path: string
@@ -40,6 +43,10 @@ type channel = 'twin' | 'live'
 type criterion = 'commands' | 'events' | 'search' | 'messages' | 'errors'
 type action = 'create' | 'retrieve' | 'modify' | 'delete' | 'created' | 'modified' | 'deleted' | string
 
+/** Convenience class to work with Bosch IoT Things / Eclipse Ditto protocol message.
+ *
+ * Adds some parsing functionality on top of the ThingMessageInfo interface.
+ */
 export class ThingMessage implements ThingMessageInfo {
   readonly topic: string
   readonly path: string
@@ -113,6 +120,93 @@ export class ThingMessage implements ThingMessageInfo {
     if (!this._parsed) { this.doParse() }
     const action = this._topicElements![5]
     return action
+  }
+
+}
+
+export namespace Helpers {
+
+  /** Create partial object starting at nested path element.
+   *
+   * Example: partial('/a/b', { c: 1, d: { e: 2 } }) = { a: { b: { c: 1, d: { e: 2 } } } }
+   */
+  export function partial(path: string, subobject: any): any {
+    const pathelements = path.substr(1).split('/')
+    const last = pathelements.pop() as string
+    const result = {}
+    let current: any = result
+    pathelements.forEach(pathelement => {
+      current[pathelement] = {}
+      current = current[pathelement]
+    })
+    current[last] = subobject
+    return result
+  }
+
+  /** Opens WebSocket and prepares automatic re-open and keep-alive (heartbeat) mechanism. */
+  export function openWebSocket(url: string, options: any, timeout: number, onOpenCallback: (ws: NodeWebSocket) => void) {
+
+    let ws = new NodeWebSocket(url, options)
+
+    ws.on('open', () => {
+      onOpenCallback(ws)
+
+      // Heartbeat messages
+      setInterval(() => { if (ws.readyState === NodeWebSocket.OPEN) ws.ping() }, 60000)
+    })
+
+    ws.on('close', () => {
+      console.log('websocket closed; trying to re-open')
+      setTimeout(() => openWebSocket(url, options, timeout, onOpenCallback), timeout)
+    })
+
+    ws.on('error', (err) => {
+      console.log(`websocket error ${err}`)
+    })
+  }
+
+  /** Create response message after processing. */
+  export async function processWithResponse<I, O>(request: ThingMessage, processor: (I) => O, input: I): Promise<ThingMessage> {
+    let status = 200
+    let response: O | { error: string }
+    try {
+      response = await processor(input)
+    } catch (e) {
+      response = { error: e.toString() }
+      status = 400
+      // console.log(`processWithResponse error ${e}`)
+    }
+
+    return new ThingMessage({
+      topic: request.topic,
+      headers: {
+        'correlation-id': request.headers['correlation-id'],
+        'content-type': 'application/json',
+        direction: 'FROM',
+        // include also (redundant) thing-id and subject as specificed in Ditto protocol; may be obsolte after CR-5200
+        'thing-id': request.thingId,
+        subject: request.action
+      },
+      'path': request.path.replace('inbox', 'outbox'),
+      'status': status,
+      'value': response
+    } as ThingMessageInfo)
+  }
+
+  /** Sequentielly invokes and array of functions, waiting for each execution. Errors are just logged, but execution continues. */
+  export async function processAll(a: Array<() => void>, errorLogPrefix) {
+    a.forEach(async (f, i, a) => {
+      try {
+        await f()
+      } catch (e) {
+        console.log(`${errorLogPrefix}: ${JSON.stringify(e.error || e)}`)
+      }
+      a.splice(i, 1)
+    })
+  }
+
+  export async function sleep(milliseconds): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
   }
 
 }

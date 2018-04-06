@@ -30,8 +30,7 @@
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { Config } from './config'
 import { compare as jsonCompare } from 'fast-json-patch'
 
@@ -69,7 +68,7 @@ export class Synchronizer {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`[Synchronizer] start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -104,7 +103,7 @@ export class Synchronizer {
     if (m.channel === 'live' && m.criterion === 'messages' && m.path === '/outbox/messages/determineDesiredPatch') {
       const input = { ...m.value, thingId: m.thingId }
 
-      util.processWithResponse(m, (p) => this.determineDesiredPatch(p), input).then(r => {
+      Helpers.processWithResponse(m, (p) => this.determineDesiredPatch(p), input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => { if (err) console.log('[Synchronizer] websocket send error ' + err) })
       })
       return

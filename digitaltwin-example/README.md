@@ -2,18 +2,16 @@
 
 **Table of contents**
 
-- [Introduction](#Introduction)
-- [General concept](#General-concept)
-  - [Structure of Digital Twins](#Structure-of-Digital-Twins)
-  - [Implementation and Deployment of Digital Twins](#Implementation-and-Deployment-of-Digital-Twins)
-- [Example](#Example)
-  - [Example Digital Twin](#Example-Digital-Twin)
-  - [Example Microservice Implementation](#Example-microservice-implementation)
-- [Prepare](#Prepare)
-- [Build and Run](#Build-and-Run)
-- [Extensions / Further-reading](#Extensions-/-Further-reading)
-
-## Use an existing or request a new Bosch IoT Things service instance
+- [Introduction](#introduction)
+- [General concept](#general-concept)
+  - [Structure of Digital Twins](#structure-of-digital-twins)
+  - [Implementation and Deployment of Digital Twins](#implementation-and-deployment-of-digital-twins)
+- [Example](#example)
+  - [Example Digital Twin](#example-digital-twin)
+  - [Example Microservice Implementation](#example-microservice-implementation)
+- [Prepare](#prepare)
+- [Build and Run](#build-and-run)
+- [Extensions / Further-reading](#extensions--further-reading)
 
 # Introduction
 

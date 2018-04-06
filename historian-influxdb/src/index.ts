@@ -30,7 +30,7 @@
 import { Historian } from './service/history-collector'
 import * as fs from 'fs'
 
-async function start(args: string[]) {
+async function start(_args: string[]) {
 
   // read config either as single configuration or as array of configurations
   let configs = JSON.parse(fs.readFileSync('config.json', 'utf8'))

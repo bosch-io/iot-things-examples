@@ -30,8 +30,7 @@
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { Config } from './config'
 
 const WEBSOCKET_REOPEN_TIMEOUT = 5000
@@ -69,7 +68,7 @@ export class Historian {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -113,7 +112,7 @@ export class Historian {
 
       const input = { ...m.value, thingId: m.thingId }
 
-      util.processWithResponse(m, (p) => this.historianQuery(p), input).then(r => {
+      Helpers.processWithResponse(m, (p) => this.historianQuery(p), input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => console.log('[HistorianQuery] ' + (err ? 'websocket send error ' + err : 'websocket send response')))
       })
       return
@@ -124,7 +123,7 @@ export class Historian {
 
   /** Pushes modifications as InfluxDB measurements. */
   private async processModification(thingId: string, path: string, value: any) {
-    const modifiedThing = util.partial(path, value)
+    const modifiedThing = Helpers.partial(path, value)
     const data = this.collectMeasurements(modifiedThing.features, thingId)
 
     if (data) {

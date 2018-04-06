@@ -2,17 +2,16 @@
 
 This example shows how to create a simple user interface to authenticate with OpenID Connect and use JSON Web Tokens (JWT) to access your things.
 
-# Create a Solution
+# Use an existing or request a new Bosch IoT Things service instance
 
-<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking">Book the Bosch IoT Things cloud service</a>
-
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
 
 # Configure your API Token and other settings
 
 Create or adjust file "src/main/resources/config.properties"
 
 ```
-thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
+thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
 apiToken=### your Bosch IoT Things Solution API Token ###
 http.proxyHost=### your http proxy host, if you need one ###
 http.proxyPort=### your http proxy port, if you need one ###
@@ -50,7 +49,7 @@ java -jar target/openid-jwt-login.jar
 
 # Usage
 
-Browse to the Bosch IoT Things Dashboard: <https://things.apps.bosch-iot-cloud.com/> to create a demo user.
+Browse to the Bosch IoT Things Dashboard: <https://things.s-apps.de1.bosch-iot-cloud.com/> to create a demo user.
 
 Browse to the example web app: <http://localhost:8080/openid-jwt-login/> and click on "Create" in the UI to create an empty Thing.
 

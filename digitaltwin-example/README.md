@@ -168,7 +168,7 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as decribed in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
 
 ## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 

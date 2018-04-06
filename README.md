@@ -32,7 +32,7 @@ This Node.js based example shows how to collect historic data in a InfluxDB time
 
 ### Example "digitaltwin-example"
 
-This example shows a simple Node.js based End-to-End scenario for Digital Twins based on Bosch IoT Things / Eclipse Ditto.
+This example shows a simple Node.js based end-to-end scenario for Digital Twins based on Bosch IoT Things / Eclipse Ditto.
 
 ### Example "desired-state-synchronizer"
 

@@ -1,7 +1,7 @@
 # Bosch IoT Things - Minimal Web UI
 
 This example shows how to create a simple user interface to list a thing.
-Find detailed instructions in our [tutorial](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:client:client).
+Find detailed instructions in our [tutorial](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:client:client).
 
 ## Configure your settings
 
@@ -35,7 +35,7 @@ Browse to the example web app: <http://localhost:8080/mini-webui/>
 
 Set your API token and the ID of the thing to be queried.
 
-Then click Submit. 
+Then click Submit.
 
 ## License
 See the iot-things-examples top level README.md file for license details.

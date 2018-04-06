@@ -25,12 +25,111 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as NodeWebSocket from 'ws'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
 
-export namespace util {
+/** Interface to describe Bosch IoT Things / Eclipse Ditto protocol message. */
+export interface ThingMessageInfo {
+  topic: string
+  path: string
+  value: any
+  headers?: any
+  fields?: string
+  status?: number
+}
 
-  /** Create partial object starting at nested path element. */
+type channel = 'twin' | 'live'
+type criterion = 'commands' | 'events' | 'search' | 'messages' | 'errors'
+type action = 'create' | 'retrieve' | 'modify' | 'delete' | 'created' | 'modified' | 'deleted' | string
+
+/** Convenience class to work with Bosch IoT Things / Eclipse Ditto protocol message.
+ *
+ * Adds some parsing functionality on top of the ThingMessageInfo interface.
+ */
+export class ThingMessage implements ThingMessageInfo {
+  readonly topic: string
+  readonly path: string
+  readonly value: any
+  readonly headers: any
+  readonly fields?: string
+  readonly status?: number
+
+  private _parsed: boolean = false
+  private _topicElements?: string[]
+  private _thingId?: string
+
+  constructor(obj: ThingMessageInfo) {
+    this.topic = obj.topic
+    this.headers = obj.headers
+    this.path = obj.path
+    this.value = obj.value
+    this.fields = obj.fields
+    this.status = obj.status
+  }
+
+  toJSONString() {
+    return JSON.stringify(this, (k, v) => k.startsWith('_') ? undefined : v)
+  }
+
+  private doParse(): any {
+    this._topicElements = this.topic.split('/')
+    this._thingId = this._topicElements[0] + ':' + this._topicElements[1]
+
+    const group = this._topicElements[2]
+    if (['things'].indexOf(group) < 0) {
+      throw new Error(`Topic group "${group}" invalid in topic "${this.topic}"`)
+    }
+    this._parsed = true
+  }
+
+  get thingId(): string {
+    if (!this._parsed) { this.doParse() }
+    return this._thingId!
+  }
+
+  get namespace(): string {
+    if (!this._parsed) { this.doParse() }
+    return this._topicElements![0]
+  }
+
+  get localThingId(): string {
+    if (!this._parsed) { this.doParse() }
+    return this._topicElements![1]
+  }
+
+  get channel(): channel {
+    if (!this._parsed) { this.doParse() }
+    const channel = this._topicElements![3]
+    if (['twin', 'live'].indexOf(channel) < 0) {
+      throw new Error(`Topic channel "${channel}" invalid in topic "${this.topic}"`)
+    }
+    return channel as channel
+  }
+
+  get criterion(): criterion {
+    if (!this._parsed) { this.doParse() }
+    const criterion = this._topicElements![4]
+    if (['commands', 'events', 'search', 'messages', 'errors'].indexOf(criterion) < 0) {
+      throw new Error(`Topic criterion "${criterion}" invalid in topic "${this.topic}"`)
+    }
+    return criterion as criterion
+  }
+
+  get action(): action {
+    if (!this._parsed) { this.doParse() }
+    const action = this._topicElements![5]
+    return action
+  }
+
+}
+
+export namespace Helpers {
+
+  /** Create partial object starting at nested path element.
+   *
+   * Example: partial('/a/b', { c: 1, d: { e: 2 } }) = { a: { b: { c: 1, d: { e: 2 } } } }
+   */
   export function partial(path: string, subobject: any): any {
     const pathelements = path.substr(1).split('/')
     const last = pathelements.pop() as string
@@ -94,12 +193,13 @@ export namespace util {
     } as ThingMessageInfo)
   }
 
-  export async function processAll(a: Array<() => void>, logprefix) {
+  /** Sequentielly invokes and array of functions, waiting for each execution. Errors are just logged, but execution continues. */
+  export async function processAll(a: Array<() => void>, errorLogPrefix) {
     a.forEach(async (f, i, a) => {
       try {
         await f()
       } catch (e) {
-        console.log(`${logprefix}: ${JSON.stringify(e.error || e)}`)
+        console.log(`${errorLogPrefix}: ${JSON.stringify(e.error || e)}`)
       }
       a.splice(i, 1)
     })

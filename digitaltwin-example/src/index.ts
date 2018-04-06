@@ -25,6 +25,8 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import { Frontend } from './service/frontend'
 import { DeviceCommissioning } from './service/device-commissioning'
 import { DeviceSimulation } from './service/device-simulation'

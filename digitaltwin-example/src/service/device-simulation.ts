@@ -25,12 +25,13 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { setInterval } from 'timers'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
@@ -50,6 +51,18 @@ const HUB_TENANT = CONFIG.deviceCommissioning.hubTenant
 const HUB_DEVICE_ID = THING_ID.substr(THING_ID.indexOf(':') + 1)
 const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID
 const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
+
+/** Simple device simulation that simulates device activity in absence of a real phyiscal device.
+ *
+ * It periodically sends a temperature value and accepts configuration changes of a threshold value.
+ *
+ * The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry dat
+ * AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes.
+ * The WebSocket channel is not proposed for large scale scenarios with high number of device connections
+ * but should be replaced by an appropriate device connectivity channel.
+ * As soon as Eclipse Hono supports command&control (see https://www.eclipse.org/hono/api/command-and-control-api/)
+ * using MQTT, the simulation could be switched to it for both channels.
+ */
 
 export class DeviceSimulation {
 
@@ -72,7 +85,7 @@ export class DeviceSimulation {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`DeviceSimulation start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -112,7 +125,7 @@ export class DeviceSimulation {
       && m.path.startsWith('/features/Device/properties/config')) {
 
       if (THING_ID === m.thingId) {
-        const t = util.partial(m.path, m.value)
+        const t = Helpers.partial(m.path, m.value)
         if (t.features.Device.properties.config.threshold) {
           this.config.threshold = t.features.Device.properties.config.threshold
           console.log('[DeviceSimulation] new threshold: ' + this.config.threshold)

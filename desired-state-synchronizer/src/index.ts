@@ -27,11 +27,11 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
+import * as fs from 'fs'
+import { Config } from './service/config'
 import { Synchronizer } from './service/synchronizer'
 import { DeviceSimulation } from './service/device-simulation'
-import { Frontend } from './frontend'
-import { Config } from './service/config'
-import * as fs from 'fs'
+import { Frontend } from './service/frontend'
 
 async function start(_args: string[]) {
 

@@ -28,11 +28,11 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import * as requestPromise from 'request-promise-native'
-import { Config } from './service/config'
-import { util } from './util/util'
+import { Config } from './config'
+import { Helpers } from './helpers'
 
-/**
- * Example frontend of an IoT application.
+/** Example frontend of an IoT application.
+ *
  * Set's up a Thing entity, periodically tries to set a desired configuration value and also periodically reads the whole state (reported and desired).
  */
 
@@ -155,7 +155,7 @@ export class Frontend {
     })
     cleanup.push(async () => {
       console.log('[Frontend] ...cleanup policy')
-      await util.sleep(2000)
+      await Helpers.sleep(2000)
       return requestPromise({
         ...this.defaultOptions,
         url: this.config.httpBaseUrl + '/api/2/policies/' + this.config.policyId,
@@ -164,9 +164,9 @@ export class Frontend {
     })
 
     console.log('[Frontend] cleanup')
-    await util.processAll(cleanup, '[Frontend] ignore failed cleanup')
+    await Helpers.processAll(cleanup, '[Frontend] ignore failed cleanup')
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(5000)
+    await Helpers.sleep(5000)
 
     // create Policy
 
@@ -185,7 +185,7 @@ export class Frontend {
     }))
 
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(2000)
+    await Helpers.sleep(2000)
 
     // create Thing
 
@@ -198,12 +198,12 @@ export class Frontend {
         body: thing
       })
     } catch (e) {
-      await util.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
+      await Helpers.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
       throw e
     }
 
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(10000)
+    await Helpers.sleep(10000)
   }
 
   private async configureThreshold() {

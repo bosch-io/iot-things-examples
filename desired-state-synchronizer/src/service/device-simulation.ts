@@ -30,15 +30,15 @@
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as uuidv4 from 'uuid/v4'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { setInterval } from 'timers'
 import { Config } from './config'
 
 const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
-/**
- * Simulation of the processing required on a device/gateway that supports to be configured from the backend and reports status values.
+/** Simple device simulation that simulates device activity in absence of a real phyiscal device.
+ *
+ * Shows the processing required on a device/gateway that supports to be configured from the backend and reports status values.
  * The simulation includes online and offline behavior where offline support is based on a synchroinization between reported and desired configuration state.
  */
 export class DeviceSimulation {
@@ -75,7 +75,7 @@ export class DeviceSimulation {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`[DeviceSimulation] start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(this.serviceConfig.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(this.serviceConfig.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -130,7 +130,7 @@ export class DeviceSimulation {
 
     // receive config directly by handling creates/modifications on @desired features
     if (m.channel === 'twin' && m.criterion === 'events' && (m.action === 'modified' || m.action === 'created')) {
-      const t = util.partial(m.path, m.value)
+      const t = Helpers.partial(m.path, m.value)
 
       if (t.features
         && t.features['Device@desired']
@@ -199,7 +199,7 @@ export class DeviceSimulation {
         let p = patch[i]
 
         if ((p.op === 'add' || p.op === 'replace')) {
-          const t = util.partial(p.path, p.value)
+          const t = Helpers.partial(p.path, p.value)
 
           // check if add/replace patch contains new config
           if (t.Device

@@ -25,6 +25,8 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as mqtt from 'mqtt'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
@@ -45,6 +47,8 @@ const HUB_TENANT = THINGS_NAMESPACE
 const HUB_DEVICE_ID = THINGS_LOCAL_THING_ID
 const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID
 const HUB_DEVICE_PASSWORD = 'xxx'
+const HUB_REGISTRY_USERNAME = 'xxx'
+const HUB_REGISTRY_PASSWORD = 'xxx'
 
 // Other constants (do not change)
 const THING_ID = THINGS_NAMESPACE + ':' + THINGS_LOCAL_THING_ID
@@ -151,6 +155,7 @@ class HubDeviceIntegration {
       url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT,
       method: 'POST',
       json: true,
+      auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
       body: {
         'device-id': HUB_DEVICE_ID
       }
@@ -163,6 +168,7 @@ class HubDeviceIntegration {
         url: 'https://device-registry.bosch-iot-hub.com/credentials/' + HUB_TENANT,
         method: 'POST',
         json: true,
+        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
         body: {
           'device-id': HUB_DEVICE_ID,
           'auth-id': HUB_DEVICE_AUTH_ID,
@@ -177,6 +183,7 @@ class HubDeviceIntegration {
       // in case of errors: delete unwanted device again
       await requestPromise({
         url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
+        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
         method: 'DELETE'
       })
     }
@@ -223,7 +230,7 @@ class HubDeviceIntegration {
 
     await requestPromise({
       url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
-      auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
+      auth: { user: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, pass: HUB_DEVICE_PASSWORD },
       method: 'PUT',
       json: true,
       body: msg
@@ -259,8 +266,8 @@ class HubDeviceIntegration {
       const r = await requestPromise({
         url: 'https://device-registry.bosch-iot-hub.com/credentials/' + HUB_TENANT
           + '?device-id=' + HUB_DEVICE_ID + '&auth-id=' + HUB_DEVICE_AUTH_ID + '&type=' + 'hashed-password',
-        method: 'DELETE'
-        // auth: { username: username, password: password }
+        method: 'DELETE',
+        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD }
       })
       console.log(`cleanup: delete device credential done; ${r}`)
     } catch (err) {
@@ -270,7 +277,8 @@ class HubDeviceIntegration {
     try {
       const r = await requestPromise({
         url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
-        method: 'DELETE'
+        method: 'DELETE',
+        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD }
       })
       console.log(`cleanup: delete device connection done; ${r}`)
     } catch (err) {

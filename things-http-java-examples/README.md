@@ -2,8 +2,8 @@
 
 This example shows how to connect to Bosch IoT Things with the Signature Authentication (CRS).
 The CRS Authentication allows (technical) clients to connect with a signature instead of BASIC auth.
-You can find more information on the different authentication processes at our [Wiki](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:004_rest_api:011_authenticate_as_a_client).
-Instructions how to generate the required keystore are available in our [Getting started](https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-solution-ui#private_and_public_key) guide. 
+You can find more information on the different authentication processes at our [Wiki](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:004_rest_api:011_authenticate_as_a_client).
+Instructions how to generate the required keystore are available in our [Getting started](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-solution-ui#private_and_public_key) guide.
 
 ## Configure
 

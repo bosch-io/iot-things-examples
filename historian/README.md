@@ -28,9 +28,9 @@ The time serias data is recorded in a simple document structure in MongoDB.
 For each and every single (scalar) property of a Thing exactly one document is managed.
 This document has a unique id consisting of "<thing-id>/<feature-id>/properties/<property-path>".
 The documents have to array fields: a "values" array and a "timestamps" array.
-Both arrays are updated on every property change. 
+Both arrays are updated on every property change.
 The new value and timestamp is added to the end of the array
-In addition the array is sliced to not exceed a fixed element count. 
+In addition the array is sliced to not exceed a fixed element count.
 
 | Document Id | Content |
 | --- | --- |
@@ -41,16 +41,16 @@ In addition the array is sliced to not exceed a fixed element count.
 
 ## Create a Solution with a private/public key
 
-<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking">Book the Bosch IoT Things cloud service</a>
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
 
-Add the CRClient.jks to the folder "src/main/resources".
+Create and add a Public Key to your solution and store the things-client.jks file to the folder "src/main/resources".
 
 ## Configure your Client Id and other settings
 
 Create file "config.properties" in folder "src/main/resources". _Please change the ids._
 
 ```
-thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
+thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
 clientId=###your solution id ###\:historian
 apiToken=###your historian solution API token###
 keyAlias=CR
@@ -91,26 +91,6 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
          "READ": true,
          "WRITE": false,
          "ADMINISTRATE": false
-      }
-   }
-   ...
-}
-```
-
-## Optionally configure history size for your thing
-
-If you want to define a custom history size for a thing you can do so by adding a special feature to this thing.
-Add a feature "HistoryConfig" with a property "historySize" in order to configure the custom size of the history.
-
-```
-{
-   ...
-   "features": {
-      ...
-      "HistoryConfig": {
-         "properties": {
-            "historySize": 5000
-         }
       }
    }
    ...

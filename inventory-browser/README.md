@@ -4,16 +4,16 @@ This example shows how to create a simple user interface to list things and thei
 
 ![Screenshot](screenshot.png)
 
-# Create a Solution
+# Use an existing or request a new Bosch IoT Things service instance
 
-<a href="https://things.apps.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking">Book the Bosch IoT Things cloud service</a>
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
 
 # Configure your API Token and other settings
 
 Create or adjust file "src/main/resources/config.properties"
 
 ```
-thingsServiceEndpointUrl=https://things.apps.bosch-iot-cloud.com
+thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
 apiToken=### your Bosch IoT Things Solution API Token ###
 http.proxyHost=### your http proxy host, if you need one ###
 http.proxyPort=### your http proxy port, if you need one ###
@@ -37,7 +37,7 @@ java -jar target/inventory-browser.jar
 
 ## Show Dashboard
 
-Browse to the Bosch IoT Things Dashboard: <https://things.apps.bosch-iot-cloud.com/>
+Browse to the Bosch IoT Things Dashboard: <https://things.s-apps.de1.bosch-iot-cloud.com/>
 
 ## Create Demo User
 
@@ -88,8 +88,8 @@ _Change the ids before executing this call._
    },
    "features":{
       "geolocation":{
+         "definition": [ "org.eclipse.vorto.Geolocation:1.0.0" ],
          "properties":{
-            "_definition":"org.eclipse.vorto.Geolocation:1.0.0",
             "geoposition":{
                "latitude":47.68,
                "longitude":9.3865

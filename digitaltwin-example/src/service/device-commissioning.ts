@@ -25,13 +25,14 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
 import * as Ajv from 'ajv'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
@@ -50,6 +51,12 @@ const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
 const COMMISSION_DEVICE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionDevice.schema.json', 'utf8')))
 const COMMISSION_GATEWAY_DEVICE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionGatewayDevice.schema.json', 'utf8')))
 
+/** Microservice implementation to support commissioning of a device to prepare the device connectivity.
+ *
+ * Implements http://vorto.eclipse.org/#/details/org.eclipse.ditto/HonoCommissioning/1.0.0 to register devices at Bosch IoT Hub / Eclipse Hono for usage with Bosch IoT Things / Eclispe Ditto.
+ * The current implementation only includes these elements in commissioning but could be extended or be used as a template for more complex commissioning orchestrations.
+ */
+
 export class DeviceCommissioning {
 
   private ws?: NodeWebSocket
@@ -66,7 +73,7 @@ export class DeviceCommissioning {
       // DEBUG
       // await this.commission({ thingId: 'abc:xxx', localThingId: 'xxx:', hubTenant: 'xxx', hubDevicePasswordHashed: 'xxx' })
 
-      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -132,7 +139,7 @@ export class DeviceCommissioning {
 
       input = { ...input, thingId: m.thingId, localThingId: m.localThingId }
 
-      util.processWithResponse(m, processor, input).then(r => {
+      Helpers.processWithResponse(m, processor, input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => console.log('[Commissioning] ' + (err ? 'websocket send error ' + err : 'websocket send response')))
       })
       return
@@ -193,7 +200,7 @@ export class DeviceCommissioning {
       auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword }
     }))
     console.log('[Commissioning] cleanup')
-    await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
+    await Helpers.processAll(cleanup, '[Commissioning] ignore failed cleanup')
 
     // register device
 
@@ -243,7 +250,7 @@ export class DeviceCommissioning {
         })
         console.log(`[Commissioning] credential result ${rc.statusCode} ${rc.headers.location}`)
       } catch (e) {
-        await util.processAll(cleanup, '[Commissioning] cleanup credential registration')
+        await Helpers.processAll(cleanup, '[Commissioning] cleanup credential registration')
         throw e
       }
 
@@ -283,7 +290,7 @@ export class DeviceCommissioning {
       console.log('[Commissioning] update commissioning info successful')
     } catch (e) {
       console.log(`[Commissioning] update commissioning info failed ${e}`)
-      await util.processAll(cleanup, '[Commissioning] ignore failed cleanup')
+      await Helpers.processAll(cleanup, '[Commissioning] ignore failed cleanup')
       throw e
     }
 

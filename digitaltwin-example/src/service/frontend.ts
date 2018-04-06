@@ -25,11 +25,13 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as fs from 'fs'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
 import * as Ajv from 'ajv'
-import { util } from '../util/util'
+import { Helpers } from './helpers'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
@@ -47,6 +49,16 @@ const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
 
 const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/com.acme.catalog_Accessories_2.0.0/operations/retrieveSupportedAccessories-response.schema.json', 'utf8')))
 const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionDevice-response.schema.json', 'utf8')))
+
+/** Example frontend of an IoT application using Digital Twins.
+ *
+ * The implementation shows the following examplinary topics:
+ *  - set up a Thing entity with its Policy to define the digital twin
+ *  - trigger a commissioning to setup- the device connectivity
+ *  - periodically sets a configuration value (that should be used by the device)
+ *  - periodically retrieves supported accessories (as orchestratet business logic usable in the context of this digital twin)
+ *  - periodically reads the whole state of the digital twin.
+ */
 
 export class Frontend {
 
@@ -193,9 +205,9 @@ export class Frontend {
     }))
 
     console.log('[Frontend] cleanup')
-    await util.processAll(cleanup, '[Frontend] ignore failed cleanup')
+    await Helpers.processAll(cleanup, '[Frontend] ignore failed cleanup')
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(2000)
+    await Helpers.sleep(2000)
 
     // create Policy
 
@@ -214,7 +226,7 @@ export class Frontend {
     }))
 
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(1000)
+    await Helpers.sleep(1000)
 
     // create Thing
 
@@ -227,12 +239,12 @@ export class Frontend {
         body: thing
       })
     } catch (e) {
-      await util.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
+      await Helpers.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
       throw e
     }
 
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await util.sleep(1000)
+    await Helpers.sleep(1000)
   }
 
   private async commission() {

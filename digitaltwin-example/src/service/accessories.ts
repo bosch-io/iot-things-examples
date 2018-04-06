@@ -25,12 +25,13 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
+/* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
+
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo } from '../util/thing-message'
-import { util } from '../util/util'
+import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
@@ -49,6 +50,13 @@ const REQUEST_OPTIONS: requestPromise.RequestPromiseOptions = {
   headers: CONFIG.httpHeaders
 }
 
+/** Microservice to provide a custom functionality to determine supported accessory products.
+ *
+ * By knowning the context of the digital twin it determines accessories that can be combined with the device
+ * (e.g. batteries, spare parts).
+ * In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
+ */
+
 export class Accessories {
 
   private ws?: NodeWebSocket
@@ -62,7 +70,7 @@ export class Accessories {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`Accessories start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      util.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
+      Helpers.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
         (ws) => {
           this.ws = ws
 
@@ -106,7 +114,7 @@ export class Accessories {
         case 'retrieveSupportedAccessories': processor = this.retrieveSupportedAccessories
       }
 
-      util.processWithResponse(m, processor, input).then(r => {
+      Helpers.processWithResponse(m, processor, input).then(r => {
         this.ws!.send(JSON.stringify(r), (err) => console.log('[Accessories] ' + (err ? 'websocket send error ' + err : 'websocket send response ok')))
       })
       return

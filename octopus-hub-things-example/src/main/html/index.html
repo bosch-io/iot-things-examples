@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Octopus - Bosch IoT Suite Example</title>
+  <!--
+       Bosch SI Example Code License
+       Version 1.0, January 2016
+
+       Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+
+       Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+       following conditions are met:
+
+       1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+       disclaimer.
+
+       2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+       following disclaimer in the documentation and/or other materials provided with the distribution.
+
+       BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+       LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+       THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+       ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+       BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+       LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+       THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+       UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+       LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+       EMPLOYEES, REPRESENTATIVES AND ORGANS.
+       -->
+  <style>
+    .hide-me {
+      display: none;
+      visibility: hidden;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      padding: 15px;
+      text-align: left;
+      border: 1px solid black;
+    }
+  </style>
+  <script>
+
+      function isAuthenticated() {
+          return (localStorage.getItem('thingId')
+                  && localStorage.getItem('permissionsTenant')
+                  && localStorage.getItem('permissionsUser')
+                  && localStorage.getItem('permissionsPassword')
+                  && localStorage.getItem('solutionApiToken'));
+
+      }
+
+      function login() {
+          localStorage.setItem('thingId', document.loginForm.thingId.value);
+          localStorage.setItem('permissionsTenant', document.loginForm.permissionsTenant.value);
+          localStorage.setItem('permissionsUser', document.loginForm.permissionsUser.value);
+          localStorage.setItem('permissionsPassword', document.loginForm.permissionsPassword.value);
+          localStorage.setItem('solutionApiToken', document.loginForm.solutionApiToken.value);
+          handleLogin();
+          return false;
+      }
+
+      function handleLogin() {
+          showData();
+          hideLoginForm();
+          showLogoutForm();
+          startRequestingData();
+      }
+
+      function logout() {
+          localStorage.removeItem('thingId');
+          localStorage.removeItem('permissionsTenant');
+          localStorage.removeItem('permissionsUser');
+          localStorage.removeItem('permissionsPassword');
+          localStorage.removeItem('solutionApiToken');
+          handleLogout();
+          return false;
+      }
+
+      function handleLogout() {
+          hideData();
+          hideLogoutForm();
+          showLoginForm();
+      }
+
+      function showLoginForm() {
+          document.loginForm.classList.remove('hide-me');
+      }
+
+      function hideLoginForm() {
+          document.loginForm.classList.add('hide-me');
+      }
+
+      function showLogoutForm() {
+          document.logoutForm.classList.remove('hide-me');
+      }
+
+      function hideLogoutForm() {
+          document.logoutForm.classList.add('hide-me');
+      }
+
+      function showData() {
+          document.getElementById('data-container').classList.remove('hide-me');
+      }
+
+      function hideData() {
+          document.getElementById('data-container').classList.add('hide-me');
+      }
+
+      function getApiToken() {
+          return localStorage.getItem('solutionApiToken');
+      }
+
+      function getPermissionsUser() {
+          return localStorage.getItem('permissionsTenant') + '\\' + localStorage.getItem('permissionsUser');
+      }
+
+      function getThingId() {
+          return localStorage.getItem('thingId');
+      }
+
+      function getPermissionsPassword() {
+          return localStorage.getItem('permissionsPassword');
+      }
+
+      function startRequestingData() {
+          setTimeout(function () {
+              if (isAuthenticated()) {
+                  requestData()
+                      .then(function (octopus) {
+                          var features = octopus.features;
+                          var keys = Object.keys(features).sort();
+                          for (var i = 0; i < keys.length; i++) {
+                              var key = keys[i];
+                              var feature = features[key].properties.status;
+                              updateFeature(key, feature)
+                          }
+                      });
+                  startRequestingData();
+              }
+          }, 5000);
+      }
+
+      function updateFeature(key, feature) {
+          var element = document.getElementById(key)
+          if(element) {
+              element.parentNode.removeChild(element);
+          }
+
+          var dataContainer = document.getElementById('data-container');
+
+          var featureDataContainer = document.createElement('div');
+          featureDataContainer.setAttribute('id', key);
+
+          var featureHeader = document.createElement('h1');
+          featureHeader.innerHTML = key;
+
+          var dataTable = document.createElement('table');
+          dataTable.setAttribute('style','table-layout: fixed;');
+
+          featureDataContainer.appendChild(featureHeader);
+          featureDataContainer.appendChild(dataTable);
+
+          var headerRow = dataTable.appendChild(document.createElement('tr'));
+          var valueRow = dataTable.appendChild(document.createElement('tr'));
+          for (var valueName in feature) {
+              var headerValue = headerRow.appendChild(document.createElement('th'));
+              headerValue.innerHTML = valueName;
+              var value = valueRow.appendChild(document.createElement('td'));
+              value.innerHTML = feature[valueName];
+          }
+
+          dataContainer.appendChild(featureDataContainer);
+      }
+
+      function requestData() {
+          var headers = new Headers();
+          headers.append('x-cr-api-token', getApiToken());
+          headers.append('Authorization', 'Basic ' + btoa(getPermissionsUser() + ":" + getPermissionsPassword()));
+          headers.append('Content-Type', 'application/json');
+
+          var init = {
+              method: 'GET',
+              headers: headers,
+              mode: 'cors',
+              cache: 'default'
+          };
+
+          var request = new Request('https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + getThingId() + '?fields=features');
+
+          return fetch(request, init)
+              .then(function (response) {
+                console.log(response);
+                return response.json();
+              });
+      }
+
+
+  </script>
+</head>
+<body>
+<form name="loginForm" onSubmit="return login()">
+  Full qualified thing id (namespace:thingId):<br>
+  <input type="text" name="thingId" value=""><br>
+  Permissions Tenant:<br>
+  <input type="text" name="permissionsTenant" value=""><br>
+  Permissions User:<br>
+  <input type="text" name="permissionsUser" value=""><br><br>
+  Permissions Password:<br>
+  <input type="password" name="permissionsPassword" value=""><br><br>
+  Solution Api Token:<br>
+  <input type="password" name="solutionApiToken" value=""><br><br>
+  <input type="submit" value="Start">
+</form>
+<form name="logoutForm" class="hide-me" onSubmit="return logout()">
+  <input type="submit" value="Stop">
+</form>
+<div id="data-container"></div>
+<script>
+    if (isAuthenticated()) {
+        handleLogin();
+    }
+</script>
+</body>
+</html>

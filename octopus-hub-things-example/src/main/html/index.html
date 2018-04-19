@@ -110,7 +110,11 @@
       }
 
       function hideData() {
-          document.getElementById('data-container').classList.add('hide-me');
+          var dataContainer = document.getElementById('data-container');
+          dataContainer.classList.add('hide-me');
+          while (dataContainer.firstChild) {
+              dataContainer.removeChild(dataContainer.firstChild);
+          }
       }
 
       function getApiToken() {
@@ -130,26 +134,48 @@
       }
 
       function startRequestingData() {
-          setTimeout(function () {
-              if (isAuthenticated()) {
-                  requestData()
-                      .then(function (octopus) {
-                          var features = octopus.features;
-                          var keys = Object.keys(features).sort();
-                          for (var i = 0; i < keys.length; i++) {
-                              var key = keys[i];
-                              var feature = features[key].properties.status;
-                              updateFeature(key, feature)
-                          }
-                      });
-                  startRequestingData();
-              }
-          }, 5000);
+          removeErrors();
+          if (isAuthenticated()) {
+              requestData()
+                  .then(function (octopus) {
+                      displayFeatures(octopus.features);
+                      setTimeout(function () {
+                          startRequestingData();
+                      }, 5000);
+                  })
+                  .catch(function (reason) {
+                      reason.json().then(showError);
+                  });
+          }
+      }
+
+      function showError(jsonReason) {
+          var errorParagraph = document.createElement("p");
+          errorParagraph.innerHTML = 'HTTP Status ' + jsonReason.status + ": " + jsonReason.message + " - " +
+                                     jsonReason.description;
+          document.getElementById('errorContainer').appendChild(errorParagraph);
+      }
+
+      function removeErrors() {
+          var errorContainer = document.getElementById('errorContainer');
+
+          while (errorContainer.firstChild) {
+              errorContainer.removeChild(errorContainer.firstChild);
+          }
+      }
+
+      function displayFeatures(features) {
+          var keys = Object.keys(features).sort();
+          for (var i = 0; i < keys.length; i++) {
+              var key = keys[i];
+              var feature = features[key].properties.status;
+              updateFeature(key, feature)
+          }
       }
 
       function updateFeature(key, feature) {
           var element = document.getElementById(key)
-          if(element) {
+          if (element) {
               element.parentNode.removeChild(element);
           }
 
@@ -162,7 +188,7 @@
           featureHeader.innerHTML = key;
 
           var dataTable = document.createElement('table');
-          dataTable.setAttribute('style','table-layout: fixed;');
+          dataTable.setAttribute('style', 'table-layout: fixed;');
 
           featureDataContainer.appendChild(featureHeader);
           featureDataContainer.appendChild(dataTable);
@@ -192,12 +218,15 @@
               cache: 'default'
           };
 
-          var request = new Request('https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + getThingId() + '?fields=features');
+          var request = new Request('https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + getThingId()
+                                    + '?fields=features');
 
           return fetch(request, init)
               .then(function (response) {
-                console.log(response);
-                return response.json();
+                  if (response.ok) {
+                      return response.json();
+                  }
+                  throw response;
               });
       }
 
@@ -221,6 +250,7 @@
 <form name="logoutForm" class="hide-me" onSubmit="return logout()">
   <input type="submit" value="Stop">
 </form>
+<div id="errorContainer"></div>
 <div id="data-container"></div>
 <script>
     if (isAuthenticated()) {

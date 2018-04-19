@@ -59,7 +59,7 @@ The cool thing hereby is that it doesn't matter if your device is available at t
 sensor values.
 Bosch IoT Things will deliver the last known state of your device.
 
-####Create a solution
+#### Create a solution
 For this example you need a free Bosch IoT Things service plan that you can get at the 
 [Bosch IoT Suite Portal](https://accounts.bosch-iot-suite.com/subscriptions).
 

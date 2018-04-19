@@ -40,7 +40,6 @@ There you can write the code that should be executed on your board and upload it
 2. Configure [ESP8266 board support](https://learn.adafruit.com/adafruit-feather-huzzah-esp8266/using-arduino-ide#install-the-esp8266-board-package)
 3. Install the following libraries (Sketch > Include Library > Manage Libraries)
     * [Adafruit Unified Sensor library](https://github.com/adafruit/Adafruit_Sensor)
-    * [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280_Library)
     * [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)
     * [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
     * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)

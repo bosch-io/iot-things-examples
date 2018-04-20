@@ -55,7 +55,7 @@ void setup() {
 void loop() {
   if(!hub->deviceIsConnected()) {
     octopus->showColor(1, 0x80, 0, 0, 0); // red
-    hub->connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID, HUB_DEVICE_PASSWORD);
+    hub->connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID "@" HUB_TENANT, HUB_DEVICE_PASSWORD);
     octopus->showColor(1, 0, 0x80, 0, 0); // green
   }
   loopSensors(octopus, hub);

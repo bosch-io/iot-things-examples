@@ -79,5 +79,5 @@ void BoschIotHub::publish(String payload) {
   int publishResult = mqttClient.publish("telemetry", payload.c_str());
   if (!publishResult) {
     Printer::printlnMsg("Bosch IoT Hub", "Publish failed, if this happens repeatedly increase MQTT_MAX_PACKET_SIZE in PubSubClient.h");
-  }   
+  }
 }

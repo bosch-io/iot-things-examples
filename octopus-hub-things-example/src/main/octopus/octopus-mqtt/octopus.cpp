@@ -123,7 +123,7 @@ Bme680Values Octopus::readBme680() {
 }
 
 void Octopus::initBme680() {
-  Printer::printlnMsg("Octopus", "Initializing BME680: ");
+  Printer::printMsg("Octopus", "Initializing BME680: ");
   if (this->bme680.begin(118)) {
     this->bme680.setTemperatureOversampling(BME680_OS_8X);
     this->bme680.setHumidityOversampling(BME680_OS_2X);
@@ -137,7 +137,7 @@ void Octopus::initBme680() {
 }
 
 void Octopus::initBno055() {
-  Printer::printlnMsg("Octopus", "Initializing BNO055: ");
+  Printer::printMsg("Octopus", "Initializing BNO055: ");
   if (this->bno055.begin()) {
     this->bno055.setExtCrystalUse(true);
     Serial.println("OK");

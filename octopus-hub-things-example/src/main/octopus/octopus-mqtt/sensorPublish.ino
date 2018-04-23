@@ -35,57 +35,69 @@ float powerMax = 1E-20;
 float tempBnoMin = 1E+20;
 float tempBnoMax = 1E-20;
 
-String sensorUpdateString(String featureName, float sensorValue, float minValue, float maxValue, String units) {
+String publishSensorDataString(float power, Bme680Values bme680Values, Bno055Values bno055Values) {
   String output = "{\"topic\": \"";
   output += THINGS_NAMESPACE;
   output += "/";
   output += THING_ID;
   output += "/things/twin/commands/modify\",\"headers\": {\"response-required\": false},";
-  output += "\"path\": \"/features/" + featureName + "/properties/status\", \"value\": {\"sensorValue\": " + sensorValue;
+  output += "\"path\": \"/features\", \"value\":{";
+  output += sensorMinMaxValueString("Power_0", power, powerMin, powerMax, "V");
+  output += sensorMinMaxValueString("HumiditySensor_BME680", bme680Values.humidity, humidityMin, humidityMax, "%");
+  output += sensorMinMaxValueString("TemperatureSensor_BME680", bme680Values.temperature, tempMin, tempMax, "°C");
+  output += sensorMinMaxValueString("Barometer_BME680", bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa");
+  output += sensorMinMaxValueString("TemperatureSensor_BNO055", bno055Values.temperature, tempBnoMin, tempBnoMax, "°C");
+  output += sensor3dValueString("Accelerometer_BNO055", bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2");
+  output += sensor3dValueString("AbsoluteOrientation_BNO055", bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°");
+  output += sensor3dValueString("Gravity_BNO055", bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2");
+  output += sensor3dValueString("AngularVelocity_BNO055", bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s");
+  output += sensor3dValueString("LinearAcceleration_BNO055", bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2");
+  output += sensor3dValueString("Magnetometer_BNO055", bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT");
+  output += "}}";
+  return output;
+}
+
+String sensorMinMaxValueString(String featureName, float sensorValue, float minValue, float maxValue, String units) {
+  String output = "\"" + featureName + "\": { \"properties\": \"status:\"";
+  output += "{\"sensorValue\": ";
+  output += sensorValue;
   output += ", \"minMeasuredValue\": ";
   output += minValue;
   output += ", \"maxMeasuredValue\": ";
   output += maxValue;
   output += ", \"sensorUnits\": \"";
   output += units;
-  output += "\"}}";    
+  output += "\"}";
   return output;
 }
 
-String sensor3dUpdateString(String featureName, float xValue, float yValue, float zValue, String units) {
-  String output = "{\"topic\": \"";
-  output += THINGS_NAMESPACE;
-  output += "/";
-  output += THING_ID;
-  output += "/things/twin/commands/modify\",\"headers\": {\"response-required\": false},";
-  output += "\"path\": \"/features/" + featureName + "/properties/status\", \"value\": {\"xValue\": " + xValue;
+String sensor3dValueString(String featureName, float xValue, float yValue, float zValue, String units) {
+  String output = "\"" + featureName + "\": { \"properties\": \"status:\"";
+  output += "{\"xValue\": ";
+  output += xValue;
   output += ", \"yValue\": ";
   output += yValue;
   output += ", \"zValue\": ";
   output += zValue;
   output += ", \"sensorUnits\": \"";
   output += units;
-  output += "\"}}";    
+  output += "\"}";
   return output;
 }
 
 void publishSensorData(float vcc, Bme680Values bme680Values, Bno055Values bno055Values) {
-  publishVcc(vcc);
-  publishBme680(bme680Values);
-  publishBno055(bno055Values);
+
+  hub->publish(publishSensorDataString(vcc, bme680Values, bno055Values));
 }
 
-void publishVcc(float power) {
+void updateMinMax(float power, Bme680Values bme680Values, Bno055Values bno055Values) {
   if (powerMin > power) {
     powerMin = power;
   }
   if (powerMax < power) {
     powerMax = power;
   }
-  hub->publish(sensorUpdateString("Power_0", power, powerMin, powerMax, "V"));
-}
 
-void publishBme680(Bme680Values bme680Values) {
   float humidity = bme680Values.humidity;
   if (humidityMin > humidity) {
     humidityMin = humidity;
@@ -93,7 +105,7 @@ void publishBme680(Bme680Values bme680Values) {
   if (humidityMax < humidity) {
     humidityMax = humidity;
   }
-  hub->publish(sensorUpdateString("HumiditySensor_BME680", humidity, humidityMin, humidityMax, "%"));
+
   float temp = bme680Values.temperature;
   if (tempMin > temp) {
     tempMin = temp;
@@ -101,7 +113,7 @@ void publishBme680(Bme680Values bme680Values) {
   if (tempMax < temp) {
     tempMax = temp;
   }
-  hub->publish(sensorUpdateString("TemperatureSensor_BME680", temp, tempMin, tempMax, "°C"));
+
   float barometer = bme680Values.pressure / 100.0;
   if (barometerMin > barometer) {
     barometerMin = barometer;
@@ -109,10 +121,7 @@ void publishBme680(Bme680Values bme680Values) {
   if (barometerMax < barometer) {
     barometerMax = barometer;
   }
-  hub->publish(sensorUpdateString("Barometer_BME680", barometer, barometerMin, barometerMax, "hPa"));
-}
 
-void publishBno055(Bno055Values bno055Values) {
   float tempBno = bno055Values.temperature;
   if (tempBnoMin > tempBno) {
     tempBnoMin = tempBno;
@@ -120,15 +129,4 @@ void publishBno055(Bno055Values bno055Values) {
   if (tempBnoMax < tempBno) {
     tempBnoMax = tempBno;
   }
-  hub->publish(sensorUpdateString("TemperatureSensor_BNO055", tempBno, tempBnoMin, tempBnoMax, "°C"));
-  // if (bno055Values.calibrationSys > 0) {
-    hub->publish(sensor3dUpdateString("Accelerometer_BNO055", bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2"));
-    hub->publish(sensor3dUpdateString("AbsoluteOrientation_BNO055", bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°"));
-    hub->publish(sensor3dUpdateString("Gravity_BNO055", bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2"));
-    hub->publish(sensor3dUpdateString("AngularVelocity_BNO055", bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s"));
-    hub->publish(sensor3dUpdateString("LinearAcceleration_BNO055", bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2"));
-    hub->publish(sensor3dUpdateString("Magnetometer_BNO055", bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT"));
-  /* } else {
-      Printer::printMsg("BNO055", "Skipping update to hub, system calibration < 1");
-  }*/
 }

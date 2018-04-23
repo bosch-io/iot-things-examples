@@ -43,21 +43,10 @@ Octopus::Octopus() {
 }
 
 void Octopus::connectToWifi(char* ssid, const char* password) {
-  byte macAddress[6];
-  
-  WiFi.macAddress(macAddress);
-  Printer::printMsg("MAC address", "");
-  Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
-      macAddress[0],
-      macAddress[1],
-      macAddress[2],
-      macAddress[3],
-      macAddress[4],
-      macAddress[5]);
-  
+
   this->showColor(0, 0, 0, 0, 0x80); // white
+  Printer::printMsg("Octopus::WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
   WiFi.begin(ssid, password);
-  Printer::printMsg("WiFi", "Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);

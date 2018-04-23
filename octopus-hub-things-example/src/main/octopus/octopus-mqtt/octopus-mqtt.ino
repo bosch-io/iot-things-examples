@@ -69,6 +69,7 @@ void loop() {
 
     printSensorData(vcc, bme680Values, bno055Values);
     publishSensorData(vcc, bme680Values, bno055Values);
+    Serial.println();
   }
   delay(LOOP_DELAY);
 }

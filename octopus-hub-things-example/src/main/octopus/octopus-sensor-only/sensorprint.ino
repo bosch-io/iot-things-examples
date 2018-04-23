@@ -24,26 +24,14 @@
  * REPRESENTATIVES AND ORGANS.
  */
 
-unsigned long lastSensorUpdateMillis = 0;
-// ---- Pretty-printing Functions ----
-
-void loopSensors(Octopus* octopus) {
-  if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
-    lastSensorUpdateMillis = millis();
-    printSensors(octopus);
-  }
-  delay(LOOP_DELAY);
+void printSensorData(float vcc, Bme680Values bme680Values, Bno055Values bno055Values) {
+  printVcc(vcc);
+  printBme680(bme680Values);
+  printBno055(bno055Values);
 }
 
-void printSensors (Octopus* octopus) {
-  Serial.println("--- Sensor Loop --- ");
-  
-  Printer::printMsg("VCC", "ESP8266 supply voltage: ");
-  Serial.println(octopus->getVcc());
-
+void printBme680(Bme680Values bme680Values) {
   Printer::printMsg("BME680", "temp: ");
-  
-  Bme680Values bme680Values = octopus->readBme680();
   Serial.print(bme680Values.temperature);
   Serial.print(" °C, pressure: ");
   Serial.print(bme680Values.pressure / 100.0);
@@ -54,9 +42,10 @@ void printSensors (Octopus* octopus) {
   Serial.print(" KOhms, altitude = ");
   Serial.print(bme680Values.altitude);
   Serial.println(" m");
+}
 
-  Bno055Values bno055Values = octopus->readBno055();
-
+void printBno055(Bno055Values bno055Values) {
+  // Only use values if calibration status > 0
   Printer::printMsg("BNO055", "Calibration status: Sys=");
   Serial.print(bno055Values.calibrationSys, DEC);
   Serial.print(", Gyro=");
@@ -111,6 +100,9 @@ void printSensors (Octopus* octopus) {
   Serial.print(bno055Values.magneticFieldStrengthY);
   Serial.print(", z=");
   Serial.println(bno055Values.magneticFieldStrengthZ);
+}
 
-  Serial.println();
+void printVcc(float power) {
+  Printer::printMsg("VCC", "ESP8266 supply voltage: ");
+  Serial.println(power);
 }

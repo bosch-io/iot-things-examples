@@ -34,6 +34,8 @@ ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 Octopus* octopus;
 BoschIotHub* hub;
 
+unsigned long lastSensorUpdateMillis = 0;
+
 void setup() {
   Serial.begin(115200);
   while (!Serial);
@@ -58,5 +60,15 @@ void loop() {
     hub->connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID "@" HUB_TENANT, HUB_DEVICE_PASSWORD);
     octopus->showColor(1, 0, 0x80, 0, 0); // green
   }
-  loopSensors(octopus, hub);
+
+  if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
+    lastSensorUpdateMillis = millis();
+    Bme680Values bme680Values = octopus->readBme680();
+    Bno055Values bno055Values = octopus->readBno055();
+    float vcc = octopus->getVcc();
+
+    printSensorData(vcc, bme680Values, bno055Values);
+    publishSensorData(vcc, bme680Values, bno055Values);
+  }
+  delay(LOOP_DELAY);
 }

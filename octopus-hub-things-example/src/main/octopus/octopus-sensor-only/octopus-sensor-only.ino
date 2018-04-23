@@ -47,5 +47,13 @@ void setup() {
 }
 
 void loop() {
-  loopSensors(octopus);
+  if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
+    lastSensorUpdateMillis = millis();
+    Bme680Values bme680Values = octopus->readBme680();
+    Bno055Values bno055Values = octopus->readBno055();
+    float vcc = octopus->getVcc();
+
+    printSensorData(vcc, bme680Values, bno055Values);
+  }
+  delay(LOOP_DELAY);
 }

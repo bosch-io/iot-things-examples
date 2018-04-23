@@ -76,8 +76,18 @@ void BoschIotHub::connectDevice(const char* deviceId, const char* authId, const 
 void BoschIotHub::publish(String payload) {
   Printer::printlnMsg("Bosch IoT Hub", payload);
   /* Publish all available data to the MQTT broker */
-  int publishResult = mqttClient.publish("telemetry", payload.c_str());
+  const char* topic = "telemetry";
+  const size_t requiredLength = 5 + 2+strlen(topic) + payload.length();
+
+  if (requiredLength > MQTT_MAX_PACKET_SIZE) {
+    Printer::printlnMsg("Bosch IoT Hub", "Cannot publish: Message is too big.");
+    Printer::printMsg("Bosch IoT Hub", "Increase MQTT_MAX_PACKET_SIZE in PubSubClient.h to at least ");
+    Serial.println(requiredLength);
+  }
+
+  int publishResult = mqttClient.publish(topic, payload.c_str());
   if (!publishResult) {
-    Printer::printlnMsg("Bosch IoT Hub", "Publish failed, if this happens repeatedly increase MQTT_MAX_PACKET_SIZE in PubSubClient.h");
+    Printer::printMsg("Bosch IoT Hub", "Publish failed");
+    Serial.println(publishResult);
   }
 }

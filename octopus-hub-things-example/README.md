@@ -88,6 +88,9 @@ For this example you need a Bosch IoT Things service plan. A free plan can be bo
 ![Create Solution](images/createSolution.png)
 
 Well done! You have a free Bosch IoT Things service instance.
+Now you can find the attributes, relevant for this example, when you click "Credentials" on your Bosch IoT Things 
+service instance in the [Bosch IoT Suite portal](https://accounts.bosch-iot-suite.com/subscriptions). 
+
 
 ### Bosch IoT Hub
 Bosch IoT Hub is a service that allows to connect devices through various protocols to applications of the Bosch
@@ -105,6 +108,8 @@ For this example you need a Bosch IoT Hub service plan . A free plan can be book
 ![Create Hub Instance](images/createHubInstance.png)
 
 Well done! You have a free Bosch IoT Hub service instance.
+Now you can find the attributes, relevant for this example, when you click "Credentials" on your Bosch IoT Hub service 
+instance in the [Bosch IoT Suite portal](https://accounts.bosch-iot-suite.com/subscriptions). 
 
 ### Bosch IoT Permissions
 

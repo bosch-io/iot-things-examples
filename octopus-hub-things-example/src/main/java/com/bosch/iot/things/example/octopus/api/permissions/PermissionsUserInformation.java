@@ -32,7 +32,7 @@ public class PermissionsUserInformation {
 
     private PermissionsUserInformation() {}
 
-    public static final String USERNAME = getPropertyOrThrowException("permissions.tenant") + "\\" +
+    public static final String USERNAME = getPropertyOrThrowException("permissions.tenant-name") + "\\" +
             getPropertyOrThrowException("permissions.username");
 
     public static final String PASSWORD = getPropertyOrThrowException("permissions.password");

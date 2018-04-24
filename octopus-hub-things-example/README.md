@@ -1,6 +1,9 @@
 # Using the Octopus board with the Bosch IoT Suite
 
 This example shows how to use the Octopus board (Bosch IoT Suite edition) with the Bosch IoT Suite.
+In the image below we illustrated the components of this example and how they will interact with each other.
+![Visualisation](images/exampleVisualizationpng.png)
+
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Setting up the Arduino IDE](#setup-ide)
 2. [Subscribe for the Bosch IoT Suite service instances](#subscribe-for-bosch-iot-suite-service-instances)

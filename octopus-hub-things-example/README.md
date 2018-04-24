@@ -164,7 +164,7 @@ Open `src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
 
 All properties have to be set in `src/main/octopus/octopus-mqtt/settings.h`
 
-### Retrieve stored sensor data from Bosch IoT Things
+## Retrieve stored sensor data from Bosch IoT Things
 
 The data of the registered thing can be retrieved via the 
 [HTTP API of Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/documentation/rest/#!/Things/get_things_thingId).

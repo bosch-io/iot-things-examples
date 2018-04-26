@@ -26,7 +26,7 @@ A digital twin is an orchestration of many (all) aspects of an IoT device/produc
 Each digital twin is represented as Thing and the aspects a represented as Features within this Thing.\
 Some of these Features might represent a state with properties, while others represent an interface to some functionality (e.g. operations or events), and some Features are both.
 
-Normally there are "contracts" that define the structure of the state and/or the interfaces of functionality. These contracts are defined using Eclipse Vorto by describing Function Blocks. Some Features may also be "free form", i.e. there is no "written" contract that defines its state/functionality.
+Normally there are "contracts" that define the structure of the state and/or the interfaces of functionality. These contracts can be defined using Eclipse Vorto by describing Function Blocks. Some Features may also be "free form", i.e. there is no "written" contract that defines its state/functionality.
 
 Finally, there needs to be a place where the orchestration is described. Policies are used to manage the orchestration. They include the roles and access rights and by this directly define the responsibility of these roles.
 
@@ -41,9 +41,9 @@ The user of a digital twin (e.g. business application, frontend) can interact wi
 
 All custom microservices that implement functionality of one/multiple Features can be integrated into the digital twin by using the Ditto protocol via multiple protocol bindings. You can use either a WebSocket binding, AMQP 1.0, or AMQP 0.91 (RabbitMQ) binding, depending on what is best suited regarding technology and non-functional requirements.
 
-The most important characteristic of a digital twin is the representation of state and the functionality of the physical device that is connected to the Internet. This integration is done using the same approach and explicitly prepared for integration with Bosch IoT Hub / Eclipse Hono.
+The most important characteristic of a digital twin is the representation of state and the functionality of the physical device that is connected to the Internet. This integration is done using the same approach and is explicitly prepared for integration with Bosch IoT Hub / Eclipse Hono.
 
-The following diagram shows deployment options for digital twin with Bosch IoT Things / Eclipse Ditto:
+The following diagram shows deployment options for digital twins with Bosch IoT Things / Eclipse Ditto:
 
 ![deployment](doc/digitaltwin-deployment.png)
 
@@ -80,7 +80,7 @@ Following the deployment model from above this looks like this:
 The policy-based orchestration works with different (technical) users that are used for each microservice. In the policy notation the IDs of these users are called subjects and the subjects reflect the role each microservice has within the digital twin:
 You will need users for following roles:
 - **owner**: this is a user that owns the overall digital twin. It is set-up to have all access rights on all features and the policy itself. In the example the _Frontend_ user is the owner of the digital twin.
-- **integration**: this is a "virtual" user/subject that is used to define access rights used in the integration with Bosch IoT Hub / Eclipse Hono. This subject is allowed to write status properties and read configuration properties. As it is "virtual" no real (technical) user entity is required, but any unique, arbitrary subject ID can be used for that.
+- **integration**: this is a "virtual" user/subject that is used to define access rights used in the integration with Bosch IoT Hub / Eclipse Hono. This subject is allowed to write status properties and read configuration properties. As it is "virtual", no real (technical) user entity is required, but any unique, arbitrary subject ID can be used for that.
 - **simulation**: used by the device simulation microservice to act as replacement for a real physical device. It will be configured with the same access rights as the _Integration_ subject.
 - **accessories**: as the example accessories microservice uses a message-based interaction pattern ("retrieveSupportedAccessories") this subject requires receive permissions on these messages. The retrieval is based on product information and so this subject requires access on the respective _ProductInfo_ feature also.
 - **commissioning**: the commissioning workflow is also integrated using message-based interaction patterns (e.g. "commissionDevice"). Access rights to receive these messages are defined and also access rights to manage the state of the _Commissioning_ feature in order to write result information.

@@ -27,8 +27,8 @@ package com.bosch.cr.examples.jwt.auth;
 
 import com.bosch.im.api2.Scope;
 import com.bosch.im.api2.client.IClient;
-import com.bosch.im.api2.dto.AuthenticationDto;
-import com.bosch.im.api2.dto.AuthorizationDto;
+import com.bosch.im.api2.dto.AuthenticationResponseDto;
+import com.bosch.im.api2.dto.AuthorizationResponseDto;
 
 /**
  * Helper class for requesting JSON Web Tokens at Bosch IoT Permissions.
@@ -51,9 +51,9 @@ final class ImAuthenticationHelper {
      *
      * @return a DTO holding authentication info (jwt)
      */
-    public AuthenticationDto authenticate(final String tenantIdOrName, final String userName, final String password) {
+    public AuthenticationResponseDto authenticate(final String tenantIdOrName, final String userName, final String password) {
         return client.authenticate() //
-                .userTenantIdOrName(tenantIdOrName) //
+                .userTenant(tenantIdOrName) //
                 .userName(userName) //
                 .password(password) //
                 .executeAndGet();
@@ -68,7 +68,7 @@ final class ImAuthenticationHelper {
      * @param authenticationDto a DTO holding authentication info (jwt)
      * @return a DTO holding authorization info (jwt)
      */
-    public AuthorizationDto authorize(final AuthenticationDto authenticationDto) {
+    public AuthorizationResponseDto authorize(final AuthenticationResponseDto authenticationDto) {
         return client.authorize() //
                 .userTenantId(authenticationDto.getUserTid()) //
                 .scopes(Scope.trid, Scope.gid) //

@@ -32,15 +32,17 @@ ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
 Octopus* octopus;
 
+unsigned long lastSensorUpdateMillis = 0;
+
 void setup() {
   Serial.begin(115200);
   while (!Serial);
 
   Serial.println("                             "); // print some spaces to let the Serial Monitor catch up
   Serial.println();
-  
+
   Printer::printlnMsg("Reset reason", ESP.getResetReason());
-  
+
   octopus = new Octopus();
 
   Serial.println();

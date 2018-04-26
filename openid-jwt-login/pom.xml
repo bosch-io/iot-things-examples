@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.bosch.im</groupId>
             <artifactId>im-api2-client</artifactId>
-            <version>1.0.alpha5</version>
+            <version>1.5</version>
         </dependency>
     </dependencies>
 

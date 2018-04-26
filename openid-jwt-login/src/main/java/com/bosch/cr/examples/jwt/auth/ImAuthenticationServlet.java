@@ -36,6 +36,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.bosch.im.api2.dto.AuthenticationResponseDto;
+import com.bosch.im.api2.dto.AuthorizationResponseDto;
 import org.apache.http.HttpStatus;
 
 import com.bosch.cr.examples.jwt.ConfigurationProperties;
@@ -46,10 +48,8 @@ import com.bosch.cr.json.JsonMissingFieldException;
 import com.bosch.cr.json.JsonObject;
 import com.bosch.cr.json.JsonValue;
 import com.bosch.im.api2.client.IClient;
-import com.bosch.im.api2.client.IClientBuilder;
-import com.bosch.im.api2.client.exception.server.AuthenticationDeniedException;
-import com.bosch.im.api2.dto.AuthenticationDto;
-import com.bosch.im.api2.dto.AuthorizationDto;
+import com.bosch.im.api2.client.builder.IClientBuilder;
+import com.bosch.im.api2.client.impl.client.ClientBuilder;
 
 /**
  * @since 1.0.0
@@ -87,11 +87,13 @@ public class ImAuthenticationServlet extends HttpServlet {
         final String clientSecret = configurationProperties.getPropertyAsString(ConfigurationProperty.IM_CLIENT_SECRET);
         final String url = configurationProperties.getPropertyAsString(ConfigurationProperty.IM_URL);
 
-        final IClient client = IClientBuilder.newInstance() //
-                .clientId(clientId) //
-                .clientSecret(clientSecret) //
-                .serviceUrl(url) //
+        final IClient client = new ClientBuilder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .serviceUrl(url)
                 .build();
+
+
 
         authenticationHelper = new ImAuthenticationHelper(client);
     }
@@ -113,9 +115,9 @@ public class ImAuthenticationServlet extends HttpServlet {
             final String password = jsonObject.getValue(PASSWORD).map(JsonValue::asString)
                     .orElseThrow(() -> new JsonMissingFieldException(PASSWORD.getPointer()));
 
-            final AuthenticationDto authenticationDto =
+            final AuthenticationResponseDto authenticationDto =
                     authenticationHelper.authenticate(tenantNameOrId, userName, password);
-            final AuthorizationDto authorizationDto = authenticationHelper.authorize(authenticationDto);
+            final AuthorizationResponseDto authorizationDto = authenticationHelper.authorize(authenticationDto);
             final String authorizationToken = authorizationDto.getAuthorizationToken();
 
             final boolean secure = configurationProperties.getPropertyAsBoolean(ConfigurationProperty.SECURE_COOKIE);
@@ -129,7 +131,7 @@ public class ImAuthenticationServlet extends HttpServlet {
         } catch (final JsonMissingFieldException e) {
             resp.setStatus(HttpStatus.SC_BAD_REQUEST);
             resp.getOutputStream().print(e.getMessage());
-        } catch (final AuthenticationDeniedException e) {
+        } catch (final Exception e) {
             resp.setStatus(HttpStatus.SC_UNAUTHORIZED);
             resp.getOutputStream().print(e.getMessage());
         }

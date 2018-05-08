@@ -55,7 +55,8 @@ There you can write the code that should be executed on your board and upload it
     * [ArduinoJson library](https://github.com/bblanchon/ArduinoJson)
 4. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the MQTT_MAX_PACKET_SIZE
 to 2048. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
-an array of this size.
+an array of this size. Unfortunately we can't define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
+compiles.
 
 With this setup, you can run our example that demonstrates how to retrieve the sensor values of your
 board. Open `src/main/octopus/octopus-sensor-only/octopus-sensor-only.ino` in Arduino IDE and upload it to your

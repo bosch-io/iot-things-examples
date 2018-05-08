@@ -24,13 +24,13 @@
  * REPRESENTATIVES AND ORGANS.
  */
 
-void printSensorData(float vcc, Bme680Values bme680Values, Bno055Values bno055Values) {
+void printSensorData(float vcc, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
   printVcc(vcc);
   printBme680(bme680Values);
   printBno055(bno055Values);
 }
 
-void printBme680(Bme680Values bme680Values) {
+void printBme680(const Bme680Values& bme680Values) {
   Printer::printMsg("BME680", "temp: ");
   Serial.print(bme680Values.temperature);
   Serial.print(" °C, pressure: ");
@@ -44,7 +44,7 @@ void printBme680(Bme680Values bme680Values) {
   Serial.println(" m");
 }
 
-void printBno055(Bno055Values bno055Values) {
+void printBno055(const Bno055Values& bno055Values) {
   // Only use values if calibration status > 0
   Printer::printMsg("BNO055", "Calibration status: Sys=");
   Serial.print(bno055Values.calibrationSys, DEC);

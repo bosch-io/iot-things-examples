@@ -30,7 +30,7 @@
 
 ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
-Octopus* octopus;
+Octopus octopus;
 
 unsigned long lastSensorUpdateMillis = 0;
 
@@ -43,7 +43,7 @@ void setup() {
 
   Printer::printlnMsg("Reset reason", ESP.getResetReason());
 
-  octopus = new Octopus();
+  octopus.begin();
 
   Serial.println();
 }
@@ -51,9 +51,9 @@ void setup() {
 void loop() {
   if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
     lastSensorUpdateMillis = millis();
-    Bme680Values bme680Values = octopus->readBme680();
-    Bno055Values bno055Values = octopus->readBno055();
-    float vcc = octopus->getVcc();
+    Bme680Values bme680Values = octopus.readBme680();
+    Bno055Values bno055Values = octopus.readBno055();
+    float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);
   }

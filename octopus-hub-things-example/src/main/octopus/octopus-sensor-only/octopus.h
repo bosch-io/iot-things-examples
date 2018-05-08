@@ -81,7 +81,7 @@ class Octopus {
   void initBno055();
   
   public:
-    Octopus();
+    void begin();
     void showColor(char led, char red, char green, char blue, char white);
     float getVcc ();
     Bno055Values readBno055();

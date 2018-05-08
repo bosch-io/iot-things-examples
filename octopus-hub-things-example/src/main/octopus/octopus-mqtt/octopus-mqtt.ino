@@ -31,8 +31,8 @@
 
 ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
-Octopus* octopus;
-BoschIotHub* hub;
+Octopus octopus;
+BoschIotHub hub(MQTT_BROKER, MQTT_PORT, MQTT_SERVER_FINGERPRINT);
 
 unsigned long lastSensorUpdateMillis = 0;
 
@@ -45,12 +45,10 @@ void setup() {
   
   Printer::printlnMsg("Reset reason", ESP.getResetReason());
   
-  octopus = new Octopus();
-  octopus->connectToWifi(WIFI_SSID, WIFI_PASSWORD);
+  octopus.begin();
+  octopus.connectToWifi(WIFI_SSID, WIFI_PASSWORD);
 
-  hub = new BoschIotHub(MQTT_BROKER, MQTT_PORT, MQTT_SERVER_FINGERPRINT);
-
-  if(hub->connect()) {
+  if(hub.connect()) {
     Printer::printlnMsg("Error", "Could not connect to Hub. Restarting octopus");
     ESP.restart();
   }
@@ -59,17 +57,17 @@ void setup() {
 }
 
 void loop() {
-  if(!hub->deviceIsConnected()) {
-    octopus->showColor(1, 0x80, 0, 0, 0); // red
-    hub->connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID "@" HUB_TENANT, HUB_DEVICE_PASSWORD);
-    octopus->showColor(1, 0, 0x80, 0, 0); // green
+  if(!hub.deviceIsConnected()) {
+    octopus.showColor(1, 0x80, 0, 0, 0); // red
+    hub.connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID "@" HUB_TENANT, HUB_DEVICE_PASSWORD);
+    octopus.showColor(1, 0, 0x80, 0, 0); // green
   }
 
   if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
     lastSensorUpdateMillis = millis();
-    Bme680Values bme680Values = octopus->readBme680();
-    Bno055Values bno055Values = octopus->readBno055();
-    float vcc = octopus->getVcc();
+    Bme680Values bme680Values = octopus.readBme680();
+    Bno055Values bno055Values = octopus.readBno055();
+    float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);
     publishSensorData(vcc, bme680Values, bno055Values);

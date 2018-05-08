@@ -30,7 +30,7 @@
 #include "octopus.h"
 #include "printer.h"
 
-Octopus::Octopus() {
+void Octopus::begin() {
   Serial.println("--- Initializing Octopus --- ");  
 
   this->initLights();

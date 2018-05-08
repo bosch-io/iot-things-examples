@@ -87,7 +87,7 @@ String sensor3dValueString(String featureName, float xValue, float yValue, float
 
 void publishSensorData(float vcc, Bme680Values bme680Values, Bno055Values bno055Values) {
 
-  hub->publish(publishSensorDataString(vcc, bme680Values, bno055Values));
+  hub.publish(publishSensorDataString(vcc, bme680Values, bno055Values));
 }
 
 void updateMinMax(float power, Bme680Values bme680Values, Bno055Values bno055Values) {

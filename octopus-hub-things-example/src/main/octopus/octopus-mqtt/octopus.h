@@ -80,12 +80,12 @@ class Octopus {
   void initBno055();
   
   public:
-    Octopus();
+    void begin();
     void connectToWifi(char* ssid, const char* password);
     void showColor(char led, char red, char green, char blue, char white);
     float getVcc ();
-    Bno055Values readBno055();
-    Bme680Values readBme680();
+    const Bno055Values readBno055();
+    const Bme680Values readBme680();
 };
 
 #endif

@@ -29,8 +29,8 @@
 #include "octopus.h"
 #include "printer.h"
 
-Octopus::Octopus() {
-  Serial.println("--- Initializing Octopus --- ");  
+void Octopus::begin() {
+   Serial.println("--- Initializing Octopus --- ");  
 
   this->initLights();
   
@@ -68,7 +68,7 @@ float Octopus::getVcc () {
   return ESP.getVcc() / 1000.0;
 }
 
-Bno055Values Octopus::readBno055() {
+const Bno055Values Octopus::readBno055() {
   Bno055Values values;
   
   this->bno055.getCalibration(&values.calibrationSys, &values.calibrationGyro, &values.calibrationAccel, &values.calibrationMag);
@@ -107,7 +107,7 @@ Bno055Values Octopus::readBno055() {
   return values;
 }
 
-Bme680Values Octopus::readBme680() {
+const Bme680Values Octopus::readBme680() {
   Bme680Values values;
   if (!this->bme680.performReading()) { 
     Serial.println("Sensor reading failure");

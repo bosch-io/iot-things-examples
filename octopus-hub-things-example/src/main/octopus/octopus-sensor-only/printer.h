@@ -23,7 +23,6 @@
  * ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S EMPLOYEES,
  * REPRESENTATIVES AND ORGANS.
  */
-
 #ifndef PRINTER_H
 #define PRINTER_H
 #include <WString.h>
@@ -31,8 +30,8 @@
 class Printer {
 
   public: 
-    static void printMsg(const char* header, const String message);
-    static void printlnMsg(const char* header, const String message);
+    static void printMsg(const char* header, const String& message);
+    static void printlnMsg(const char* header, const String& message);
 };
 
 #endif

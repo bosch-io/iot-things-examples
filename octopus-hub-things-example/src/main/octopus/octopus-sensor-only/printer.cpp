@@ -23,11 +23,10 @@
  * ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S EMPLOYEES,
  * REPRESENTATIVES AND ORGANS.
  */
-
 #include "printer.h";
 #include <Arduino.h>
 
-void Printer::printMsg(const char * header, const String message) {    
+void Printer::printMsg(const char * header, const String& message) {
     Serial.printf("[%s] ", header);
 
     if(strlen(header) > 17 ) {
@@ -41,7 +40,7 @@ void Printer::printMsg(const char * header, const String message) {
     Serial.print(message);
 }
 
-void Printer::printlnMsg(const char * header, const String message) {    
+void Printer::printlnMsg(const char * header, const String& message) {
     Printer::printMsg(header, message);
     Serial.println();
 }

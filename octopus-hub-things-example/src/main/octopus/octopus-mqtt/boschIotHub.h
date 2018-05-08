@@ -31,6 +31,8 @@
 #include <PubSubClient.h>
 #include "octopus.h"
 
+#define MQTT_MAX_PACKET_SIZE 2048
+
 class BoschIotHub {
   private:
     WiFiClientSecure wiFiClient;
@@ -43,7 +45,7 @@ class BoschIotHub {
   public:
     BoschIotHub(const char* mqttBroker, const int mqttPort, const char* mqttServerFingerprint);
 
-    void connect();
+    bool connect();
     bool deviceIsConnected();
     void connectDevice(const char* deviceId, const char* authId, const char* devicePassword);
     void publish(String payload);

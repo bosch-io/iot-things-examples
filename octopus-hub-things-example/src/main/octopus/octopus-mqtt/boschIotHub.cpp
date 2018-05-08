@@ -31,7 +31,7 @@ BoschIotHub::BoschIotHub(const char* mqttBroker_, const int mqttPort_, const cha
   : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerFingerprint(mqttServerFingerprint_) {
 }
 
-void BoschIotHub::connect() {
+bool BoschIotHub::connect() {
   mqttClient.setServer(mqttBroker, mqttPort);
   if (!wiFiClient.connect(mqttBroker, mqttPort)) {
     Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");

@@ -48,7 +48,7 @@ void setup() {
   octopus.begin();
   octopus.connectToWifi(WIFI_SSID, WIFI_PASSWORD);
 
-  if(hub.connect()) {
+  if(!hub.connect()) {
     Printer::printlnMsg("Error", "Could not connect to Hub. Restarting octopus");
     ESP.restart();
   }

@@ -34,20 +34,20 @@ BoschIotHub::BoschIotHub(const char* mqttBroker_, const int mqttPort_, const cha
 void BoschIotHub::connect() {
   mqttClient.setServer(mqttBroker, mqttPort);
   if (!wiFiClient.connect(mqttBroker, mqttPort)) {
-    Printer::printlnMsg("Bosch IoT Hub", "Connect failed, will restart");
-    /* Secure connection failed, start over */
-    ESP.restart();
+    Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");
+    return false;
   } else {
     Printer::printlnMsg("Bosch IoT Hub", "Secure connection established"); 
   }
          
   if (!wiFiClient.verify(mqttServerFingerprint, mqttBroker)) {
-    Printer::printlnMsg("Bosch IoT Hub", "Failed to verify certificate, restarting");
-    /* Verify failed, start over */
-    ESP.restart();
+    Printer::printlnMsg("Bosch IoT Hub", "Failed to verify certificate.");
+    return false;
   } else {
     Printer::printlnMsg("Bosch IoT Hub", "Server certificate verified"); 
-  } 
+  }
+
+  return true;
 }
 
 bool BoschIotHub::deviceIsConnected() {

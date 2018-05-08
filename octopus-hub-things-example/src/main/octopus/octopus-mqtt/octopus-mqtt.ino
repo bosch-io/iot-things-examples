@@ -49,7 +49,11 @@ void setup() {
   octopus->connectToWifi(WIFI_SSID, WIFI_PASSWORD);
 
   hub = new BoschIotHub(MQTT_BROKER, MQTT_PORT, MQTT_SERVER_FINGERPRINT);
-  hub->connect();
+
+  if(hub->connect()) {
+    Printer::printlnMsg("Error", "Could not connect to Hub. Restarting octopus");
+    ESP.restart();
+  }
 
   Serial.println();    
 }

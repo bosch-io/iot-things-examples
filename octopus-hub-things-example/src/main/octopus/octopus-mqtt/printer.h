@@ -30,8 +30,8 @@
 class Printer {
 
   public: 
-    static void printMsg(const char* header, const String message);
-    static void printlnMsg(const char* header, const String message);
+    static void printMsg(const char* header, const String& message);
+    static void printlnMsg(const char* header, const String& message);
 };
 
 #endif

@@ -77,6 +77,7 @@ public class DeviceIntegration {
     private final String userid;
     private final String username;
     private final String password;
+    private final String tenantName;
 
     private final String proxyHost;
     private final String proxyPort;
@@ -120,6 +121,7 @@ public class DeviceIntegration {
         userid = props.getProperty("userid");
         username = props.getProperty("username");
         password = props.getProperty("password");
+        tenantName = props.getProperty("tenantName");
 
         proxyHost = props.getProperty("proxyHost");
         proxyPort = props.getProperty("proxyPort");
@@ -142,7 +144,7 @@ public class DeviceIntegration {
         final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
                 CredentialsAuthenticationConfiguration
                         .newBuilder()
-                        .username(username)
+                        .username(tenantName + "\\" + username)
                         .password(password)
                         .build();
 

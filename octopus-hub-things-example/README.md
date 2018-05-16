@@ -164,6 +164,39 @@ The Arduino Sketch, we have prepared, publishes the sensor information via the B
 Open `src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
 
 All properties have to be set in `src/main/octopus/octopus-mqtt/settings.h`
+Just create this file from the following template and replace XXX placeholders with your configuration properties.
+
+```
+#ifndef SETTINGS_H
+#define SETTING_H
+
+// ---- WiFi configuration ----
+#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to cconnect to
+#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to cconnect to
+
+// ---- Things registration properties ----
+#define THINGS_NAMESPACE "XXX" // The namespace you created in your solution
+#define THING_ID "XXX" // should not be changed unless you changed code in the java preparation program
+
+// ---- Hub registration properties ----
+#define HUB_TENANT "XXX" // The tenant id of your hub instance
+#define HUB_DEVICE_ID "XXX" // The device id that was printed out by the java preparation program
+#define HUB_DEVICE_AUTH_ID "XXX" // The auth id that was printed out by the java preparation program
+#define HUB_DEVICE_PASSWORD "XXX" // The device password that was printed out by the java preparation program
+
+// ---- Update rate of sensors ----
+#define SENSOR_UPDATE_RATE_MS 5000 // Print updated sensor value every 5 seconds
+#define LOOP_DELAY 100
+
+// ---- Hub MQTT configuration ----
+// Do not change this
+#define MQTT_BROKER "mqtt.bosch-iot-hub.com"
+#define MQTT_PORT 8883
+/* SHA-1 fingerprint of the server certificate of the MQTT broker, UPPERCASE and spacing */
+#define MQTT_SERVER_FINGERPRINT "EE 6A DB 0F B7 C3 E1 7F B4 FB BB A2 95 C5 DC E1 4F FE B1 7F"
+
+#endif
+```
 
 ## Retrieve stored sensor data from Bosch IoT Things
 

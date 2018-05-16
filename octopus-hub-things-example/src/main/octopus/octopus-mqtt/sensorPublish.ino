@@ -35,7 +35,7 @@ float powerMax = 1E-20;
 float tempBnoMin = 1E+20;
 float tempBnoMax = 1E-20;
 
-String publishSensorDataString(float power, Bme680Values bme680Values, Bno055Values bno055Values) {
+String publishSensorDataString(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
   String output = "{\"topic\": \"";
   output += THINGS_NAMESPACE;
   output += "/";
@@ -57,7 +57,7 @@ String publishSensorDataString(float power, Bme680Values bme680Values, Bno055Val
   return output;
 }
 
-String sensorMinMaxValueString(String featureName, float sensorValue, float minValue, float maxValue, String units) {
+String sensorMinMaxValueString(const String& featureName, float sensorValue, float minValue, float maxValue, const String& units) {
   String output = "\"" + featureName + "\": { \"properties\": \"status:\"";
   output += "{\"sensorValue\": ";
   output += sensorValue;
@@ -71,7 +71,7 @@ String sensorMinMaxValueString(String featureName, float sensorValue, float minV
   return output;
 }
 
-String sensor3dValueString(String featureName, float xValue, float yValue, float zValue, String units) {
+String sensor3dValueString(const String& featureName, float xValue, float yValue, float zValue, const String& units) {
   String output = "\"" + featureName + "\": { \"properties\": \"status:\"";
   output += "{\"xValue\": ";
   output += xValue;
@@ -85,12 +85,12 @@ String sensor3dValueString(String featureName, float xValue, float yValue, float
   return output;
 }
 
-void publishSensorData(float vcc, Bme680Values bme680Values, Bno055Values bno055Values) {
+void publishSensorData(float vcc, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
 
   hub.publish(publishSensorDataString(vcc, bme680Values, bno055Values));
 }
 
-void updateMinMax(float power, Bme680Values bme680Values, Bno055Values bno055Values) {
+void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
   if (powerMin > power) {
     powerMin = power;
   }

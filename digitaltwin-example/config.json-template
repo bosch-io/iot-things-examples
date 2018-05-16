@@ -6,23 +6,24 @@
   },
   "accessories": {
     "subject": "iot-permissions:<<<your-accessories-userid>>>",
-    "username": "<<<your-accessories-username>>>",
+    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-accessories-username>>>",
     "password": "<<<your-accessories-password>>>"
   },
   "deviceCommissioning": {
     "subject": "iot-permissions:<<<your-deviceCommissioning-userid>>>",
-    "username": "<<<your-deviceCommissioning-username>>>",
+    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-deviceCommissioning-username>>>",
     "password": "<<<your-deviceCommissioning-password>>>",
     "hubTenant": "<<<your-hub-tenant>>>",
-    "hubDeviceId": "<<<your-favored-hub-device-id>>>"
+    "hubRegistryUsername": "<<<your-hub-device-registry-username>>>",
+    "hubRegistryPassword": "<<<your-hub-device-registry-username>>>"
   },
   "deviceSimulation": {
     "subject": "iot-permissions:<<<your-deviceSimulation-userid>>>",
-    "username": "<<<your-deviceSimulation-username>>>",
+    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-deviceSimulation-username>>>",
     "password": "<<<your-deviceSimulation-password>>>"
   },
   "frontend": {
-    "username": "<<<your-frontend-username>>>",
+    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-frontend-username>>>",
     "password": "<<<your-frontend-password>>>",
     "apitoken": "<<<your-api-token>>>",
     "thingId": "<<<your-thingid>>>",

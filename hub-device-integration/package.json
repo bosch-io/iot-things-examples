@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/jest": "22.0.1",
+    "hoek": "4.2.1",
     "@types/supertest": "2.0.4",
     "typescript": "2.6.2",
     "tslint": "5.9.1",

@@ -44,6 +44,7 @@ void Octopus::begin() {
 
 void Octopus::connectToWifi(char* ssid, const char* password) {
 
+  WiFi.mode(WIFI_STA);
   this->showColor(0, 0, 0, 0, 0x80); // white
   Printer::printMsg("Octopus::WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
   WiFi.begin(ssid, password);

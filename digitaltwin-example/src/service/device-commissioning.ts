@@ -211,15 +211,20 @@ export class DeviceCommissioning {
     if (viaGatewayId) {
       body.via = viaGatewayId
     }
-    const rd = await requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId),
-      method: 'POST',
-      auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword },
-      json: true,
-      body: body,
-      resolveWithFullResponse: true
-    })
-    console.log(`[Commissioning] result ${rd.statusCode} ${rd.headers.location}`)
+    try {
+      const rd = await requestPromise({
+        url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId),
+        method: 'POST',
+        auth: { user: CONFIG.deviceCommissioning.hubRegistryUsername, pass: CONFIG.deviceCommissioning.hubRegistryPassword },
+        json: true,
+        body: body,
+        resolveWithFullResponse: true
+      })
+      console.log(`[Commissioning] result ${rd.statusCode} ${rd.headers.location}`)
+    } catch (e) {
+      console.log(`[Commissioning] register device failed ${e}`)
+      throw e
+    }
 
     cleanup.push(() => requestPromise({
       url: 'https://device-registry.bosch-iot-hub.com/registration/' + encodeURIComponent(tenantId) + '/' + encodeURIComponent(deviceId),

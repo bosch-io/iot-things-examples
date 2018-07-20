@@ -1,0 +1,18 @@
+{
+  "things": {
+    "namespace": "<<<your reserved namespace, e.g. com.acme.xyz>>>",
+    "apitoken": "<<<your things api token>>>",
+    "authSubject": "integration:<<<your solution id>>>:<<<your custom suffix configured in your things-hub-connection>>>",
+    "username": "<<<username of your application user>>>",
+    "password": "<<<password of your application user>>>",
+    "thingname": "<<<your choosen thingname within your namespace, e.g. mything123>>>"
+  },
+  "hub": {
+    "tenant": "<<<your hub tenant id>>>",
+    "registryUsername": "<<<your device registry username, e.g. device-registry@t12345678901234567890>>>",
+    "registryPassword": "<<<your device registry password>>>",
+    "deviceId": "<<<your choosen device id, normally matching namespace:thingname, e.g. com.acme.xyz:mything123>>>",
+    "deviceAuthId": "<<<your choosen device auth id, normally the same as deviceId but only characters/digits/minus, e.g. com-acme-xyz-mything123>>>",
+    "devicePassword": "<<<your choosen device password>>>"
+  }
+}

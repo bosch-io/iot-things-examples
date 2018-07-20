@@ -30,34 +30,16 @@
 import * as mqtt from 'mqtt'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
+import * as fs from 'fs'
 
-// !!! Your configuration/credentials for Bosch IoT Things
-const THINGS_NAMESPACE = 'xxx'
-const THINGS_LOCAL_THING_ID = 'xxx'
-const THINGS_USERNAME = 'xxx'
-const THINGS_PASSWORD = 'xxx'
-const THINGS_API_TOKEN = 'xxx'
+const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
-// Authorization subject used for integration with Bosch IoT Hub
-// see https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:006_message:007_protocol_bindings:amqp10_binding
-const THINGS_HUB_SUBJECT = 'iot-things:xxx'
-
-// !!! Your configuration/credentials for Bosch IoT Hub
-const HUB_TENANT = THINGS_NAMESPACE
-const HUB_DEVICE_ID = THINGS_LOCAL_THING_ID
-const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID
-const HUB_DEVICE_PASSWORD = 'xxx'
-const HUB_REGISTRY_USERNAME = 'xxx'
-const HUB_REGISTRY_PASSWORD = 'xxx'
-
-// Other constants (do not change)
-const THING_ID = THINGS_NAMESPACE + ':' + THINGS_LOCAL_THING_ID
+const THING_ID = CONFIG.things.namespace + ':' + CONFIG.things.thingname
 const POLICY_ID = THING_ID
-
 const THINGS_HTTP_DEFAULT_OPTIONS = {
   json: true,
-  auth: { username: THINGS_USERNAME, password: THINGS_PASSWORD },
-  headers: { 'x-cr-api-token': THINGS_API_TOKEN }
+  auth: { username: CONFIG.things.username, password: CONFIG.things.password },
+  headers: { 'x-cr-api-token': CONFIG.things.apitoken }
 }
 
 class HubDeviceIntegration {
@@ -65,12 +47,12 @@ class HubDeviceIntegration {
   async start(): Promise<void> {
     await this.cleanup()
     await this.registerThing()
-    await this.registerDeviceConnection()
+    await this.registerDevice()
 
     const PROPERTY_PATH = '/features/temperature/properties/status/sensorValue'
 
     const msg = {
-      topic: THINGS_NAMESPACE + '/' + THINGS_LOCAL_THING_ID + '/things/twin/commands/modify',
+      topic: CONFIG.things.namespace + '/' + CONFIG.things.thingname + '/things/twin/commands/modify',
       path: PROPERTY_PATH,
       value: 0,
       headers: { 'response-required': false }
@@ -108,7 +90,9 @@ class HubDeviceIntegration {
           }
         },
         hub: {
-          subjects: {}, // will be set programmatically further down
+          subjects: {
+            [CONFIG.things.authSubject]: { type: 'iot-things-integration' }
+          },
           resources: {
             'thing:/features': { grant: ['WRITE'], revoke: [] },
             'message:/': { grant: ['WRITE'], revoke: [] }
@@ -116,7 +100,6 @@ class HubDeviceIntegration {
         }
       }
     }
-    policy.entries.hub.subjects[THINGS_HUB_SUBJECT] = { type: 'iot-things-clientid' }
 
     const thing = {
       policyId: POLICY_ID,
@@ -132,6 +115,9 @@ class HubDeviceIntegration {
       body: policy
     }))
 
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await this.sleep(2000)
+
     try {
       await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
         url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + THING_ID,
@@ -146,32 +132,36 @@ class HubDeviceIntegration {
       }))
     }
 
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await this.sleep(2000)
+
     console.log('policy + thing registered')
   }
 
-  async registerDeviceConnection(): Promise<void> {
+  async registerDevice(): Promise<void> {
 
     await requestPromise({
-      url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT,
+      url: 'https://device-registry.bosch-iot-hub.com/registration/' + CONFIG.hub.tenant,
       method: 'POST',
       json: true,
-      auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
+      auth: { user: CONFIG.hub.registryUsername, pass: CONFIG.hub.registryPassword },
       body: {
-        'device-id': HUB_DEVICE_ID
-      }
+        'device-id': CONFIG.hub.deviceId
+      },
+      resolveWithFullResponse: true
     })
 
-    const devicePasswordHashed = shajs('sha512').update(HUB_DEVICE_PASSWORD).digest('base64')
+    const devicePasswordHashed = shajs('sha512').update(CONFIG.hub.devicePassword).digest('base64')
 
     try {
       await requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + HUB_TENANT,
+        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + CONFIG.hub.tenant,
         method: 'POST',
         json: true,
-        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
+        auth: { user: CONFIG.hub.registryUsername, pass: CONFIG.hub.registryPassword },
         body: {
-          'device-id': HUB_DEVICE_ID,
-          'auth-id': HUB_DEVICE_AUTH_ID,
+          'device-id': CONFIG.hub.deviceId,
+          'auth-id': CONFIG.hub.deviceAuthId,
           'type': 'hashed-password',
           'secrets': [{
             'hash-function': 'sha-512',
@@ -182,13 +172,13 @@ class HubDeviceIntegration {
     } catch (err) {
       // in case of errors: delete unwanted device again
       await requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
-        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD },
+        url: 'https://device-registry.bosch-iot-hub.com/registration/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId,
+        auth: { user: CONFIG.hub.registryUsername, pass: CONFIG.hub.registryPassword },
         method: 'DELETE'
       })
     }
 
-    console.log('device connection + device credentials registered\n')
+    console.log('device + device credentials registered\n')
   }
 
   async sendDataMqtt(msg): Promise<void> {
@@ -197,10 +187,10 @@ class HubDeviceIntegration {
       console.log('trying mqtt connection')
 
       const mqttClient = mqtt.connect('mqtts://mqtt.bosch-iot-hub.com:8883', {
-        clientId: HUB_DEVICE_ID,
+        clientId: CONFIG.hub.deviceId,
         rejectUnauthorized: false,
-        username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT,
-        password: HUB_DEVICE_PASSWORD
+        username: CONFIG.hub.deviceAuthId + '@' + CONFIG.hub.tenant,
+        password: CONFIG.hub.devicePassword
       } as mqtt.IClientOptions)
 
       setTimeout(() => { mqttClient.end(); reject('mqtt timeout') }, 5000)
@@ -209,7 +199,7 @@ class HubDeviceIntegration {
       mqttClient.on('connect', function () {
         console.log('mqtt connected')
 
-        mqttClient.publish('telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID, JSON.stringify(msg), { qos: 0 },
+        mqttClient.publish('telemetry/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId, JSON.stringify(msg), { qos: 0 },
           (err) => {
             // either way: immediatly shutdown client after publish
             mqttClient.end()
@@ -229,8 +219,8 @@ class HubDeviceIntegration {
   async sendDataHttp(msg): Promise<void> {
 
     await requestPromise({
-      url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
-      auth: { user: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, pass: HUB_DEVICE_PASSWORD },
+      url: 'https://rest.bosch-iot-hub.com/telemetry/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId,
+      auth: { user: CONFIG.hub.deviceAuthId + '@' + CONFIG.hub.tenant, pass: CONFIG.hub.devicePassword },
       method: 'PUT',
       json: true,
       body: msg
@@ -242,7 +232,7 @@ class HubDeviceIntegration {
   async checkUpdate(path: string, referenceValue: any): Promise<void> {
 
     // wait for some time ...
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await this.sleep(2000)
 
     // receive value from twin
     let result = await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
@@ -264,10 +254,10 @@ class HubDeviceIntegration {
 
     try {
       const r = await requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + HUB_TENANT
-          + '?device-id=' + HUB_DEVICE_ID + '&auth-id=' + HUB_DEVICE_AUTH_ID + '&type=' + 'hashed-password',
+        url: 'https://device-registry.bosch-iot-hub.com/credentials/' + CONFIG.hub.tenant
+          + '?device-id=' + CONFIG.hub.deviceId + '&auth-id=' + CONFIG.hub.deviceAuthId + '&type=' + 'hashed-password',
         method: 'DELETE',
-        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD }
+        auth: { user: CONFIG.hub.registryUsername, pass: CONFIG.hub.registryPassword }
       })
       console.log(`cleanup: delete device credential done; ${r}`)
     } catch (err) {
@@ -276,13 +266,13 @@ class HubDeviceIntegration {
 
     try {
       const r = await requestPromise({
-        url: 'https://device-registry.bosch-iot-hub.com/registration/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
+        url: 'https://device-registry.bosch-iot-hub.com/registration/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId,
         method: 'DELETE',
-        auth: { user: HUB_REGISTRY_USERNAME, pass: HUB_REGISTRY_PASSWORD }
+        auth: { user: CONFIG.hub.registryUsername, pass: CONFIG.hub.registryPassword }
       })
-      console.log(`cleanup: delete device connection done; ${r}`)
+      console.log(`cleanup: delete device done; ${r}`)
     } catch (err) {
-      console.log(`cleanup: ignored unsuccessful delete device connection: ${err}`)
+      console.log(`cleanup: ignored unsuccessful delete device: ${err}`)
     }
 
     try {
@@ -305,7 +295,14 @@ class HubDeviceIntegration {
       console.log(`cleanup: ignored unsuccessful delete policy: ${err}`)
     }
 
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await this.sleep(2000)
+
     console.log()
+  }
+
+  private async sleep(milliseconds): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
   }
 
 }

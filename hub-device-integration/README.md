@@ -14,12 +14,11 @@ Request your own tenant for the Bosch IoT Hub: see [Bosch IoT Hub cloud service]
 ## Configure the integration of these two instances
 
 After you have both instances (Things and Hub) in place, you can setup the integration between the two.
-See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection)
-for details.
+See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection) for details.
 
 ## Configure your settings
 
-Put your configuration settings and credentials in the file "config.json". You can copy "config-template.json" as template and fill out placeholders.
+Put your configuration settings and credentials in the file "config.json". You can copy "config.json-template" as template and fill out placeholders.
 
 ## Usage
 

@@ -56,12 +56,13 @@ const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
  *
  * It periodically sends a temperature value and accepts configuration changes of a threshold value.
  *
- * The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry dat
+ * The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data
  * AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes.
  * The WebSocket channel is not proposed for large scale scenarios with high number of device connections
  * but should be replaced by an appropriate device connectivity channel.
- * As soon as Eclipse Hono supports command&control (see https://www.eclipse.org/hono/api/command-and-control-api/)
- * using MQTT, the simulation could be switched to it for both channels.
+ * As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated command&control
+ * (see https://www.eclipse.org/hono/api/command-and-control-api/) pattern using MQTT, the simulation could be switched to it
+ * for both channels.
  */
 
 export class DeviceSimulation {

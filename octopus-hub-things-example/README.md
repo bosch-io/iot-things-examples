@@ -1,7 +1,7 @@
 # Using the Octopus board with the Bosch IoT Suite
 
 This example shows how to use the Octopus board (Bosch IoT Suite edition) with the Bosch IoT Suite.
-In the image below we illustrated the components of this example and how they will interact with each other.
+In the image below, we illustrated the components of this example and how they will interact with each other.
 ![Visualisation](images/exampleVisualizationpng.png)
 
 Before you can start, you have to prepare your setup. This includes the following steps:
@@ -18,7 +18,7 @@ Before you can start, you have to prepare your setup. This includes the followin
 The Octopus board is created by Guido Burger. Its original purpose was to be used as a teaching tool for Hackathons in
 secondary schools in Germany. It features a number of sensors, and the ability to connect sensors, inputs, and 
 actuators in a relatively simple way. More information and the source code for the schematics can be found on the 
-<a href="http://fab-lab.eu/octopus/">Fab-Lab.eu Octopus page</a>. 
+<a href="https://www.tindie.com/products/FabLab/iot-octopus-badge-for-iot-evaluation/">Fab-Lab.eu Octopus page</a>. 
 While Guido Burger offers some boards in his Tindie store, overall the Octopus board is a not-for-profit activity.
 The Octopus board is a small board based on a ESP8266 Chip that can be programmed e.g. using the Arduino IDE.
 The special thing about this board is, that it already contains components that makes it a ready-to-run starter-kit 
@@ -54,7 +54,7 @@ There you can write the code that should be executed on your board and upload it
     * [PubSubClient library](https://github.com/knolleary/pubsubclient)
 4. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the MQTT_MAX_PACKET_SIZE
 to 2048. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
-an array of this size. Unfortunately we can't define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
+an array of this size. Unfortunately, we cannot define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
 compiles.
 
 With this setup, you can run our example that demonstrates how to retrieve the sensor values of your
@@ -75,7 +75,7 @@ The cool thing hereby is that it doesn't matter if your device is available at t
 sensor values.
 Bosch IoT Things will deliver the last known state of your device.
 
-For this example you need a Bosch IoT Things service plan. A free plan can be booked at the
+For this example, you need a Bosch IoT Things service plan. A free plan can be booked at the
 [Bosch IoT Suite portal](https://accounts.bosch-iot-suite.com/subscriptions).
 
 * Click "New Subscription".
@@ -123,11 +123,11 @@ This user will be used as technical user to access the API of your Bosch IoT Sui
 example.
 
 ## Activate protocol binding
-To allow Bosch IoT Things to retrieve messages you send to Bosch IoT Hub, you need to 
+To allow Bosch IoT Things to retrieve messages you send via Bosch IoT Hub, you need to 
 [create an AMQP-Connection in Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/solution/connections).
 Use the credentials of your Bosch IoT Things instance to authenticate.
 In the next menu select "Create your first connection".
-* Validate that the selected Connection category is "Bosch IoT Hub" (1)
+* Set the Connection category to "Bosch IoT Hub" (1)
 * Enter a name for you connection (2)
 * Select Continue
 ![Create a new connection](images/createConnection1.png)
@@ -136,17 +136,17 @@ In the next menu select "Create your first connection".
 ![Adapt Coordinates section](images/createConnectionCoordinates.png)
 
 * Adapt the Authorization section with the suffix "octopus". This subject must be part of the policy attached to your
-thing. Otherwise messages that are received by this connection are not allowed to modify your thing. 
-The thing and the policy will be created by a java bootstrapper in this tutorial. So for the ease of this tutorial
+thing. Otherwise, messages received via this connection are not allowed to modify your thing. 
+The thing and the policy will be created by a Java bootstrapper in this tutorial. So for the ease of this tutorial
 please use the suffix "octopus".
-If you insist on using another suffix, you need to adapt the PolicyFactory in the java bootstrapper.
+If you insist on using another suffix, you need to adapt the PolicyFactory in the Java bootstrapper.
 ![Adapt Authorization section](images/createConnectionAuthorization.png)
 
-* Adapat the Sources section by adding "telemetry/${your-hub-tenant-id}"
+* Adapt the Sources section by adding "telemetry/${your-hub-tenant-id}"
 ![Adapt Sources section](images/createConnectionSources.png)
 
 * Click on "Test Connection" to verify your connection. If the test completes successfully click "Create", if not
-  double check the sections you've adapted.
+  double check the sections you have adapted.
 
 ## Configure the example
 
@@ -189,8 +189,8 @@ Just create this file from the following template and replace XXX placeholders w
 #define SETTING_H
 
 // ---- WiFi configuration ----
-#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to cconnect to
-#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to cconnect to
+#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to connect to
+#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to connect to
 
 // ---- Things registration properties ----
 #define THINGS_NAMESPACE "XXX" // The namespace you created in your solution
@@ -224,7 +224,7 @@ The data of the registered thing can be retrieved via the
 For the ease of this example we provide a view of the data at
 `src/main/html/index.html`. The page refreshes every few seconds and displays the data retrieved from Bosch IoT Things.
 Because of the 'same-origin-policy' you need to provide this html via a webserver.
-For example IntelliJ supports this by right click on the index.html inside intelliJ and select 'Open in Browser'.
+For example IntelliJ supports this by right click on the index.html inside IntelliJ and select 'Open in Browser'.
 We tested it in Firefox.
 
 ## Make it run!

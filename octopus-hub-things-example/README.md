@@ -142,7 +142,7 @@ please use the suffix "octopus".
 If you insist on using another suffix, you need to adapt the PolicyFactory in the java bootstrapper.
 ![Adapt Authorization section](images/createConnectionAuthorization.png)
 
-* Adapat the Sources section by adding "telemetry/<your-hub-tenant-id>"
+* Adapat the Sources section by adding "telemetry/${your-hub-tenant-id}"
 ![Adapt Sources section](images/createConnectionSources.png)
 
 * Click on "Test Connection" to verify your connection. If the test completes successfully click "Create", if not

@@ -144,15 +144,23 @@
                       }, 5000);
                   })
                   .catch(function (reason) {
-                      reason.json().then(showError);
+                      if(reason.json){
+                          reason.json().then(showHttpError);
+                      } else {
+                          showError(reason)
+                      }
                   });
           }
       }
 
-      function showError(jsonReason) {
+      function showHttpError(jsonReason) {
+          showError('HTTP Status ' + jsonReason.status + ": " + jsonReason.message + " - " +
+                    jsonReason.description);
+      }
+
+      function showError(text) {
           var errorParagraph = document.createElement("p");
-          errorParagraph.innerHTML = 'HTTP Status ' + jsonReason.status + ": " + jsonReason.message + " - " +
-                                     jsonReason.description;
+          errorParagraph.innerHTML = text;
           document.getElementById('errorContainer').appendChild(errorParagraph);
       }
 
@@ -168,8 +176,13 @@
           var keys = Object.keys(features).sort();
           for (var i = 0; i < keys.length; i++) {
               var key = keys[i];
-              var feature = features[key].properties.status;
-              updateFeature(key, feature)
+              var feature = features[key];
+              if (feature.properties) {
+                  var propertiesStatus = feature.properties.status;
+                  updateFeature(key, propertiesStatus)
+              } else {
+                  throw "No properties for feature " + key + ", yet."
+              }
           }
       }
 

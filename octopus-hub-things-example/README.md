@@ -52,7 +52,6 @@ There you can write the code that should be executed on your board and upload it
     * [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
     * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
     * [PubSubClient library](https://github.com/knolleary/pubsubclient)
-    * [ArduinoJson library](https://github.com/bblanchon/ArduinoJson)
 4. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the MQTT_MAX_PACKET_SIZE
 to 2048. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
 an array of this size. Unfortunately we can't define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
@@ -124,11 +123,30 @@ This user will be used as technical user to access the API of your Bosch IoT Sui
 example.
 
 ## Activate protocol binding
- > Coming soon: UI to establish connection between Bosch IoT Things and Bosch IoT Hub.
+To allow Bosch IoT Things to retrieve messages you send to Bosch IoT Hub, you need to 
+[create an AMQP-Connection in Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/solution/connections).
+Use the credentials of your Bosch IoT Things instance to authenticate.
+In the next menu select "Create your first connection".
+* Validate that the selected Connection category is "Bosch IoT Hub" (1)
+* Enter a name for you connection (2)
+* Select Continue
+![Create a new connection](images/createConnection1.png)
 
-Have a look at
-[our documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:006_message:007_protocol_bindings:amqp10_binding)
-to find out how to activate protocol binding.
+* Adapt the Coordinates section with the messaging-username and messaging password of your Bosch IoT Hub Instance.
+![Adapt Coordinates section](images/createConnectionCoordinates.png)
+
+* Adapt the Authorization section with the suffix "octopus". This subject must be part of the policy attached to your
+thing. Otherwise messages that are received by this connection are not allowed to modify your thing. 
+The thing and the policy will be created by a java bootstrapper in this tutorial. So for the ease of this tutorial
+please use the suffix "octopus".
+If you insist on using another suffix, you need to adapt the PolicyFactory in the java bootstrapper.
+![Adapt Authorization section](images/createConnectionAuthorization.png)
+
+* Adapat the Sources section by adding "telemetry/<your-hub-tenant-id>"
+![Adapt Sources section](images/createConnectionSources.png)
+
+* Click on "Test Connection" to verify your connection. If the test completes successfully click "Create", if not
+  double check the sections you've adapted.
 
 ## Configure the example
 

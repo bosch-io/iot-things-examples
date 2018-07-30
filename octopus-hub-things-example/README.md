@@ -124,11 +124,13 @@ This user will be used as technical user to access the API of your Bosch IoT Sui
 example.
 
 ## Activate protocol binding
- > Coming soon: UI to establish connection between Bosch IoT Things and Bosch IoT Hub.
 
-Have a look at
-[our documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=005_dev_guide:006_message:007_protocol_bindings:amqp10_binding)
-to find out how to activate protocol binding.
+The Things user interface supports you to easily establish the connection between Bosch IoT Things and Bosch IoT Hub.
+
+Create a new connection of category *Bosch IoT Hub* and make sure you authorize `integration:my-Solution-ID:octopus`.
+
+Find details in [our documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection).
+
 
 ## Configure the example
 

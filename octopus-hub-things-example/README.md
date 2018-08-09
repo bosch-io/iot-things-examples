@@ -234,3 +234,26 @@ You're now fully prepared to let your Octopus board publish its sensor informati
 Just press "Upload" inside the Arduino IDE and wait until it's uploaded.
 For troubleshooting, feel free to use the "Serial Monitor" of the Arduino IDE, where you can find the latest log
 messages.
+
+## Troubleshooting
+
+In case your Octopus has turned the red light on, check the Arduino Serial Monitor  - at the upper right corner - to see details.
+
+### Case 1
+
+Wrong device credentials. 
+
+If you execute the Java bootstrapper multiple times the old thing, policy, device and credentials will be replaced.
+
+ * Check the new Device password. Verify that you've entered the password printed out by the latest execution of the bootstrapper.
+ * Solution: Adjust the credentials at `octopus-mqtt\settings.h` → upload :+1:
+
+### Case 2
+
+In case the Hub is not allowed to publish to Things:
+
+  * Check the policy `your.namespace:octopus` via the HTTP API 
+  * By default only the subject `integration:my-Solution-ID:octopus` is empowered. So in case the Hub connection you have created empowers another subject, this subject must be added in the policy.
+  * Solution 1: Add your authorization subject `integration:my-Solution-ID:my-octo`  as shown in the tutorial at https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:09_policy:09_policy
+  * Solution 2: In case you need to repeat the tutorial several times, the easy way is to add `integration:my-Solution-ID:octopus`  as an authorized subject via the Things user interface.
+    https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection

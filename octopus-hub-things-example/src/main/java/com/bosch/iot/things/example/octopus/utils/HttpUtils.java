@@ -44,11 +44,18 @@ public class HttpUtils {
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     public static final String APPLICATION_JSON_CONTENT_TYPE = "application/json";
 
+    private static AsyncHttpClient httpClient = buildConfiguredHttpClient();
+
+
     private HttpUtils() {
         throw new AssertionError();
     }
 
     public static AsyncHttpClient getConfiguredHttpClient() {
+        return httpClient;
+    }
+
+    private static AsyncHttpClient buildConfiguredHttpClient() {
         final DefaultAsyncHttpClientConfig.Builder builder = new DefaultAsyncHttpClientConfig.Builder();
 
         proxyConfig().ifPresent(builder::setProxyServer);

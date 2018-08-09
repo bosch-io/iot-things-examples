@@ -26,6 +26,8 @@
  */
 package com.bosch.iot.things.example.octopus;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ import com.bosch.iot.things.example.octopus.api.things.ThingsApi;
 import com.bosch.iot.things.example.octopus.api.things.ThingsApiImpl;
 import com.bosch.iot.things.example.octopus.api.things.model.OctopusFactory;
 import com.bosch.iot.things.example.octopus.api.things.model.PolicyFactory;
+import com.bosch.iot.things.example.octopus.utils.HttpUtils;
 
 public class Example {
 
@@ -46,7 +49,7 @@ public class Example {
 
     private static final HubDeviceRegistryApi HUB_API = new HubDeviceRegistryApiImpl();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         cleanUp();
         THINGS_API.registerPolicy(PolicyFactory.newInstance());
@@ -68,7 +71,7 @@ public class Example {
         LOGGER.info("Device Password: {}", CredentialsFactory.HUB_DEVICE_PASSWORD);
         LOGGER.info("===============================");
 
-        LOGGER.info("Terminate with CTRL + C");
+        HttpUtils.getConfiguredHttpClient().close();
     }
 
     private static void cleanUp() {

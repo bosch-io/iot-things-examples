@@ -74,7 +74,7 @@ public class PolicyFactory {
     private static PolicyEntry buildHubEntry() {
         final Subjects subjects = Subjects.newInstance(
                 Subject.newInstance(
-                        "integration:" + SolutionInformation.SOLUTION_ID + ":hub",
+                        "integration:" + SolutionInformation.SOLUTION_ID + ":octopus",
                         SubjectType.newInstance("iot-things-clientid")));
 
         final Resources resources = Resources.newInstance(

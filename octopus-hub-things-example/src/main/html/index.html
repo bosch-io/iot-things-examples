@@ -181,7 +181,8 @@
                   var propertiesStatus = feature.properties.status;
                   updateFeature(key, propertiesStatus)
               } else {
-                  throw "No properties for feature " + key + ", yet."
+                  //throw "No properties for feature " + key + ", yet."
+                  console.log("No properties for feature " + key + ", yet.")
               }
           }
       }

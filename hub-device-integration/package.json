@@ -37,7 +37,7 @@
     "tslint-config-standard": "7.0.0",
     "concurrently": "3.5.1",
     "jest": "22.1.2",
-    "nodemon": "1.14.11",
+    "nodemon": "1.18.3",
     "supertest": "3.0.0"
   }
 }

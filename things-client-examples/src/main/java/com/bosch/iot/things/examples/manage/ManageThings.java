@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.ditto.json.JsonFactory;
@@ -81,7 +80,7 @@ public class ManageThings extends ExamplesBase {
                 .thenCompose(retrievedThing -> {
                     LOGGER.info("My thing as persisted: {}", retrievedThing);
                     return myThing.delete();
-                }).get(10, TimeUnit.SECONDS);
+                }).get(TIMEOUT_VALUE * 3, TIMEOUT_UNIT);
     }
 
     /**
@@ -114,7 +113,7 @@ public class ManageThings extends ExamplesBase {
             } else {
                 LOGGER.error("Create Thing Failed: {}", throwable);
             }
-        }).get(1, TimeUnit.SECONDS);
+        }).get(TIMEOUT_VALUE, TIMEOUT_UNIT);
     }
 
     /**
@@ -132,7 +131,7 @@ public class ManageThings extends ExamplesBase {
         LOGGER.info("Starting: retrieveThings()");
         /* Retrieve a Single Thing*/
         client.twin().forId(complexThingId).retrieve().thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
-                .get(1, TimeUnit.SECONDS);
+                .get(TIMEOUT_VALUE, TIMEOUT_UNIT);
 
         /* Retrieve a List of Things */
         client.twin().retrieve(myThingId, complexThingId).thenAccept(things -> {
@@ -142,7 +141,7 @@ public class ManageThings extends ExamplesBase {
             } else {
                 LOGGER.info("Retrieved things: {}", Arrays.toString(things.toArray()));
             }
-        }).get(1, TimeUnit.SECONDS);
+        }).get(TIMEOUT_VALUE, TIMEOUT_UNIT);
 
         /* Retrieve a List of Things with field selectors */
         client.twin().retrieve(JsonFieldSelector.newInstance("attributes"), myThingId, complexThingId)
@@ -154,7 +153,7 @@ public class ManageThings extends ExamplesBase {
                         things.forEach(
                                 thing -> LOGGER.info("Thing {} has attributes {}.", thing, thing.getAttributes()));
                     }
-                }).get(1, TimeUnit.SECONDS);
+                }).get(TIMEOUT_VALUE, TIMEOUT_UNIT);
     }
 
     public void updateThing() throws InterruptedException, TimeoutException, ExecutionException {
@@ -193,9 +192,9 @@ public class ManageThings extends ExamplesBase {
             } else {
                 LOGGER.info("Update successful!");
             }
-        }).get(2, TimeUnit.SECONDS);
+        }).get(TIMEOUT_VALUE, TIMEOUT_UNIT);
 
-        boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
+        boolean allMessagesReceived = countDownLatch.await(TIMEOUT_VALUE * 3, TIMEOUT_UNIT);
         LOGGER.info("All events received: {}", allMessagesReceived);
     }
 

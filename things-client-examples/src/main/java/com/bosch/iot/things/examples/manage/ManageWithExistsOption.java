@@ -156,4 +156,13 @@ public class ManageWithExistsOption extends ExamplesBase {
         });
     }
 
+    public static void main(final String... args) throws Exception {
+        final ManageWithExistsOption manage = new ManageWithExistsOption();
+        try {
+            manage.putFeatureWithExistsFalsePreventsOverwrites();
+            manage.putFeatureWithExistsTruePreventsCreates();
+        } finally {
+            manage.terminate();
+        }
+    }
 }

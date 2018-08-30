@@ -25,9 +25,10 @@
     "@types/request-promise-native": "^1.0.15",
     "@types/ws": "~3.2.1",
     "https-proxy-agent": "~2.2.1",
-    "request": "~2.83.0",
+    "request": "^2.88.0",
     "request-promise-native": "~1.0.5",
-    "ws": "~4.0.0"
+    "ws": "~4.0.0",
+    "sshpk": "~1.14.2"
   },
   "devDependencies": {
     "@types/jest": "~22.0.1",

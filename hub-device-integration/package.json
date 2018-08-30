@@ -26,7 +26,8 @@
     "mqtt": "^2.15.3",
     "prune": "~0.0.2",
     "request-promise-native": "~1.0.5",
-    "sha.js": "^2.4.11"
+    "sha.js": "^2.4.11",
+    "lodash": "~4.17.10"
   },
   "devDependencies": {
     "@types/jest": "~22.0.1",

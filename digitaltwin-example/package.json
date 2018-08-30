@@ -28,10 +28,11 @@
     "ajv": "~6.1.1",
     "express": "^4.16.3",
     "https-proxy-agent": "~2.2.1",
-    "request": "~2.86.0",
+    "request": "^2.88.0",
     "request-promise-native": "~1.0.5",
     "sha.js": "^2.4.11",
-    "ws": "~4.0.0"
+    "ws": "~4.0.0",
+    "sshpk": "~1.14.2"
   },
   "devDependencies": {
     "@types/jest": "~22.0.1",

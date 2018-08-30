@@ -26,11 +26,12 @@
     "@types/uuid": "~3.4.3",
     "@types/ws": "~3.2.1",
     "fast-json-patch": "~2.0.6",
-    "https-proxy-agent": "^2.2.1",
-    "request": "~2.83.0",
+    "https-proxy-agent": "~2.2.1",
+    "request": "^2.88.0",
     "request-promise-native": "~1.0.5",
     "uuid": "~3.2.1",
-    "ws": "~4.0.0"
+    "ws": "~4.0.0",
+    "sshpk": "~1.14.2"
   },
   "devDependencies": {
     "@types/jest": "~22.0.1",

@@ -21,24 +21,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "9.3.0",
-    "@types/request-promise-native": "1.0.11",
-    "@types/ws": "3.2.1",
-    "https-proxy-agent": "2.1.1",
-    "request": "2.83.0",
-    "request-promise-native": "1.0.5",
-    "ws": "4.0.0"
+    "@types/node": "~9.3.0",
+    "@types/request-promise-native": "^1.0.15",
+    "@types/ws": "~3.2.1",
+    "https-proxy-agent": "~2.1.1",
+    "request": "~2.83.0",
+    "request-promise-native": "~1.0.5",
+    "ws": "~4.0.0"
   },
   "devDependencies": {
-    "@types/jest": "22.0.1",
-    "@types/supertest": "2.0.4",
-    "typescript": "2.7.1",
-    "tslint": "5.9.1",
-    "tslint-config-standard": "7.0.0",
-    "concurrently": "3.5.1",
-    "jest": "22.1.2",
-    "nodemon": "1.14.11",
-    "supertest": "3.0.0"
+    "@types/jest": "~22.0.1",
+    "@types/supertest": "^2.0.5",
+    "concurrently": "~3.5.1",
+    "jest": "^22.1.4",
+    "nodemon": "^1.14.12",
+    "supertest": "~3.0.0",
+    "tslint": "~5.9.1",
+    "tslint-config-standard": "~7.0.0",
+    "typescript": "^2.7.2"
   },
   "engines": {
     "npm": "^5.4.0",

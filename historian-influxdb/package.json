@@ -24,7 +24,7 @@
     "@types/node": "~9.3.0",
     "@types/request-promise-native": "^1.0.15",
     "@types/ws": "~3.2.1",
-    "https-proxy-agent": "~2.1.1",
+    "https-proxy-agent": "~2.2.1",
     "request": "~2.83.0",
     "request-promise-native": "~1.0.5",
     "ws": "~4.0.0"

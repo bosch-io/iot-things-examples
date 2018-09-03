@@ -78,6 +78,7 @@ class Octopus {
   void initLights();
   void initBme680();
   void initBno055();
+  void setupNTP();
   
   public:
     void begin();

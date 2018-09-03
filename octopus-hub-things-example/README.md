@@ -210,8 +210,9 @@ Just create this file from the following template and replace XXX placeholders w
 // Do not change this
 #define MQTT_BROKER "mqtt.bosch-iot-hub.com"
 #define MQTT_PORT 8883
-/* SHA-1 fingerprint of the server certificate of the MQTT broker, UPPERCASE and spacing */
-#define MQTT_SERVER_FINGERPRINT "7E 8E 7E FF 65 3E C0 02 88 F4 43 AE C5 FE E0 ED 89 C6 E2 06"
+
+extern const unsigned char mqtt_server_ca[];
+extern const unsigned int mqtt_server_ca_len;
 
 #endif
 ```

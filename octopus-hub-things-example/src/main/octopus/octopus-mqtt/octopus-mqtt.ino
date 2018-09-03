@@ -32,7 +32,7 @@
 ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
 Octopus octopus;
-BoschIotHub hub(MQTT_BROKER, MQTT_PORT, MQTT_SERVER_FINGERPRINT);
+BoschIotHub hub(MQTT_BROKER, MQTT_PORT, mqtt_server_ca, mqtt_server_ca_len);
 
 unsigned long lastSensorUpdateMillis = 0;
 

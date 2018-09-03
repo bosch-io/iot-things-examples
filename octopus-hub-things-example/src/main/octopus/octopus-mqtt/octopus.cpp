@@ -28,6 +28,7 @@
 #include <Arduino.h>
 #include "octopus.h"
 #include "printer.h"
+#include "time.h"
 
 void Octopus::begin() {
    Serial.println("--- Initializing Octopus --- ");  
@@ -58,6 +59,18 @@ void Octopus::connectToWifi(char* ssid, const char* password) {
   Printer::printMsg("WiFi", "Connected. IP address: ");
   Serial.println(WiFi.localIP());
   this->showColor(0, 0, 0, 0x80, 0); // blue
+  Octopus::setupNTP();
+}
+
+void Octopus::setupNTP(){
+  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+  time_t now = 0;
+  while(now < 100000){
+    delay(500);
+    time(&now);
+  }
+  Printer::printMsg("WiFi", "NTP. Time: ");
+  Serial.println(ctime(&now));
 }
 
 void Octopus::showColor(char led, char red, char green, char blue, char white) {

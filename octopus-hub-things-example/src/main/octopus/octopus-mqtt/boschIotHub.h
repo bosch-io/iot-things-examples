@@ -40,10 +40,11 @@ class BoschIotHub {
   
     const char* mqttBroker;
     const int mqttPort;
-    const char* mqttServerFingerprint;
+    const unsigned char* mqttServerCA;
+    const unsigned int mqttServerCALen;
     
   public:
-    BoschIotHub(const char* mqttBroker, const int mqttPort, const char* mqttServerFingerprint);
+    BoschIotHub(const char* mqttBroker, const int mqttPort, const unsigned char* mqttServerCA, const unsigned int mqttServerCALen);
 
     bool connect();
     bool deviceIsConnected();

@@ -49,6 +49,7 @@ There you can write the code that should be executed on your board and upload it
 3. Install the following libraries (Sketch > Include Library > Manage Libraries)
     * [Adafruit Unified Sensor library](https://github.com/adafruit/Adafruit_Sensor)
     * [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)
+    * [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280)
     * [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
     * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
     * [PubSubClient library](https://github.com/knolleary/pubsubclient)
@@ -210,8 +211,9 @@ Just create this file from the following template and replace XXX placeholders w
 // Do not change this
 #define MQTT_BROKER "mqtt.bosch-iot-hub.com"
 #define MQTT_PORT 8883
-/* SHA-1 fingerprint of the server certificate of the MQTT broker, UPPERCASE and spacing */
-#define MQTT_SERVER_FINGERPRINT "7E 8E 7E FF 65 3E C0 02 88 F4 43 AE C5 FE E0 ED 89 C6 E2 06"
+
+extern const unsigned char mqtt_server_ca[];
+extern const unsigned int mqtt_server_ca_len;
 
 #endif
 ```

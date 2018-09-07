@@ -65,8 +65,13 @@ void loop() {
 
   if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
     lastSensorUpdateMillis = millis();
-    Bme680Values bme680Values = octopus.readBme680();
-    Bno055Values bno055Values = octopus.readBno055();
+    static Bme680Values bme680Values;
+    static Bno055Values bno055Values;
+    memset(&bme680Values, 0, sizeof(bme680Values));
+    memset(&bno055Values, 0, sizeof(bno055Values));
+    octopus.readBme680(bme680Values);
+    octopus.readBno055(bno055Values);
+    octopus.readBme280(bme680Values);
     float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);

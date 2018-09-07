@@ -49,6 +49,7 @@ There you can write the code that should be executed on your board and upload it
 3. Install the following libraries (Sketch > Include Library > Manage Libraries)
     * [Adafruit Unified Sensor library](https://github.com/adafruit/Adafruit_Sensor)
     * [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)
+    * [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280)
     * [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
     * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
     * [PubSubClient library](https://github.com/knolleary/pubsubclient)

@@ -59,10 +59,6 @@ This example shows how to use the HTTP API within Java using the Signature Authe
 
 This example creates a web application with a login dialog. Upon successful authentication a JSON Web Tokens (JWT) is issued by one of the identity providers integrated with the Things service. The web application then displays all things on which the specific user was granted read permission.
 
-### Example "openid-browser-automation"
-
-Use this example in case you need to work with a OpenId Connect JWT token issued by Bosch-ID. The application mimics a browser-based login, for a Bosch account. PROVIDED ONLY AS EXAMPLE FOR DEVELOPMENT - DO NOT USE IN PRODUCTION!
-
 ### Example "mini-device-integration"
 
 This example shows how to create a minimal Java-based device integration application with our Things Client for Java.

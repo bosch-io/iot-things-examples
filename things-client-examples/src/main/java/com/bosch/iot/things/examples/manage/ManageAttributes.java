@@ -26,10 +26,7 @@
  */
 package com.bosch.iot.things.examples.manage;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.ditto.json.JsonFactory;
@@ -58,8 +55,6 @@ public class ManageAttributes extends ExamplesBase {
     private static final JsonPointer ATTRIBUTE_JSON_POINTER2 = JsonFactory.newPointer("height");
     private static final JsonValue ATTRIBUTE_JSON_VALUE2 = JsonFactory.newValue(13398);
 
-    private static final int TIMEOUT = 5;
-
     public void crudAttributes() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
 
@@ -71,7 +66,7 @@ public class ManageAttributes extends ExamplesBase {
                 .build();
 
         final Twin twin = client.twin();
-        twin.create(thing).get(TIMEOUT, SECONDS);
+        twin.create(thing).get(TIMEOUT_VALUE, TIMEOUT_UNIT);
         final TwinThingHandle thingHandle = twin.forId(thingId);
 
         thingHandle.putAttribute(ATTRIBUTE_JSON_POINTER1, NEW_ATTRIBUTE_JSON_VALUE)
@@ -82,7 +77,7 @@ public class ManageAttributes extends ExamplesBase {
                 .thenAccept(
                         thing2 -> LOGGER.info("RETRIEVED thing after attributes where deleted is {}",
                                 thing2.toJsonString()))
-                .get(5, TimeUnit.SECONDS);
+                .get(TIMEOUT_VALUE, TIMEOUT_UNIT);
     }
 
     public static void main(String[] args) throws Exception {

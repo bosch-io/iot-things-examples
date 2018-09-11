@@ -71,9 +71,6 @@ import com.bosch.iot.things.examples.common.model.ExampleUser;
  */
 public abstract class ExamplesBase {
 
-    protected static final long TIMEOUT_VALUE = 5;
-    protected static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExamplesBase.class);
     private static final String CONFIG_PROPERTIES_FILE = "config.properties";
 

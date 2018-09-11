@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bosch.iot.things.clientapi.options.Option;
 import com.bosch.iot.things.clientapi.options.Options;
+import com.bosch.iot.things.clientapi.things.FeatureHandle;
 import com.bosch.iot.things.clientapi.things.ThingHandle;
 import com.bosch.iot.things.clientapi.twin.TwinFeatureHandle;
 import com.bosch.iot.things.examples.common.ExamplesBase;
@@ -51,7 +52,7 @@ import com.bosch.iot.things.examples.common.ExamplesBase;
  * <p>
  * This example shows how the exists-option (specified by the factory-method {@link
  * com.bosch.iot.things.clientapi.options.Options.Modify#exists(boolean)} can be used in the context of managing a
- * feature.
+ * feature({@link FeatureHandle}).
  * </p>
  * <p>
  * Note that this option can be also used top-level to manage a Thing ({@link com.bosch.iot.things.clientapi.things.CommonThingIntegration#put(Thing,

@@ -159,7 +159,7 @@ public class ManageThings extends ExamplesBase {
     public void updateThing() throws InterruptedException, TimeoutException, ExecutionException {
         LOGGER.info("Starting: updateThing()");
         final CountDownLatch countDownLatch = new CountDownLatch(2);
-        final String thingId = "com.bosch.iot.example:" + UUID.randomUUID().toString();
+        final String thingId = namespace + ":" + UUID.randomUUID().toString();
         final JsonPointer attributeJsonPointer = JsonFactory.newPointer("foo");
         final JsonValue attributeJsonValue = JsonFactory.newValue("bar");
         final Thing thing = ThingsModelFactory.newThingBuilder()
@@ -209,4 +209,5 @@ public class ManageThings extends ExamplesBase {
             manageThings.terminate();
         }
     }
+
 }

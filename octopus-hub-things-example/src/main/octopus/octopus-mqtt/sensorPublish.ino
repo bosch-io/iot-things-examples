@@ -85,10 +85,10 @@ String sensor3dValueString(const String& featureName, float xValue, float yValue
   return output;
 }
 
-void publishSensorData(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
+bool publishSensorData(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
 
   updateMinMax(power, bme680Values, bno055Values);
-  hub.publish(publishSensorDataString(power, bme680Values, bno055Values));
+  return hub.publish(publishSensorDataString(power, bme680Values, bno055Values));
 }
 
 void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {

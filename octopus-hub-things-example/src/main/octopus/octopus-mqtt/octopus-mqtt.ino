@@ -71,11 +71,14 @@ void loop() {
     memset(&bno055Values, 0, sizeof(bno055Values));
     octopus.readBme680(bme680Values);
     octopus.readBno055(bno055Values);
-    octopus.readBme280(bme680Values);
     float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);
-    publishSensorData(vcc, bme680Values, bno055Values);
+    if(publishSensorData(vcc, bme680Values, bno055Values))
+      octopus.showColor(1, 0, 0x80, 0, 0); // green
+    else
+      octopus.showColor(1, 0x80, 0, 0, 0); // red
+
     Serial.println();
   }
   delay(LOOP_DELAY);

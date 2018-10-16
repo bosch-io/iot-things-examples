@@ -79,7 +79,7 @@ void BoschIotHub::connectDevice(const char* deviceId, const char* authId, const 
     mqttClient.loop();
 }
 
-void BoschIotHub::publish(String payload) {
+bool BoschIotHub::publish(String payload) {
   Printer::printlnMsg("Bosch IoT Hub", payload);
   /* Publish all available data to the MQTT broker */
   const char* topic = "telemetry";
@@ -95,5 +95,8 @@ void BoschIotHub::publish(String payload) {
   if (!publishResult) {
     Printer::printMsg("Bosch IoT Hub", "Publish failed");
     Serial.println(publishResult);
+    return false;
   }
+
+  return true;
 }

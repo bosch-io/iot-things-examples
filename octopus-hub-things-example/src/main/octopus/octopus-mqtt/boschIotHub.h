@@ -49,7 +49,7 @@ class BoschIotHub {
     bool connect();
     bool deviceIsConnected();
     void connectDevice(const char* deviceId, const char* authId, const char* devicePassword);
-    void publish(String payload);
+    bool publish(String payload);
 };
 
 #endif

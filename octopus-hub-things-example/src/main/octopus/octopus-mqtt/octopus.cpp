@@ -126,7 +126,7 @@ bool Octopus::readBno055(Bno055Values &values) {
   return true;
 }
 
-#if BME280
+#ifdef BME280
 void Octopus::initBme280() {
   Printer::printMsg("Octopus", "Initializing BME280: ");
   if (this->bme280.begin()) {

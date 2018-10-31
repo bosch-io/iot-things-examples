@@ -26,6 +26,7 @@
 #ifndef OCTOPUS_H
 #define OCTOPUS_H
 
+#include "settings.h"
 #ifdef BME280
 #include <Adafruit_BME280.h>  // Make sure you have the Adafruit BME280 library installed
 #else

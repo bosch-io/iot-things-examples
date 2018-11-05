@@ -28,6 +28,7 @@
 #include <Arduino.h>
 #include "octopus.h"
 #include "printer.h"
+#include "time.h"
 
 void Octopus::begin() {
    Serial.println("--- Initializing Octopus --- ");  
@@ -35,7 +36,11 @@ void Octopus::begin() {
   this->initLights();
   
   delay(1000); // give sensors some time to start up
+  #ifdef BME280
+  this->initBme280();
+  #else
   this->initBme680();
+  #endif
   this->initBno055();
   delay(500);
   
@@ -58,6 +63,18 @@ void Octopus::connectToWifi(char* ssid, const char* password) {
   Printer::printMsg("WiFi", "Connected. IP address: ");
   Serial.println(WiFi.localIP());
   this->showColor(0, 0, 0, 0x80, 0); // blue
+  Octopus::setupNTP();
+}
+
+void Octopus::setupNTP(){
+  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+  time_t now = 0;
+  while(now < 100000){
+    delay(500);
+    time(&now);
+  }
+  Printer::printMsg("WiFi", "NTP. Time: ");
+  Serial.println(ctime(&now));
 }
 
 void Octopus::showColor(char led, char red, char green, char blue, char white) {
@@ -69,9 +86,10 @@ float Octopus::getVcc () {
   return ESP.getVcc() / 1000.0;
 }
 
-const Bno055Values Octopus::readBno055() {
-  Bno055Values values;
-  
+bool Octopus::readBno055(Bno055Values &values) {
+  if(!bno055Ready)
+    return false;
+
   this->bno055.getCalibration(&values.calibrationSys, &values.calibrationGyro, &values.calibrationAccel, &values.calibrationMag);
   values.temperature = this->bno055.getTemp();
   
@@ -105,44 +123,80 @@ const Bno055Values Octopus::readBno055() {
   values.magneticFieldStrengthY = bnoMagnet.y();
   values.magneticFieldStrengthZ = bnoMagnet.z();
 
-  return values;
+  return true;
 }
 
-const Bme680Values Octopus::readBme680() {
-  Bme680Values values;
+#ifdef BME280
+void Octopus::initBme280() {
+  Printer::printMsg("Octopus", "Initializing BME280: ");
+  if (this->bme280.begin()) {
+    bme280Ready = true;
+    Serial.println("OK");
+  } else {
+    bme280Ready = false;
+    Serial.println("Not found");
+  }
+}
+
+bool Octopus::readBme280(Bme680Values &values) {
+  if(!bme280Ready)
+    return false;
+
+  this->bme280.begin(0x77);
+  values.temperature = this->bme280.readTemperature();
+  values.pressure = this->bme280.readPressure();
+  values.humidity = this->bme280.readHumidity();
+  values.gas_resistance = 0;
+  values.altitude = this->bme280.readAltitude(SEALEVELPRESSURE_HPA);
+  return true;
+}
+
+#else
+
+bool Octopus::readBme680(Bme680Values &values) {
+  if(!bme680Ready)
+    return false;
+
+
   if (!this->bme680.performReading()) { 
     Serial.println("Sensor reading failure");
-    return values;
+    return false;
   } else {
     values.temperature = bme680.temperature;
     values.pressure = bme680.pressure;
     values.humidity = bme680.humidity;
     values.gas_resistance = bme680.gas_resistance;
     values.altitude = bme680.readAltitude(SEALEVELPRESSURE_HPA);
-    return values;
+    return true;
   }
 }
 
 void Octopus::initBme680() {
   Printer::printMsg("Octopus", "Initializing BME680: ");
-  if (this->bme680.begin(118)) {
+  if (this->bme680.begin(0x76)) {
     this->bme680.setTemperatureOversampling(BME680_OS_8X);
     this->bme680.setHumidityOversampling(BME680_OS_2X);
     this->bme680.setPressureOversampling(BME680_OS_4X);
     this->bme680.setIIRFilterSize(BME680_FILTER_SIZE_3);
     this->bme680.setGasHeater(320, 150); // 320*C for 150 ms
+    bme680Ready = true;
     Serial.println("OK");
   } else {
+    bme680Ready = false;
     Serial.println("Not found");
   }
 }
+
+#endif
 
 void Octopus::initBno055() {
   Printer::printMsg("Octopus", "Initializing BNO055: ");
   if (this->bno055.begin()) {
     this->bno055.setExtCrystalUse(true);
+    bno055Ready = true;
     Serial.println("OK");
   } else {
+    bno055Ready = false;
     Serial.println("Not found");
   }
 }

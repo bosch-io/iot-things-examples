@@ -21,23 +21,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "9.3.0",
-    "@types/request-promise-native": "1.0.10",
-    "mqtt": "2.15.1",
-    "prune": "0.0.2",
-    "request-promise-native": "1.0.5",
-    "sha.js": "2.4.9"
+    "@types/node": "~9.3.0",
+    "@types/request-promise-native": "^1.0.15",
+    "mqtt": "^2.15.3",
+    "prune": "~0.0.2",
+    "request-promise-native": "~1.0.5",
+    "sha.js": "^2.4.11",
+    "lodash": "~4.17.10"
   },
   "devDependencies": {
-    "@types/jest": "22.0.1",
-    "hoek": "4.2.1",
-    "@types/supertest": "2.0.4",
-    "typescript": "2.6.2",
-    "tslint": "5.9.1",
-    "tslint-config-standard": "7.0.0",
-    "concurrently": "3.5.1",
-    "jest": "22.1.2",
-    "nodemon": "1.14.11",
-    "supertest": "3.0.0"
+    "@types/jest": "~22.0.1",
+    "@types/supertest": "^2.0.5",
+    "concurrently": "~3.5.1",
+    "hoek": "~4.2.1",
+    "jest": "^22.1.4",
+    "nodemon": "^1.18.4",
+    "supertest": "~3.0.0",
+    "tslint": "~5.9.1",
+    "tslint-config-standard": "~7.0.0",
+    "typescript": "~2.6.2"
   }
 }

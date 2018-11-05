@@ -32,7 +32,7 @@
 ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
 Octopus octopus;
-BoschIotHub hub(MQTT_BROKER, MQTT_PORT, MQTT_SERVER_FINGERPRINT);
+BoschIotHub hub(MQTT_BROKER, MQTT_PORT, mqtt_server_ca, mqtt_server_ca_len);
 
 unsigned long lastSensorUpdateMillis = 0;
 
@@ -65,8 +65,16 @@ void loop() {
 
   if (millis() - lastSensorUpdateMillis > SENSOR_UPDATE_RATE_MS) {
     lastSensorUpdateMillis = millis();
-    Bme680Values bme680Values = octopus.readBme680();
-    Bno055Values bno055Values = octopus.readBno055();
+    static Bme680Values bme680Values;
+    static Bno055Values bno055Values;
+    memset(&bme680Values, 0, sizeof(bme680Values));
+    memset(&bno055Values, 0, sizeof(bno055Values));
+    octopus.readBno055(bno055Values);
+    #ifdef BME280
+    octopus.readBme280(bme680Values);
+    #else
+    octopus.readBme680(bme680Values);
+    #endif
     float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);

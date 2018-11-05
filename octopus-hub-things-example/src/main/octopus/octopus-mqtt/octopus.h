@@ -26,8 +26,14 @@
 #ifndef OCTOPUS_H
 #define OCTOPUS_H
 
-#include <Adafruit_Sensor.h>  // Make sure you have the Adafruit Sensor library installed
+#include "settings.h"
+#ifdef BME280
+#include <Adafruit_BME280.h>  // Make sure you have the Adafruit BME280 library installed
+#else
 #include <Adafruit_BME680.h>  // Make sure you have the Adafruit BME680 library installed
+#endif
+
+#include <Adafruit_Sensor.h>  // Make sure you have the Adafruit Sensor library installed
 #include <Adafruit_BNO055.h>  // Make sure you have the Adafruit BNO055 library installed
 #include <utility/imumaths.h>
 #include <Adafruit_NeoPixel.h> // Make sure you have the Adafruit NeoPixel library installed
@@ -70,22 +76,38 @@ struct Bme680Values {
 };
 
 class Octopus {
- 
-  Adafruit_BME680 bme680; // I2C
-  Adafruit_BNO055 bno055 = Adafruit_BNO055(55);
-  Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, PIN_NEOPIXEL, NEO_GRBW + NEO_KHZ800);
   
-  void initLights();
+  #ifdef BME280
+  Adafruit_BME280 bme280; // I2C
+  void initBme280();
+  bool bme280Ready;
+  #else
+  
+  Adafruit_BME680 bme680; // I2C
   void initBme680();
+  bool bme680Ready;
+  #endif
+
+  Adafruit_BNO055 bno055 = Adafruit_BNO055(55);
   void initBno055();
+  bool bno055Ready;
+
+  Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, PIN_NEOPIXEL, NEO_GRBW + NEO_KHZ800);
+  void initLights();
+  void setupNTP();
   
   public:
     void begin();
     void connectToWifi(char* ssid, const char* password);
     void showColor(char led, char red, char green, char blue, char white);
     float getVcc ();
-    const Bno055Values readBno055();
-    const Bme680Values readBme680();
+    bool readBno055(Bno055Values &values);
+
+    #ifdef BME280
+    bool readBme280(Bme680Values &values);
+    #else
+    bool readBme680(Bme680Values &values);
+    #endif
 };
 
 #endif

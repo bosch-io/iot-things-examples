@@ -36,9 +36,12 @@ void Octopus::begin() {
   this->initLights();
   
   delay(1000); // give sensors some time to start up
-  this->initBme680();
-  this->initBno055();
+  #ifdef BME280
   this->initBme280();
+  #else
+  this->initBme680();
+  #endif
+  this->initBno055();
   delay(500);
   
   this->showColor(0, 0, 0x80, 0, 0); // green
@@ -123,6 +126,33 @@ bool Octopus::readBno055(Bno055Values &values) {
   return true;
 }
 
+#ifdef BME280
+void Octopus::initBme280() {
+  Printer::printMsg("Octopus", "Initializing BME280: ");
+  if (this->bme280.begin()) {
+    bme280Ready = true;
+    Serial.println("OK");
+  } else {
+    bme280Ready = false;
+    Serial.println("Not found");
+  }
+}
+
+bool Octopus::readBme280(Bme680Values &values) {
+  if(!bme280Ready)
+    return false;
+
+  this->bme280.begin(0x77);
+  values.temperature = this->bme280.readTemperature();
+  values.pressure = this->bme280.readPressure();
+  values.humidity = this->bme280.readHumidity();
+  values.gas_resistance = 0;
+  values.altitude = this->bme280.readAltitude(SEALEVELPRESSURE_HPA);
+  return true;
+}
+
+#else
+
 bool Octopus::readBme680(Bme680Values &values) {
   if(!bme680Ready)
     return false;
@@ -141,19 +171,6 @@ bool Octopus::readBme680(Bme680Values &values) {
   }
 }
 
-bool Octopus::readBme280(Bme680Values &values) {
-  if(!bme280Ready)
-    return false;
-
-  this->bme280.begin(0x77);
-  values.temperature = this->bme280.readTemperature();
-  values.pressure = this->bme280.readPressure();
-  values.humidity = this->bme280.readHumidity();
-  values.gas_resistance = 0;
-  values.altitude = this->bme280.readAltitude(SEALEVELPRESSURE_HPA);
-  return true;
-}
-
 void Octopus::initBme680() {
   Printer::printMsg("Octopus", "Initializing BME680: ");
   if (this->bme680.begin(0x76)) {
@@ -170,6 +187,8 @@ void Octopus::initBme680() {
   }
 }
 
+#endif
+
 void Octopus::initBno055() {
   Printer::printMsg("Octopus", "Initializing BNO055: ");
   if (this->bno055.begin()) {
@@ -178,17 +197,6 @@ void Octopus::initBno055() {
     Serial.println("OK");
   } else {
     bno055Ready = false;
-    Serial.println("Not found");
-  }
-}
-
-void Octopus::initBme280() {
-  Printer::printMsg("Octopus", "Initializing BME280: ");
-  if (this->bme280.begin()) {
-    bme280Ready = true;
-    Serial.println("OK");
-  } else {
-    bme280Ready = false;
     Serial.println("Not found");
   }
 }

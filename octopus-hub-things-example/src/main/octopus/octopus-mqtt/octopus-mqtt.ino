@@ -69,9 +69,12 @@ void loop() {
     static Bno055Values bno055Values;
     memset(&bme680Values, 0, sizeof(bme680Values));
     memset(&bno055Values, 0, sizeof(bno055Values));
-    octopus.readBme680(bme680Values);
     octopus.readBno055(bno055Values);
+    #ifdef BME280
     octopus.readBme280(bme680Values);
+    #else
+    octopus.readBme680(bme680Values);
+    #endif
     float vcc = octopus.getVcc();
 
     printSensorData(vcc, bme680Values, bno055Values);

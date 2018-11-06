@@ -36,10 +36,10 @@
     "lodash": "4.17.10"
   },
   "devDependencies": {
-    "@types/jest": "~22.0.1",
+    "@types/jest": "~23.3.9",
     "@types/supertest": "^2.0.5",
     "concurrently": "~3.5.1",
-    "jest": "^22.1.4",
+    "jest": "^23.6.0",
     "nodemon": "^1.14.12",
     "supertest": "~3.0.0",
     "tslint": "~5.9.1",

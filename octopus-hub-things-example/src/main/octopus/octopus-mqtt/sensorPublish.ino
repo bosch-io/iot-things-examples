@@ -39,7 +39,7 @@ String publishSensorDataString(float power, const Bme680Values& bme680Values, co
   String output = "{\"topic\": \"";
   output += THINGS_NAMESPACE;
   output += "/";
-  output += THING_ID;
+  output += THING_NAME;
   output += "/things/twin/commands/modify\",\"headers\": {\"response-required\": false, \"content-type\":\"application/vnd.eclipse.ditto+json\"},";
   output += "\"path\": \"/features\", \"value\":{";
   output += sensorMinMaxValueString("Power_0", power, powerMin, powerMax, "V") += ",";

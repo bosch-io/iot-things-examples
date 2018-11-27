@@ -195,7 +195,7 @@ Just create this file from the following template and replace XXX placeholders w
 
 // ---- Things registration properties ----
 #define THINGS_NAMESPACE "XXX" // The namespace you created in your solution
-#define THING_ID "XXX" // should not be changed unless you changed code in the java preparation program
+#define THING_ID "octopus" // should not be changed unless you changed code in the java preparation program
 
 // ---- Hub registration properties ----
 #define HUB_TENANT "XXX" // The tenant id of your hub instance

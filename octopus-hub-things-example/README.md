@@ -54,7 +54,7 @@ There you can write the code that should be executed on your board and upload it
     * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
     * [PubSubClient library](https://github.com/knolleary/pubsubclient)
 4. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the MQTT_MAX_PACKET_SIZE
-to 2048. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
+to 2560. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
 an array of this size. Unfortunately, we cannot define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
 compiles.
 

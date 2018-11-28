@@ -42,23 +42,24 @@ String publishSensorDataString(float power, const Bme680Values& bme680Values, co
   output += THING_NAME;
   output += "/things/twin/commands/modify\",\"headers\": {\"response-required\": false, \"content-type\":\"application/vnd.eclipse.ditto+json\"},";
   output += "\"path\": \"/features\", \"value\":{";
-  output += sensorMinMaxValueString("Power_0", power, powerMin, powerMax, "V") += ",";
-  output += sensorMinMaxValueString("HumiditySensor_BME680", bme680Values.humidity, humidityMin, humidityMax, "%") += ",";
-  output += sensorMinMaxValueString("TemperatureSensor_BME680", bme680Values.temperature, tempMin, tempMax, "°C") += ",";
-  output += sensorMinMaxValueString("Barometer_BME680", bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa") += ",";
-  output += sensorMinMaxValueString("TemperatureSensor_BNO055", bno055Values.temperature, tempBnoMin, tempBnoMax, "°C") += ",";
-  output += sensor3dValueString("Accelerometer_BNO055", bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2") += ",";
-  output += sensor3dValueString("AbsoluteOrientation_BNO055", bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°") += ",";
-  output += sensor3dValueString("Gravity_BNO055", bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2") += ",";
-  output += sensor3dValueString("AngularVelocity_BNO055", bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s") += ",";
-  output += sensor3dValueString("LinearAcceleration_BNO055", bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2") += ",";
-  output += sensor3dValueString("Magnetometer_BNO055", bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT");
+  output += sensorMinMaxValueString("voltage", "com.ipso.smartobjects:Voltage:1.1.0", power, powerMin, powerMax, "V") += ",";
+  output += sensorMinMaxValueString("humidity", "com.ipso.smartobjects:Humidity:1.1.0", bme680Values.humidity, humidityMin, humidityMax, "%") += ",";
+  output += sensorMinMaxValueString("temperature", "com.ipso.smartobjects:Temperature:1.1.0", bme680Values.temperature, tempMin, tempMax, "°C") += ",";
+  output += sensorMinMaxValueString("pressure", "com.ipso.smartobjects:Barometer:1.1.0", bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa") += ",";
+  output += sensorMinMaxValueString("ambient_temperature", "com.ipso.smartobjects:Temperature:1.1.0", bno055Values.temperature, tempBnoMin, tempBnoMax, "°C") += ",";
+  output += sensor3dValueString("acceleration", "com.ipso.smartobjects:Accelerometer:1.1.0", bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2") += ",";
+  output += sensor3dValueString("orientation", "com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0", bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°") += ",";
+  output += sensor3dValueString("gravity", "com.ipso.smartobjects:Accelerometer:1.1.0", bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2") += ",";
+  output += sensor3dValueString("angular_velocity", "com.ipso.smartobjects:Gyrometer:1.1.0", bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s") += ",";
+  output += sensor3dValueString("linear_acceleration", "com.ipso.smartobjects:Accelerometer:1.1.0", bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2") += ",";
+  output += sensor3dValueString("magnetometer", "com.ipso.smartobjects:Magnetometer:1.1.0", bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT");
   output += "}}";
   return output;
 }
 
-String sensorMinMaxValueString(const String& featureName, float sensorValue, float minValue, float maxValue, const String& units) {
-  String output = "\"" + featureName + "\": { \"properties\": { \"status\":";
+String sensorMinMaxValueString(const String& featureName, const String& featureDefinition, float sensorValue, float minValue, float maxValue, const String& units) {
+  String output = "\"" + featureName + "\": { \"definition\": [ \"" + featureDefinition + "\" ],";
+  output += "\"properties\": { \"status\":";
   output += "{\"sensorValue\": ";
   output += sensorValue;
   output += ", \"minMeasuredValue\": ";
@@ -71,8 +72,9 @@ String sensorMinMaxValueString(const String& featureName, float sensorValue, flo
   return output;
 }
 
-String sensor3dValueString(const String& featureName, float xValue, float yValue, float zValue, const String& units) {
-  String output = "\"" + featureName + "\": { \"properties\": { \"status\":";
+String sensor3dValueString(const String& featureName, const String& featureDefinition, float xValue, float yValue, float zValue, const String& units) {
+  String output = "\"" + featureName + "\": { \"definition\": [ \"" + featureDefinition + "\" ],";
+  output += "\"properties\": { \"status\":";
   output += "{\"xValue\": ";
   output += xValue;
   output += ", \"yValue\": ";

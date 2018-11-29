@@ -59,7 +59,7 @@ const store = new Vuex.Store({
     setDisconnected(state) {
       state.connectionStatus = false;
       state.selected = "No thing selected.";
-      state.items = [];
+      state.items = {};
     }
   },
 

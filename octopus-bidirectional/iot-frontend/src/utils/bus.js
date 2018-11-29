@@ -27,18 +27,16 @@ export default (window.Event = new class {
         }
       }
     });
-    this.source = [];
+    this.source = null;
   }
 
   fire(event, data = null) {
     if (event === "initSSE") {
       // start listening with a little timeout
+      let thingIds = this.vue.items.map(element => element.thingId).join(",");
       this.vue.items.forEach(element => {
-        this.source.push(
-          new EventSourcePolyfill(
-            `${this.vue.connection.http_endpoint}/api/2/things?=${
-              element.thingId
-            }`,
+        this.source = new EventSourcePolyfill(
+            `${this.vue.connection.http_endpoint}/api/2/things?ids=${thingIds}`,
             {
               headers: {
                 Authorization: Api.getConfig().headers.Authorization,
@@ -46,20 +44,17 @@ export default (window.Event = new class {
               },
               withCredentials: true
             }
-          )
-        );
+          );
       });
-      this.source.forEach(element => {
-        element.onmessage = res => {
-          console.log(res);
+      this.source.onmessage = (sse) => {
+        console.log(`SSE data: ${JSON.stringify(sse.data)}`);
+        if (sse.data && sse.data.length > 0) {
           this.vue.$store.commit("incrementTelemetryCount");
-          this.vue.$store.dispatch("telemetryUpdate");
-        };
-      });
+          this.vue.$store.dispatch("telemetryUpdate", sse.data);
+        }
+      };
     } else if (event === "connectionError") {
-      this.source.forEach(element => {
-        element.close();
-      });
+      this.source.close();
     } else {
       this.vue.$emit(event, data);
     }

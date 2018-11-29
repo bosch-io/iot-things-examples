@@ -13,7 +13,7 @@ const store = new Vuex.Store({
       username: "",
       password: ""
     },
-    items: [],
+    items: {},
     selected: "No thing selected",
     connectionStatus: false,
     telemetryCount: 0
@@ -27,7 +27,7 @@ const store = new Vuex.Store({
       return state.selected;
     },
     getItems: state => {
-      return state.items;
+      return Object.values(state.items);
     },
     getConnectionStatus: state => {
       return state.connectionStatus;
@@ -43,6 +43,9 @@ const store = new Vuex.Store({
     },
     setItems(state, items) {
       state.items = items;
+    },
+    setItem(state, item) {
+      state.items[item.thingId] = item;
     },
     setConnectionData(state, value) {
       state.connection = Object.assign({}, state.connection, value);
@@ -68,7 +71,10 @@ const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         Api.getAllThings()
           .then(res => {
-            this.commit("setItems", res.data.items);
+            this.commit("setItems", res.data.items.reduce(function(map, item) {
+              map[item.thingId] = item;
+              return map;
+            }, {}));
             this.commit("setConnectionStatus", true);
             resolve(res);
           })
@@ -103,8 +109,8 @@ const store = new Vuex.Store({
     disconnect({ commit }) {
       this.commit("setDisconnected");
     },
-    telemetryUpdate() {
-      this.dispatch("getAllThings");
+    telemetryUpdate(thing) {
+      this.commit("setItem", thing);
     }
   }
 });

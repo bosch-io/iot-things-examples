@@ -4,35 +4,37 @@
       class="card-body lead"
       v-show="isSelected.thingId === undefined && isSelected !== 'newItem'"
     >No thing selected</div>
+
     <div v-show="isSelected.thingId !== undefined || isSelected === 'newItem'">
       <div
         class="card-header lead"
         v-show="isSelected.thingId !== undefined && isSelected.thingId !== 'newThing'"
-      >{{ isSelected.thingId }}</div>
+      >{{ items.filter(t => t.thingId === isSelected.thingId)[0].thingId }}</div>
       <div class="card-header lead" v-show="isSelected.thingId === 'newThing'">
         <input class="form-control" v-model="isSelected.thingId">
       </div>
       <codemirror
         id="thing"
         :options="cmOptions"
-        :value="JSON.stringify(isSelected, null, '\t')"
-        @input="updateThing($event)"
+        :value="JSON.stringify(items.filter(t => t.thingId === isSelected.thingId)[0], null, '\t')"
         class="border-bottom"
       ></codemirror>
+      <!-- @input="updateThing($event)" -->
       <div class="card-body">
         <div class="container">
           <div class="row">
             <alert-view :alert="this.alert" alert-id="saveChanges"></alert-view>
           </div>
           <div class="row">
-            <button
+            <span class="lead">Command & Control</span>
+            <!-- <button
               @click="saveChanges"
               v-show="isSelected.thingId !== undefined"
               type="button"
               class="btn btn-outline-success col-md-4"
             >
               <font-awesome-icon style="margin-right: 5px;" icon="save"></font-awesome-icon>Save changes
-            </button>
+            </button>-->
           </div>
         </div>
       </div>
@@ -40,6 +42,7 @@
         id="sendMessage"
         :options="cmOptions"
         :value="JSON.stringify(message, null, '\t')"
+        @input="updateMessage($event)"
         class="border-bottom border-top"
       ></codemirror>
       <div class="card-body">
@@ -60,7 +63,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">Topic</span>
               </div>
-              <input class="form-control" type="text" placeholder="topic" :value="topic">
+              <input class="form-control" type="text" placeholder="topic" v-model="topic">
             </div>
           </div>
         </div>
@@ -106,9 +109,10 @@ export default {
       message: {
         r: 50,
         g: 50,
-        b: 50
+        b: 50,
+        w: 0
       },
-      topic: "LED"
+      topic: "switch_led"
     };
   },
   computed: {
@@ -118,6 +122,11 @@ export default {
       },
       set(value) {
         this.$store.commit("setSelected", value);
+      }
+    },
+    items: {
+      get() {
+        return this.$store.getters.getItems;
       }
     },
     userData: {
@@ -132,22 +141,25 @@ export default {
     }
   },
   methods: {
-    saveChanges() {
-      this.$store
-        .dispatch("saveChanges", JSON.parse(this.localcopy))
-        .then(res => {
-          this.showAlert(true, "saveChanges", "Successfully saved.");
-          this.$store.dispatch("getAllThings");
-        })
-        .catch(err =>
-          this.showAlert(false, "saveChanges", "Error - Status " + res.status)
-        );
-    },
-    deleteThing() {
-      this.$store.dispatch("deleteThing", this.isSelected);
-    },
-    updateThing(event) {
-      this.localcopy = event;
+    // saveChanges() {
+    //   this.$store
+    //     .dispatch("saveChanges", JSON.parse(this.localcopy))
+    //     .then(res => {
+    //       this.showAlert(true, "saveChanges", "Successfully saved.");
+    //       this.$store.dispatch("getAllThings");
+    //     })
+    //     .catch(err =>
+    //       this.showAlert(false, "saveChanges", "Error - Status " + res.status)
+    //     );
+    // },
+    // deleteThing() {
+    //   this.$store.dispatch("deleteThing", this.isSelected);
+    // },
+    // updateThing(event) {
+    //   this.localcopy = event;
+    // },
+    updateMessage(event) {
+      this.message = JSON.parse(event);
     },
     sendMessage() {
       this.$store
@@ -175,7 +187,7 @@ export default {
         this.alert.isError = false;
         this.alert.successMessage = "";
         this.alert.errorMessage = "";
-      }, 2000);
+      }, 3000);
     }
   }
 };
@@ -187,7 +199,7 @@ export default {
 }
 
 #sendMessage .CodeMirror {
-  height: 150px;
+  height: 160px;
 }
 
 .m-bottom-24px {

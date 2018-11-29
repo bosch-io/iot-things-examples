@@ -56,6 +56,12 @@
             >
               <font-awesome-icon style="margin-right: 5px;" icon="upload"/>Send message
             </button>
+            <div class="input-group col-md-8">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Topic</span>
+              </div>
+              <input class="form-control" type="text" placeholder="topic" :value="topic">
+            </div>
           </div>
         </div>
       </div>
@@ -98,9 +104,11 @@ export default {
         errorMessage: ""
       },
       message: {
-        topic: "komplett",
-        payload: "Hello World"
-      }
+        r: 50,
+        g: 50,
+        b: 50
+      },
+      topic: "LED"
     };
   },
   computed: {
@@ -143,22 +151,23 @@ export default {
     },
     sendMessage() {
       this.$store
-        .dispatch("sendMessage", this.message)
+        .dispatch("sendMessage", { message: this.message, topic: this.topic })
         .then(res => {
           this.showAlert(true, "sendMessage", "Device got message.");
           this.dispatch("getAllThings");
         })
         .catch(err => {
-          this.showAlert(false, "sendMessage", "Something went wrong.");
+          this.showAlert(false, "sendMessage", err.message);
         });
     },
     showAlert(isOkay, alertId, alertMessage) {
       this.alert.alertId = alertId;
-      this.alert.successMessage = alertMessage;
       if (isOkay) {
         this.alert.isSuccess = true;
+        this.alert.successMessage = alertMessage;
       } else {
         this.alert.isError = true;
+        this.alert.errorMessage = alertMessage;
       }
       setTimeout(() => {
         this.alert.alertId = "";
@@ -173,6 +182,14 @@ export default {
 </script>
 
 <style>
+.CodeMirror {
+  height: 600px;
+}
+
+#sendMessage .CodeMirror {
+  height: 150px;
+}
+
 .m-bottom-24px {
   margin-bottom: 24px;
 }

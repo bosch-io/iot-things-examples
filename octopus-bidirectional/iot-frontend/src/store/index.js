@@ -71,10 +71,13 @@ const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         Api.getAllThings()
           .then(res => {
-            this.commit("setItems", res.data.items.reduce(function(map, item) {
-              map[item.thingId] = item;
-              return map;
-            }, {}));
+            this.commit(
+              "setItems",
+              res.data.items.reduce(function(map, item) {
+                map[item.thingId] = item;
+                return map;
+              }, {})
+            );
             this.commit("setConnectionStatus", true);
             resolve(res);
           })
@@ -88,9 +91,10 @@ const store = new Vuex.Store({
           .catch(err => reject(err));
       });
     },
-    sendMessage({ state }, message) {
+    sendMessage({ state }, payload) {
+      console.log("im store: ", payload.message, payload.topic);
       return new Promise((resolve, reject) => {
-        Api.sendMessage(message)
+        Api.sendMessage(payload.message, payload.topic)
           .then(res => resolve(res))
           .catch(err => reject(err));
       });

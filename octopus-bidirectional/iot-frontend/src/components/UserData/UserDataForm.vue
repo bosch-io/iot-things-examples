@@ -54,7 +54,7 @@ export default {
   methods: {
     setUserData(event) {
       this.connection[event.target.id] = event.target.value;
-      this.$store.commit("setUserData", this.connection);
+      this.$store.commit("setConnectionData", this.connection);
     },
     connect() {
       this.$store.dispatch("getAllThings");

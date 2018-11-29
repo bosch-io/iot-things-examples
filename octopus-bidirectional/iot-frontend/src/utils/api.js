@@ -71,11 +71,6 @@ export default (window.Api = new class {
   };
 
   sendMessage = (message, topic) => {
-    console.log(
-      `${this.routes.things}/${
-        this.vue.selected.thingId
-      }/inbox/messages/${topic}`
-    );
     return axios.post(
       `${this.routes.things}/${
         this.vue.selected.thingId

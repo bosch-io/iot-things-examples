@@ -8,11 +8,10 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     connection: {
-      http_endpoint: "https://things-int.s-apps.de1.bosch-iot-cloud.com",
-      api_token: "121121dd63b04089ad19a454bcbc4d66",
-      solution_id: "8de86d77-526c-46e5-8856-4fc39b8eb067",
-      username: "87BF11FF7172AF7C6A086B5\\john.doe",
-      password: "john.doePw2!"
+      http_endpoint: "https://things.s-apps.de1.bosch-iot-cloud.com",
+      api_token: "",
+      username: "",
+      password: ""
     },
     items: [],
     selected: "No thing selected",

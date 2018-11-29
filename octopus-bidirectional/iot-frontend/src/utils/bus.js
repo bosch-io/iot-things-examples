@@ -50,7 +50,8 @@ export default (window.Event = new class {
         );
       });
       this.source.forEach(element => {
-        element.onmessage = () => {
+        element.onmessage = res => {
+          console.log(res);
           this.vue.$store.commit("incrementTelemetryCount");
           this.vue.$store.dispatch("telemetryUpdate");
         };

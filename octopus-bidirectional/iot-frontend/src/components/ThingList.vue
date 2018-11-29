@@ -1,27 +1,29 @@
 /* eslint-disable */
 
 <template>
-
-    <div class="list-group shadow">
-        <a v-bind:key="item.thingId" v-for="item in items" @click="select(item, $event)" href="#/" :class="item.thingId === isActiveId ? cssIsActive : cssIsNotActive">
-            <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{ item.thingId }}</h5>
-            <small>{{ item.policyId }}</small>
-            </div>
-            <p class="mb-1" >{{ item.attributes.type || 'no type' }}</p>
-        </a>
-        <div class="list-group-item disabled-list-item">
-            <div>
-                <span class="lead">
-                  <font-awesome-icon icon="plus" />
-                    <i>
-                      Create new thing
-                    </i>
-                </span>
-            </div>
-        </div>
+  <div class="list-group shadow">
+    <a
+      v-bind:key="item.thingId"
+      v-for="item in items"
+      @click="select(item, $event)"
+      href="#/"
+      :class="item.thingId === isActiveId ? cssIsActive : cssIsNotActive"
+    >
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ item.thingId }}</h5>
+        <!-- <small>{{ item.policyId }}</small> -->
+      </div>
+      <!-- <p class="mb-1">{{ item.attributes.type || 'no type' }}</p> -->
+    </a>
+    <div class="list-group-item disabled-list-item">
+      <div>
+        <span class="lead">
+          <font-awesome-icon style="margin-right: 5px;" icon="plus"/>
+          <i>Create new thing</i>
+        </span>
+      </div>
     </div>
-
+  </div>
 </template>
 
 <script>

@@ -70,17 +70,17 @@ export default (window.Api = new class {
     );
   };
 
-  sendMessage = message => {
+  sendMessage = (message, topic) => {
     console.log(
-      `${this.routes.things}/${this.vue.selected.thingId}/inbox/messages/${
-        message.topic
-      }`
+      `${this.routes.things}/${
+        this.vue.selected.thingId
+      }/inbox/messages/${topic}`
     );
     return axios.post(
-      `${this.routes.things}/${this.vue.selected.thingId}/inbox/messages/${
-        message.topic
-      }`,
-      `"${message.payload}"`,
+      `${this.routes.things}/${
+        this.vue.selected.thingId
+      }/inbox/messages/${topic}`,
+      `"${message}"`,
       this.getConfig()
     );
   };

@@ -17,11 +17,11 @@
         </div>
       </div>
       <div class="row" style="margin-top: 25px">
-        <div class="col-lg-7">
-          <ModifyThing></ModifyThing>
-        </div>
-        <div class="col-lg-5">
+        <div class="col-lg-4">
           <ThingList></ThingList>
+        </div>
+        <div class="col-lg-8">
+          <ModifyThing></ModifyThing>
         </div>
       </div>
     </div>

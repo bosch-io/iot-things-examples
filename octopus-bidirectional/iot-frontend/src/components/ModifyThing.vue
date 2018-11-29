@@ -145,7 +145,7 @@ export default {
       this.$store
         .dispatch("sendMessage", this.message)
         .then(res => {
-          this.showAlert(true, "sendMessage", "Device got Message.");
+          this.showAlert(true, "sendMessage", "Device got message.");
           this.dispatch("getAllThings");
         })
         .catch(err => {

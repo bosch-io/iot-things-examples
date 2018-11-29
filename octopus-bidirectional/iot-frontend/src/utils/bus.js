@@ -47,7 +47,6 @@ export default (window.Event = new class {
           );
       });
       this.source.onmessage = (sse) => {
-        console.log(`SSE data: ${JSON.stringify(sse.data)}`);
         if (sse.data && sse.data.length > 0) {
           this.vue.$store.commit("incrementTelemetryCount");
           this.vue.$store.dispatch("telemetryUpdate", sse.data);

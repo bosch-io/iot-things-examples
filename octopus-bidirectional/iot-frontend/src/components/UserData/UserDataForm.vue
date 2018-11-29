@@ -1,21 +1,37 @@
 <template>
-  <form>
+  <div>
     <div class="form-group">
-      <div class="m-top-10px" v-for="key in Object.keys(connection)" :key="key">
+      <div
+        class="m-top-10px"
+        v-for="key in Object.keys(connection)"
+        :key="key"
+        v-show="key !== 'http_endpoint' && key !== 'solution_id'"
+      >
         <label :for="key">
           <small class="grey">
-            <i>
-            {{ key }}:
-            </i>
+            <i>{{ key }}:</i>
           </small>
         </label>
-        <input :type="key === 'password' ? 'password' : 'text'" class="form-control" :id="key" :value="connection[key]"
-        @input="setUserData($event)">
+        <input
+          :type="key === 'password' ? 'password' : 'text'"
+          class="form-control"
+          :id="key"
+          :value="connection[key]"
+          @input="setUserData($event)"
+        >
       </div>
-      <button v-show="!connectionStatus" class="btn btn-primary m-top-16px" @click="connect()">Connect</button>
-      <button v-show="connectionStatus" class="btn btn-sencondary m-top-16px" @click="disconnect()">Disconnect</button>
+      <button
+        v-show="!connectionStatus"
+        class="btn btn-primary m-top-16px"
+        @click="connect()"
+      >Connect</button>
+      <button
+        v-show="connectionStatus"
+        class="btn btn-sencondary m-top-16px"
+        @click="disconnect()"
+      >Disconnect</button>
     </div>
-  </form>
+  </div>
 </template>
 
 <script>

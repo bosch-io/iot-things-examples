@@ -1,55 +1,60 @@
 <template>
   <div class="card shadow m-bottom-24px">
-    <div class="card-body lead" 
-        v-show="isSelected.thingId === undefined && isSelected !== 'newItem'"
-        >No thing selected
-    </div>
+    <div
+      class="card-body lead"
+      v-show="isSelected.thingId === undefined && isSelected !== 'newItem'"
+    >No thing selected</div>
     <div v-show="isSelected.thingId !== undefined || isSelected === 'newItem'">
-      <div class="card-header lead" 
-           v-show="isSelected.thingId !== undefined && isSelected.thingId !== 'newThing'"
-           >{{ isSelected.thingId }}
+      <div
+        class="card-header lead"
+        v-show="isSelected.thingId !== undefined && isSelected.thingId !== 'newThing'"
+      >{{ isSelected.thingId }}</div>
+      <div class="card-header lead" v-show="isSelected.thingId === 'newThing'">
+        <input class="form-control" v-model="isSelected.thingId">
       </div>
-      <div class="card-header lead" 
-           v-show="isSelected.thingId === 'newThing'">
-           <input class="form-control" 
-                  v-model="isSelected.thingId">
-      </div>
-      <codemirror :options="cmOptions" 
-                  :value="JSON.stringify(isSelected, null, '\t')" @input="updateThing($event)" 
-                  class="border-bottom">
-      </codemirror>
+      <codemirror
+        id="thing"
+        :options="cmOptions"
+        :value="JSON.stringify(isSelected, null, '\t')"
+        @input="updateThing($event)"
+        class="border-bottom"
+      ></codemirror>
       <div class="card-body">
         <div class="container">
           <div class="row">
-            <alert-view :alert="this.alert" 
-                        alert-id="saveChanges">
-            </alert-view>
+            <alert-view :alert="this.alert" alert-id="saveChanges"></alert-view>
           </div>
           <div class="row">
-            <button @click="saveChanges" 
-                    v-show="isSelected.thingId !== undefined" 
-                    type="button" 
-                    class="btn btn-outline-success col-md-4">
-              <font-awesome-icon icon="save"></font-awesome-icon>
-              Save changes
+            <button
+              @click="saveChanges"
+              v-show="isSelected.thingId !== undefined"
+              type="button"
+              class="btn btn-outline-success col-md-4"
+            >
+              <font-awesome-icon style="margin-right: 5px;" icon="save"></font-awesome-icon>Save changes
             </button>
           </div>
         </div>
       </div>
-      <codemirror :options="cmOptions"
-                  :value="JSON.stringify(message, null, '\t')" 
-                  class="border-bottom border-top"
-                  >
-      </codemirror>
+      <codemirror
+        id="sendMessage"
+        :options="cmOptions"
+        :value="JSON.stringify(message, null, '\t')"
+        class="border-bottom border-top"
+      ></codemirror>
       <div class="card-body">
         <div class="container">
           <div class="row">
-            <button id="sendButton" 
-                    @click="sendMessage" 
-                    type="button" 
-                    class="btn btn-outline-primary col-md-4">
-              <font-awesome-icon icon="upload" />
-              Send message
+            <alert-view :alert="this.alert" alert-id="sendMessage"></alert-view>
+          </div>
+          <div class="row">
+            <button
+              id="sendButton"
+              @click="sendMessage"
+              type="button"
+              class="btn btn-outline-primary col-md-4"
+            >
+              <font-awesome-icon style="margin-right: 5px;" icon="upload"/>Send message
             </button>
           </div>
         </div>
@@ -140,10 +145,11 @@ export default {
       this.$store
         .dispatch("sendMessage", this.message)
         .then(res => {
-          console.log("response: ", res);
+          this.showAlert(true, "sendMessage", "Device got Message.");
+          this.dispatch("getAllThings");
         })
         .catch(err => {
-          console.log("err response: ", err);
+          this.showAlert(false, "sendMessage", "Something went wrong.");
         });
     },
     showAlert(isOkay, alertId, alertMessage) {
@@ -167,10 +173,6 @@ export default {
 </script>
 
 <style>
-.CodeMirror {
-  height: auto;
-}
-
 .m-bottom-24px {
   margin-bottom: 24px;
 }

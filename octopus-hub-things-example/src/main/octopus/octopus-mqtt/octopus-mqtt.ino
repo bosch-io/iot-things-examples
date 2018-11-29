@@ -1,3 +1,4 @@
+&wa
 /*
  * Bosch SI Example Code License Version 1.0, January 2016
  *

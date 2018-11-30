@@ -2,6 +2,7 @@
 
 import Vue from "vue";
 import Vuex from "vuex";
+import deepmerge from "deepmerge";
 
 Vue.use(Vuex);
 
@@ -27,7 +28,7 @@ const store = new Vuex.Store({
       return state.selected;
     },
     getItems: state => {
-      return Object.values(state.items);
+      return state.items;
     },
     getConnectionStatus: state => {
       return state.connectionStatus;
@@ -45,7 +46,8 @@ const store = new Vuex.Store({
       state.items = items;
     },
     setItem(state, item) {
-      state.items[item.thingId] = item;
+      let thing = JSON.parse(item);
+      state.items[thing.thingId] = deepmerge(state.items[thing.thingId], thing);
     },
     setConnectionData(state, value) {
       state.connection = Object.assign({}, state.connection, value);
@@ -113,7 +115,7 @@ const store = new Vuex.Store({
     disconnect({ commit }) {
       this.commit("setDisconnected");
     },
-    telemetryUpdate(thing) {
+    telemetryUpdate({ commit }, thing) {
       this.commit("setItem", thing);
     }
   }

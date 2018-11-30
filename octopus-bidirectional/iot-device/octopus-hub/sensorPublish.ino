@@ -30,10 +30,14 @@ float tempMin = 1E+20;
 float tempMax = 1E-20;
 float barometerMin = 1E+20;
 float barometerMax = 1E-20;
+float gasMin = 1E+20;
+float gasMax = 1E-20;
 float powerMin = 1E+20;
 float powerMax = 1E-20;
 float tempBnoMin = 1E+20;
 float tempBnoMax = 1E-20;
+float altitudeMin = 1E+20;
+float altitudeMax = 1E-20;
 
 String modifyFeaturePropertiesMsg(String featureName, const String& properties) {
   StaticJsonBuffer<600> jsonBuffer;
@@ -94,6 +98,10 @@ void publishSensorData(float power, const Bme680Values& bme680Values, const Bno0
   hub.publish(
     modifyFeaturePropertiesMsg("pressure", sensorMinMaxValue(bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa")));
   hub.publish(
+    modifyFeaturePropertiesMsg("gas_resistance", sensorMinMaxValue(bme680Values.gas_resistance / 1000.0, gasMin, gasMax, "KOhms")));
+  hub.publish(
+    modifyFeaturePropertiesMsg("altitude", sensorMinMaxValue(bme680Values.altitude, altitudeMin, altitudeMax, "m")));
+  hub.publish(
     modifyFeaturePropertiesMsg("ambient_temperature", sensorMinMaxValue(bno055Values.temperature, tempBnoMin, tempBnoMax, "°C")));
 
   hub.publish(
@@ -148,5 +156,21 @@ void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Val
   }
   if (tempBnoMax < tempBno) {
     tempBnoMax = tempBno;
+  }
+
+  float altitude = bme680Values.altitude;
+  if (altitudeMin > altitude) {
+    altitudeMin = altitude;
+  }
+  if (humidityMax < altitude) {
+    altitudeMax = altitude;
+  }
+
+  float gas = bme680Values.gas_resistance / 1000.0;
+  if (gasMin > gas) {
+    gasMin = gas;
+  }
+  if (gasMax < gas) {
+    gasMax = gas;
   }
 }

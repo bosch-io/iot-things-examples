@@ -15,14 +15,14 @@
       </div>
       <!-- <p class="mb-1">{{ item.attributes.type || 'no type' }}</p> -->
     </a>
-    <div class="list-group-item disabled-list-item">
-      <div>
-        <span class="lead">
-          <font-awesome-icon style="margin-right: 5px;" icon="plus"/>
-          <i>Create new thing</i>
-        </span>
-      </div>
-    </div>
+    <!--<div class="list-group-item disabled-list-item">-->
+      <!--<div>-->
+        <!--<a @click="select('newThing', $event)" class="lead">-->
+          <!--<font-awesome-icon style="margin-right: 5px;" icon="plus"/>-->
+          <!--<i>Create new thing</i>-->
+        <!--</a>-->
+      <!--</div>-->
+    <!--</div>-->
   </div>
 </template>
 
@@ -46,15 +46,95 @@ export default {
           this.isActiveId = thing.thingId;
         }
       });
-    }
+    },
     // Unused for now:
-    // createNewThingTemplate() {
-    //   let namespace = this.userdata.filter(object => {
-    //     return object.key == "namespace";
-    //   })[0].value;
-    //   let template = `{"thingId": "${namespace}:<newThing>", "policyId": "${namespace}:<policy>", "attributes": {"type": null}, "features": {"featureA": {"properties": {"propertyA": "Hello World"}}}}`;
-    //   return JSON.parse(template);
-    // }
+    createNewThingTemplate() {
+      let namespace = this.userdata.filter(object => {
+        return object.key == "namespace";
+      })[0].value;
+      let template = `{"thingId": "${namespace}:<newThing>", "policyId": "${namespace}:<policy>", "features": {
+		"acceleration": {
+			"definition": [
+				"com.ipso.smartobjects:Accelerometer:1.1.0"
+			],
+			"properties": {}
+		},
+		"ambient_temperature": {
+			"definition": [
+				"com.ipso.smartobjects:Temperature:1.1.0"
+			],
+			"properties": {}
+		},
+		"orientation": {
+			"definition": [
+				"com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"
+			],
+			"properties": {}
+		},
+		"linear_acceleration": {
+			"definition": [
+				"com.ipso.smartobjects:Accelerometer:1.1.0"
+			],
+			"properties": {}
+		},
+		"gravity": {
+			"definition": [
+				"com.ipso.smartobjects:Accelerometer:1.1.0"
+			],
+			"properties": {}
+		},
+		"magnetometer": {
+			"definition": [
+				"com.ipso.smartobjects:Magnetometer:1.1.0"
+			],
+			"properties": {}
+		},
+		"temperature": {
+			"definition": [
+				"com.ipso.smartobjects:Temperature:1.1.0"
+			],
+			"properties": {}
+		},
+		"humidity": {
+			"definition": [
+				"com.ipso.smartobjects:Humidity:1.1.0"
+			],
+			"properties": {}
+		},
+		"gas_resistance": {
+			"definition": [
+				"com.ipso.smartobjects:Generic_Sensor:1.1.0"
+			],
+			"properties": {}
+		},
+		"pressure": {
+			"definition": [
+				"com.ipso.smartobjects:Barometer:1.1.0"
+			],
+			"properties": {}
+		},
+		,
+		"altitude": {
+			"definition": [
+				"com.ipso.smartobjects:Altitude:1.1.0"
+			],
+			"properties": {}
+		}
+		"angular_velocity": {
+			"definition": [
+				"com.ipso.smartobjects:Gyrometer:1.1.0"
+			],
+			"properties": {}
+		},
+		"voltage": {
+			"definition": [
+				"com.ipso.smartobjects:Voltage:1.1.0"
+			],
+			"properties": {}
+		}
+	}}`;
+      return JSON.parse(template);
+    }
   },
   computed: {
     items: {
@@ -72,8 +152,4 @@ export default {
 </script>
 
 <style>
-.disabled-list-item {
-  cursor: not-allowed;
-  color: grey;
-}
 </style>

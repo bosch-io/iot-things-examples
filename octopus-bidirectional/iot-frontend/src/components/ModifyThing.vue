@@ -9,14 +9,14 @@
       <div
         class="card-header lead"
         v-show="isSelected.thingId !== undefined && isSelected.thingId !== 'newThing'"
-      >{{ items.filter(t => t.thingId === isSelected.thingId)[0].thingId }}</div>
+      >{{ items[isSelected.thingId].thingId }}</div>
       <div class="card-header lead" v-show="isSelected.thingId === 'newThing'">
         <input class="form-control" v-model="isSelected.thingId">
       </div>
       <codemirror
         id="thing"
         :options="cmOptions"
-        :value="JSON.stringify(items.filter(t => t.thingId === isSelected.thingId)[0], null, '\t')"
+        :value="JSON.stringify(items[isSelected.thingId], null, '\t')"
         class="border-bottom"
       ></codemirror>
       <!-- @input="updateThing($event)" -->
@@ -107,9 +107,9 @@ export default {
         errorMessage: ""
       },
       message: {
-        r: 50,
-        g: 50,
-        b: 50,
+        r: 0,
+        g: 0,
+        b: 0,
         w: 0
       },
       topic: "switch_led"
@@ -165,8 +165,7 @@ export default {
       this.$store
         .dispatch("sendMessage", { message: this.message, topic: this.topic })
         .then(res => {
-          this.showAlert(true, "sendMessage", "Device got message.");
-          this.dispatch("getAllThings");
+          this.showAlert(true, "sendMessage", `Response: ${JSON.stringify(res.data)}`);
         })
         .catch(err => {
           this.showAlert(false, "sendMessage", err.message);
@@ -187,7 +186,7 @@ export default {
         this.alert.isError = false;
         this.alert.successMessage = "";
         this.alert.errorMessage = "";
-      }, 3000);
+      }, 5000);
     }
   }
 };

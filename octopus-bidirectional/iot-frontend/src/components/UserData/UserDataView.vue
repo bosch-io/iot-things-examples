@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="jumbotron" style="height: 100%">
-                        <p class="lead">Connection informations ..</p>
+                        <p class="lead">Connection info</p>
                         <hr class="my-4">
                         <p>Connected to Server -
                             <span v-show="connectionStatus === true" class="badge badge-success">Established</span>
@@ -19,8 +19,8 @@
                         <p>Server sent events -
                             <span class="badge badge-info">{{ telemetryCount }}</span>
                         </p>
-                        <button @click="initSSE" type="button" class="btn btn-secondary" v-show="connectionStatus && !gettingTelemetry">Init SSE</button>
-                        <button @click="stopSSE" type="button" class="btn btn-outline-secondary" v-show="gettingTelemetry">Stop SSE</button>
+                        <button @click="initSSE" type="button" class="btn btn-secondary" v-show="connectionStatus && !gettingTelemetry">Receive push updates</button>
+                        <button @click="stopSSE" type="button" class="btn btn-outline-secondary" v-show="gettingTelemetry">Stop push updates</button>
                     </div>
                 </div>
             </div>

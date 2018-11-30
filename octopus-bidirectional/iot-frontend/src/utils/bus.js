@@ -33,19 +33,17 @@ export default (window.Event = new class {
   fire(event, data = null) {
     if (event === "initSSE") {
       // start listening with a little timeout
-      let thingIds = this.vue.items.map(element => element.thingId).join(",");
-      this.vue.items.forEach(element => {
-        this.source = new EventSourcePolyfill(
-            `${this.vue.connection.http_endpoint}/api/2/things?ids=${thingIds}`,
-            {
-              headers: {
-                Authorization: Api.getConfig().headers.Authorization,
-                "x-cr-api-token": this.vue.connection.api_token
-              },
-              withCredentials: true
-            }
-          );
-      });
+      let values = Object.values(this.vue.items);
+      let thingIds = values.map(element => element.thingId).join(",");
+      this.source = new EventSourcePolyfill(
+          `${this.vue.connection.http_endpoint}/api/2/things?ids=${thingIds}&x-cr-api-token=${this.vue.connection.api_token}`,
+          {
+            headers: {
+              Authorization: Api.getConfig().headers.Authorization
+            },
+            withCredentials: true
+          }
+        );
       this.source.onmessage = (sse) => {
         if (sse.data && sse.data.length > 0) {
           this.vue.$store.commit("incrementTelemetryCount");

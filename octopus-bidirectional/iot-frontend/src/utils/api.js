@@ -49,6 +49,7 @@ export default (window.Api = new class {
   getConfig = () => {
     return {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: this.createAuthHeader(
           this.vue.connection.username,
           this.vue.connection.password
@@ -75,7 +76,7 @@ export default (window.Api = new class {
       `${this.routes.things}/${
         this.vue.selected.thingId
       }/inbox/messages/${topic}`,
-      `"${message}"`,
+      `${JSON.stringify(message)}`,
       this.getConfig()
     );
   };

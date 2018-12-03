@@ -38,6 +38,17 @@ This example shows a simple Node.js based end-to-end scenario for Digital Twins 
 
 This example shows a simple Node.js based implementation and usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto that is based on distinguishing between the current reported state of device information and a desired, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably.
 
+### Example [octopus-bidirectional](octopus-bidirectional/)
+
+This example shows how to connect an ESP8266 based IoT board via Bosch IoT Hub to Bosch IoT Things in order to 
+* update a digital twin via "telemetry" data sent from the device
+* send command&control messages via Bosch IoT Things' HTTP API via Bosch IoT Hub to the device
+
+### Example [octopus-telemetry](octopus-telemetry/)
+
+This example shows how to connect an ESP8266 based IoT board via Bosch IoT Hub to Bosch IoT Things in order to update 
+a digital twin via "telemetry" data sent from the device.
+
 ### Example "postman-collection"
 
 This is a list of prepared HTTP requests to demonstrate the typical usage of our REST-like HTTP APIs.
@@ -102,7 +113,7 @@ After adding the public repository as described above, you can simply use the Th
 <dependency>
    <groupId>com.bosch.iot.things.client</groupId>
    <artifactId>things-client</artifactId>
-   <version>3.2.0</version>
+   <version>3.2.1</version>
 </dependency>
 ```
 
@@ -112,7 +123,7 @@ We also provide an OSGi-bundle:
 <dependency>
    <groupId>com.bosch.iot.things.client</groupId>
       <artifactId>things-client-osgi</artifactId>
-   <version>3.2.0</version>
+   <version>3.2.1</version>
 </dependency>
 ```
 ## License

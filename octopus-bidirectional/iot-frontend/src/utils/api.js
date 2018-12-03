@@ -26,7 +26,7 @@ export default (window.Api = new class {
 
     this.routes = {
       policies: this.apiVersion + "/policies",
-      searchThings: this.apiVersion + "/search/things",
+      searchThings: this.apiVersion + "/search/things?&fields=thingId,policyId,attributes,features,_revision",
       things: this.apiVersion + "/things",
       messages: this.apiVersion + "/things/" + this.vue.selected.thingId
     };

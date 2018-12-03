@@ -13,7 +13,7 @@
         <h5 class="mb-1">{{ item.thingId }}</h5>
         <!-- <small>{{ item.policyId }}</small> -->
       </div>
-      <!-- <p class="mb-1">{{ item.attributes.type || 'no type' }}</p> -->
+       <p class="mb-1 pl-3">rev: {{ item['_revision'] || '' }}</p>
     </a>
     <!--<div class="list-group-item disabled-list-item">-->
       <!--<div>-->

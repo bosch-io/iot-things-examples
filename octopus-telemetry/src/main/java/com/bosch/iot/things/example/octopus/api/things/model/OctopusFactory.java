@@ -45,7 +45,7 @@ public class OctopusFactory {
 
         List<Feature> features = new ArrayList<>();
 
-        features.add(buildFeature("Power_0"));
+        features.add(buildFeature("voltage", "com.ipso.smartobjects:Voltage:1.1.0"));
         features.addAll(buildBme680Features());
         features.addAll(buildBNO055Features());
 
@@ -58,25 +58,28 @@ public class OctopusFactory {
 
     private static List<Feature> buildBme680Features() {
         return Arrays.asList(
-                buildFeature("HumiditySensor_BME680"),
-                buildFeature("TemperatureSensor_BME680"),
-                buildFeature("Barometer_BME680"));
+                buildFeature("humidity", "com.ipso.smartobjects:Humidity:1.1.0"),
+                buildFeature("temperature", "com.ipso.smartobjects:Temperature:1.1.0"),
+                buildFeature("pressure", "com.ipso.smartobjects:Barometer:1.1.0"),
+                buildFeature("gas_resistance", "com.ipso.smartobjects:Generic_Sensor:1.1.0"));
     }
 
 
     private static List<Feature> buildBNO055Features() {
         return Arrays.asList(
-                buildFeature("TemperatureSensor_BNO055"),
-                buildFeature("Accelerometer_BNO055"),
-                buildFeature("AbsoluteOrientation_BNO055"),
-                buildFeature("Gravity_BNO055"),
-                buildFeature("AngularVelocity_BNO055"),
-                buildFeature("LinearAcceleration_BNO055"),
-                buildFeature("Magnetometer_BNO055"));
+                buildFeature("ambient_temperature", "com.ipso.smartobjects:Temperature:1.1.0"),
+                buildFeature("altitude", "com.ipso.smartobjects:Altitude:1.1.0"),
+                buildFeature("acceleration", "com.ipso.smartobjects:Accelerometer:1.1.0"),
+                buildFeature("orientation", "com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"),
+                buildFeature("gravity", "com.ipso.smartobjects:Accelerometer:1.1.0"),
+                buildFeature("angular_velocity", "com.ipso.smartobjects:Gyrometer:1.1.0"),
+                buildFeature("linear_acceleration", "com.ipso.smartobjects:Accelerometer:1.1.0"),
+                buildFeature("magnetometer", "com.ipso.smartobjects:Magnetometer:1.1.0"));
     }
 
-    private static Feature buildFeature(String id) {
+    private static Feature buildFeature(String id, String definition) {
         return Feature.newBuilder()
+                .definition(FeatureDefinition.fromIdentifier(definition))
                 .withId(id)
                 .build();
     }

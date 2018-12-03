@@ -38,8 +38,8 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>octopus-example-preparation</artifactId>
-    <name>Bosch IoT Things :: Octopus Example</name>
+    <artifactId>octopus-example-telemetry</artifactId>
+    <name>Bosch IoT Things :: Octopus Telemetry Example</name>
     <description>Registers a device at Bosch IoT Hub and Bosch IoT Things</description>
 
     <dependencies>

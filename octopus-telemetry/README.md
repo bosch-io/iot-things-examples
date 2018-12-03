@@ -1,4 +1,4 @@
-# Using the Octopus board with the Bosch IoT Suite
+# Bosch IoT Things - Octopus telemetry use case via Bosch IoT Hub
 
 This example shows how to use the Octopus board (Bosch IoT Suite edition) with the Bosch IoT Suite.
 In the image below, we illustrated the components of this example and how they will interact with each other.

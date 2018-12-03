@@ -36,7 +36,7 @@ export default (window.Event = new class {
       let values = Object.values(this.vue.items);
       let thingIds = values.map(element => element.thingId).join(",");
       this.source = new EventSourcePolyfill(
-          `${this.vue.connection.http_endpoint}/api/2/things?ids=${thingIds}&x-cr-api-token=${this.vue.connection.api_token}`,
+          `${this.vue.connection.http_endpoint}/api/2/things?ids=${thingIds}&x-cr-api-token=${this.vue.connection.api_token}&fields=thingId,policyId,attributes,features,_revision`,
           {
             headers: {
               Authorization: Api.getConfig().headers.Authorization

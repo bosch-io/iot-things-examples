@@ -9,7 +9,7 @@ Furthermore will be shown how to prototype a real world device based on the Octo
 The device will be able to connect automatically to a given wireless internet access, to send telemtry data to the things service and react to messages which will be sent by the webapplication.
 The webapplication will use Bosch IoT Things HTTP endpoints to communicate with the service itself and the device. We will use the telemetry, event as well as the command & control feature.
 
-![](./img/app-thing-octopus.jpg)
+![](/img/app-things-octopus.jpg)
 
 ## Setting up Bosch IoT Things and Hub
 

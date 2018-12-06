@@ -116,7 +116,7 @@ instance in the [Bosch IoT Suite portal](https://accounts.bosch-iot-suite.com/su
 
 Bosch IoT Permissions is a service that allows you to create and manage users inside the Bosch IoT Suite.
 To make it easier for you to start with the Bosch IoT Suite we provide an instance of Bosch IoT Permissions.
-Follow [this description](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser)
+Follow the description to [Register Evaluation User](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser)
 if you don't have an instance of Bosch IoT Permissions, yet.
 If you're already familiar with Bosch IoT Permissions you can use your own instance and create the user at your own
 instance.
@@ -125,7 +125,7 @@ example.
 
 ## Activate protocol binding
 To allow Bosch IoT Things to retrieve messages you send via Bosch IoT Hub, you need to 
-[create an AMQP-Connection in Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/solution/connections).
+[create an AMQP-Connection in Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/solution/connections). Find docu at [Manage your connections](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection)
 Use the credentials of your Bosch IoT Things instance to authenticate.
 In the next menu select "Create your first connection".
 * Set the Connection category to "Bosch IoT Hub" (1)
@@ -223,7 +223,7 @@ extern const unsigned int mqtt_server_ca_len;
 ## Retrieve stored sensor data from Bosch IoT Things
 
 The data of the registered thing can be retrieved via the 
-[HTTP API of Bosch IoT Things](https://things.s-apps.de1.bosch-iot-cloud.com/documentation/rest/#!/Things/get_things_thingId).
+[HTTP API of Bosch IoT Things](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Things/get_things).
 
 For the ease of this example we provide a view of the data at
 `src/main/html/index.html`. The page refreshes every few seconds and displays the data retrieved from Bosch IoT Things.
@@ -258,6 +258,5 @@ In case the Hub is not allowed to publish to Things:
 
   * Check the policy `your.namespace:octopus` via the HTTP API 
   * By default only the subject `integration:my-Solution-ID:octopus` is empowered. So in case the Hub connection you have created empowers another subject, this subject must be added in the policy.
-  * Solution 1: Add your authorization subject `integration:my-Solution-ID:my-octo`  as shown in the tutorial at https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=007-tutorial:09_policy:09_policy
-  * Solution 2: In case you need to repeat the tutorial several times, the easy way is to add `integration:my-Solution-ID:octopus`  as an authorized subject via the Things user interface.
-    https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection
+  * Solution 1: Add your authorization subject `integration:my-Solution-ID:my-octo`  as shown in the [tutorial](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_tutorial:policy_connection:policy_connection)
+  * Solution 2: In case you need to repeat the tutorial several times, the easy way is to add `integration:my-Solution-ID:octopus`  as an authorized subject via the [Things user interface](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection)

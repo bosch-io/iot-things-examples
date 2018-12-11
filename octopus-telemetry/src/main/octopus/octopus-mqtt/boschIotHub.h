@@ -31,8 +31,6 @@
 #include <PubSubClient.h>
 #include "octopus.h"
 
-#define MQTT_MAX_PACKET_SIZE 2560
-
 class BoschIotHub {
   private:
     WiFiClientSecure wiFiClient;

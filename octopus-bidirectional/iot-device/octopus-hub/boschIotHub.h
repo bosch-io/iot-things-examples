@@ -32,7 +32,6 @@
 #include <ArduinoJson.h>
 #include "octopus.h"
 
-#define MQTT_MAX_PACKET_SIZE 2048
 #define HUB_COMMAND_CALLBACK_SIGNATURE void (*callback)(JsonObject&,String,String)
 
 class BoschIotHub {

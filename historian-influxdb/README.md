@@ -19,7 +19,7 @@ This context-based query execution can be used in addition or as replacement to 
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-[Book the Bosch IoT Things cloud service](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking)
+[Book the Bosch IoT Things cloud service](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start)
 
 ## Use or setup an InfluxDB instance
 

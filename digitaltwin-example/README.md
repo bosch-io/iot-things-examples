@@ -167,19 +167,19 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 ## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 
 Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT cloud service](https://www.bosch-iot-suite.com/hub/) for details.
 
 After you have both instances (Things and Hub) in place, you can setup the integration between the two.
-See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:manage-y-connection) for details.
+See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
 
 ## Prepare users (subjects) for each microservice
 
 As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/permissions/).
-For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register Evaluation User](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=006_demo:01_createuser).
+For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register Evaluation User](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your settings
 

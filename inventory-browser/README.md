@@ -6,7 +6,7 @@ This example shows how to create a simple user interface to list things and thei
 
 # Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=002_getting_started:booking:booking).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 # Configure your API Token and other settings
 
@@ -49,7 +49,7 @@ Browse to the example web app: <http://localhost:8080/inventory-browser/>
 
 ## Create Empty Thing
 
-In REST Documentation (Swagger): <https://cr.apps.bosch-iot-cloud.com/documentation/rest/>
+In REST Documentation (Swagger): <https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v1>
 use "Things - POST /things"
 
 thing:

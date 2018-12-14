@@ -14,7 +14,7 @@ things service and react to messages which will be sent by the web application.
 The web application will use Bosch IoT Things HTTP endpoints to communicate with the service itself and the device. 
 We will use the telemetry, event as well as the command & control pattern of the Bosch IoT Hub.
 
-![](img/app-things-octopus.jpg)
+![](img/octo.png)
 
 ## Setting up Bosch IoT Things and Hub
 

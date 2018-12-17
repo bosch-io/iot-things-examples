@@ -3,9 +3,10 @@
     <nav class="navbar fixed-top navbar-light bg-primary shadow">
       <a class="navbar-brand" href="#">
         <div class="flex-container">
-          <img src="../public/visual.png" width="35" height="35" alt>
+          <img src="../public/visual.png" width="45" height="45" alt>
           <span class="text-white">
-            <i>Bosch IoT Things - Command & Control Example</i>
+            <span class="bold">Bosch IoT</span> Things -
+            <i>Octopus bidirectional communication example</i>
           </span>
         </div>
       </a>
@@ -62,5 +63,9 @@ span {
 
 .text-white {
   color: white;
+}
+
+.bold {
+  font-weight: 900;
 }
 </style>

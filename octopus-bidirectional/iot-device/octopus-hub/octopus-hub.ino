@@ -28,7 +28,6 @@
 #include "octopus.h"
 #include "boschIotHub.h"
 
-
 ADC_MODE(ADC_VCC); // enable reading in VCC of ESP8266
 
 Octopus octopus;
@@ -37,19 +36,22 @@ BoschIotHub hub(MQTT_BROKER, MQTT_PORT, mqtt_server_ca, mqtt_server_ca_len);
 unsigned long lastSensorUpdateMillis = 0;
 unsigned int sensorUpdateRate = SENSOR_UPDATE_RATE_MS;
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  while (!Serial);
+  while (!Serial)
+    ;
 
   Serial.println("                             "); // print some spaces to let the Serial Monitor catch up
   Serial.println();
-  
+
   Printer::printlnMsg("Reset reason", ESP.getResetReason());
-  
+
   octopus.begin();
   octopus.connectToWifi(WIFI_SSID, WIFI_PASSWORD);
 
-  if(!hub.connect()) {
+  if (!hub.connect())
+  {
     Printer::printlnMsg("Error", "Could not connect to Hub. Restarting octopus");
     ESP.restart();
   }
@@ -57,12 +59,15 @@ void setup() {
   Serial.println();
 }
 
-void customMessageHandler(JsonObject& root, String command, String replyTopic) {
-  const char* dittoTopic = root["topic"];
-  JsonObject& headers = root["headers"];
+void customMessageHandler(JsonObject &root, String command, String replyTopic)
+{
 
-  if (command.equals("switch_led")) {
-    JsonObject& value = root["value"];
+  const char *dittoTopic = root["topic"];
+  JsonObject &headers = root["headers"];
+
+  if (command.equals("switch_led"))
+  {
+    JsonObject &value = root["value"];
     const char red = value["r"];
     const char green = value["g"];
     const char blue = value["b"];
@@ -72,12 +77,16 @@ void customMessageHandler(JsonObject& root, String command, String replyTopic) {
 
     root["value"] = "\"Command '" + command + "' executed\"";
     root["status"] = 200;
-  } else if (command.equals("change_update_rate")) {
+  }
+  else if (command.equals("change_update_rate"))
+  {
     sensorUpdateRate = root["value"];
-    
+
     root["value"] = "\"Command '" + command + "' executed\"";
     root["status"] = 200;
-  } else {
+  }
+  else
+  {
     root["value"] = "\"Command unknown: '" + command + "'\"";
     root["status"] = 404;
   }
@@ -88,8 +97,10 @@ void customMessageHandler(JsonObject& root, String command, String replyTopic) {
   hub.publish(replyTopicAndStatusCode.c_str(), output);
 }
 
-void loop() {
-  if(!hub.deviceIsConnected()) {
+void loop()
+{
+  if (!hub.deviceIsConnected())
+  {
     octopus.showColor(1, 0x80, 0, 0, 0); // red
     hub.connectDevice(HUB_DEVICE_ID, HUB_DEVICE_AUTH_ID "@" HUB_TENANT, HUB_DEVICE_PASSWORD);
     octopus.showColor(1, 0, 0x80, 0, 0); // green
@@ -97,18 +108,19 @@ void loop() {
     hub.registerOnDittoProtocolMessage(customMessageHandler);
   }
 
-  if (millis() - lastSensorUpdateMillis > sensorUpdateRate) {
+  if (millis() - lastSensorUpdateMillis > sensorUpdateRate)
+  {
     lastSensorUpdateMillis = millis();
     static Bme680Values bme680Values;
     static Bno055Values bno055Values;
     memset(&bme680Values, 0, sizeof(bme680Values));
     memset(&bno055Values, 0, sizeof(bno055Values));
     octopus.readBno055(bno055Values);
-    #ifdef BME280
+#ifdef BME280
     octopus.readBme280(bme680Values);
-    #else
+#else
     octopus.readBme680(bme680Values);
-    #endif
+#endif
     float vcc = octopus.getVcc();
 
     //printSensorData(vcc, bme680Values, bno055Values);

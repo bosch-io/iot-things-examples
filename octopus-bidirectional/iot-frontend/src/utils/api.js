@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import Vue from "vue";
 import store from "../store";
 import axios from "axios";
@@ -26,7 +28,9 @@ export default (window.Api = new class {
 
     this.routes = {
       policies: this.apiVersion + "/policies",
-      searchThings: this.apiVersion + "/search/things?&fields=thingId,policyId,attributes,features,_revision",
+      searchThings:
+        this.apiVersion +
+        "/search/things?&fields=thingId,policyId,attributes,features,_revision,_lastModified",
       things: this.apiVersion + "/things",
       messages: this.apiVersion + "/things/" + this.vue.selected.thingId
     };
@@ -49,7 +53,7 @@ export default (window.Api = new class {
   getConfig = () => {
     return {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: this.createAuthHeader(
           this.vue.connection.username,
           this.vue.connection.password

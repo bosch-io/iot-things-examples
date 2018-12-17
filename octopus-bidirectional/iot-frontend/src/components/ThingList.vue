@@ -11,18 +11,10 @@
     >
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1">{{ item.thingId }}</h5>
-        <!-- <small>{{ item.policyId }}</small> -->
       </div>
-       <p class="mb-1 pl-3">rev: {{ item['_revision'] || '' }}</p>
+      <p class="mb-1 pl-3">rev: {{ item['_revision'] || '' }}</p>
+      <p class="mb-1 pl-3">last modified: {{ item['_lastModified'] || '' }}</p>
     </a>
-    <!--<div class="list-group-item disabled-list-item">-->
-      <!--<div>-->
-        <!--<a @click="select('newThing', $event)" class="lead">-->
-          <!--<font-awesome-icon style="margin-right: 5px;" icon="plus"/>-->
-          <!--<i>Create new thing</i>-->
-        <!--</a>-->
-      <!--</div>-->
-    <!--</div>-->
   </div>
 </template>
 
@@ -35,7 +27,8 @@ export default {
         "list-group-item list-group-item-action flex-column align-items-start active",
       cssIsNotActive:
         "list-group-item list-group-item-action flex-column align-items-start",
-      isActiveId: ""
+      isActiveId: "",
+      isReady: false
     };
   },
   methods: {
@@ -141,11 +134,11 @@ export default {
       get() {
         return this.$store.getters.getItems;
       }
-    },
-    userdata: {
-      get() {
-        return this.$store.getters.getUserData;
-      }
+    }
+  },
+  watch: {
+    items: function(val) {
+      this.isReady = true;
     }
   }
 };

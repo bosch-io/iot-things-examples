@@ -1,10 +1,11 @@
 <template>
-  <div class="card shadow m-bottom-24px">
-    <div
+  <div vshow="isReady" class="card shadow m-bottom-24px">
+    <!-- <div
       class="card-body lead"
       v-show="isSelected.thingId === undefined && isSelected !== 'newItem'"
-    >No thing selected</div>
-
+    >No thing selected</div>-->
+    <h1>{{isConnected}}</h1>
+    <div class="card-body lead" v-show="items.length > 0 && isConnected">No thing selected</div>
     <div v-show="isSelected.thingId !== undefined || isSelected === 'newItem'">
       <div
         class="card-header lead"
@@ -19,7 +20,6 @@
         :value="JSON.stringify(items[isSelected.thingId], null, '\t')"
         class="border-bottom"
       ></codemirror>
-      <!-- @input="updateThing($event)" -->
       <div class="card-body">
         <div class="container">
           <div class="row">
@@ -27,14 +27,6 @@
           </div>
           <div class="row">
             <span class="lead">Command & Control</span>
-            <!-- <button
-              @click="saveChanges"
-              v-show="isSelected.thingId !== undefined"
-              type="button"
-              class="btn btn-outline-success col-md-4"
-            >
-              <font-awesome-icon style="margin-right: 5px;" icon="save"></font-awesome-icon>Save changes
-            </button>-->
           </div>
         </div>
       </div>
@@ -88,6 +80,7 @@ export default {
   },
   data() {
     return {
+      isReady: false,
       localcopy: {},
       cmOptions: {
         theme: "idea",
@@ -129,35 +122,13 @@ export default {
         return this.$store.getters.getItems;
       }
     },
-    userData: {
+    isConnected: {
       get() {
-        return this.$store.getters.getUserData;
-      }
-    },
-    auth: {
-      get() {
-        return this.$store.getters.getAuth;
+        return this.$store.getters.getConnectionStatus;
       }
     }
   },
   methods: {
-    // saveChanges() {
-    //   this.$store
-    //     .dispatch("saveChanges", JSON.parse(this.localcopy))
-    //     .then(res => {
-    //       this.showAlert(true, "saveChanges", "Successfully saved.");
-    //       this.$store.dispatch("getAllThings");
-    //     })
-    //     .catch(err =>
-    //       this.showAlert(false, "saveChanges", "Error - Status " + res.status)
-    //     );
-    // },
-    // deleteThing() {
-    //   this.$store.dispatch("deleteThing", this.isSelected);
-    // },
-    // updateThing(event) {
-    //   this.localcopy = event;
-    // },
     updateMessage(event) {
       this.message = JSON.parse(event);
     },
@@ -165,7 +136,11 @@ export default {
       this.$store
         .dispatch("sendMessage", { message: this.message, topic: this.topic })
         .then(res => {
-          this.showAlert(true, "sendMessage", `Response: ${JSON.stringify(res.data)}`);
+          this.showAlert(
+            true,
+            "sendMessage",
+            `Response: ${JSON.stringify(res.data)}`
+          );
         })
         .catch(err => {
           this.showAlert(false, "sendMessage", err.message);

@@ -12,8 +12,10 @@
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1">{{ item.thingId }}</h5>
       </div>
-      <p class="mb-1 pl-3">rev: {{ item['_revision'] || '' }}</p>
-      <p class="mb-1 pl-3">last modified: {{ item['_lastModified'] || '' }}</p>
+      <small>
+        <p v-if="item['_revision']" class="mb-1 pl-3">_rev: {{ item['_revision'] }}</p>
+        <p v-if="item['_modified']" class="mb-1 pl-3">{{ formatDate(item['_modified']) }}</p>
+      </small>
     </a>
   </div>
 </template>
@@ -27,8 +29,7 @@ export default {
         "list-group-item list-group-item-action flex-column align-items-start active",
       cssIsNotActive:
         "list-group-item list-group-item-action flex-column align-items-start",
-      isActiveId: "",
-      isReady: false
+      isActiveId: ""
     };
   },
   methods: {
@@ -40,93 +41,22 @@ export default {
         }
       });
     },
-    // Unused for now:
-    createNewThingTemplate() {
-      let namespace = this.userdata.filter(object => {
-        return object.key == "namespace";
-      })[0].value;
-      let template = `{"thingId": "${namespace}:<newThing>", "policyId": "${namespace}:<policy>", "features": {
-		"acceleration": {
-			"definition": [
-				"com.ipso.smartobjects:Accelerometer:1.1.0"
-			],
-			"properties": {}
-		},
-		"ambient_temperature": {
-			"definition": [
-				"com.ipso.smartobjects:Temperature:1.1.0"
-			],
-			"properties": {}
-		},
-		"orientation": {
-			"definition": [
-				"com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"
-			],
-			"properties": {}
-		},
-		"linear_acceleration": {
-			"definition": [
-				"com.ipso.smartobjects:Accelerometer:1.1.0"
-			],
-			"properties": {}
-		},
-		"gravity": {
-			"definition": [
-				"com.ipso.smartobjects:Accelerometer:1.1.0"
-			],
-			"properties": {}
-		},
-		"magnetometer": {
-			"definition": [
-				"com.ipso.smartobjects:Magnetometer:1.1.0"
-			],
-			"properties": {}
-		},
-		"temperature": {
-			"definition": [
-				"com.ipso.smartobjects:Temperature:1.1.0"
-			],
-			"properties": {}
-		},
-		"humidity": {
-			"definition": [
-				"com.ipso.smartobjects:Humidity:1.1.0"
-			],
-			"properties": {}
-		},
-		"gas_resistance": {
-			"definition": [
-				"com.ipso.smartobjects:Generic_Sensor:1.1.0"
-			],
-			"properties": {}
-		},
-		"pressure": {
-			"definition": [
-				"com.ipso.smartobjects:Barometer:1.1.0"
-			],
-			"properties": {}
-		},
-		,
-		"altitude": {
-			"definition": [
-				"com.ipso.smartobjects:Altitude:1.1.0"
-			],
-			"properties": {}
-		}
-		"angular_velocity": {
-			"definition": [
-				"com.ipso.smartobjects:Gyrometer:1.1.0"
-			],
-			"properties": {}
-		},
-		"voltage": {
-			"definition": [
-				"com.ipso.smartobjects:Voltage:1.1.0"
-			],
-			"properties": {}
-		}
-	}}`;
-      return JSON.parse(template);
+    formatDate(item) {
+      /**
+       * 0 : Year
+       * 1 : Month
+       * 2 : Day + Time
+       * --------------
+       * Second split
+       * 0 : Day
+       * 1 : Time + ?
+       */
+      let yearMonth = item.split("-");
+      let day = yearMonth[2].split("T");
+      let time = day[1].split(".");
+      return `_modified: ${day[0]}.${yearMonth[1]}.${yearMonth[0]} - ${
+        time[0]
+      }`;
     }
   },
   computed: {
@@ -138,7 +68,9 @@ export default {
   },
   watch: {
     items: function(val) {
-      this.isReady = true;
+      if (this.isActiveId !== "") {
+        this.isActiveId = "";
+      }
     }
   }
 };

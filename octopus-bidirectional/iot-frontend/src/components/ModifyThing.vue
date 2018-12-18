@@ -1,19 +1,8 @@
 <template>
-  <div vshow="isReady" class="card shadow m-bottom-24px">
-    <!-- <div
-      class="card-body lead"
-      v-show="isSelected.thingId === undefined && isSelected !== 'newItem'"
-    >No thing selected</div>-->
-    <h1>{{isConnected}}</h1>
-    <div class="card-body lead" v-show="items.length > 0 && isConnected">No thing selected</div>
-    <div v-show="isSelected.thingId !== undefined || isSelected === 'newItem'">
-      <div
-        class="card-header lead"
-        v-show="isSelected.thingId !== undefined && isSelected.thingId !== 'newThing'"
-      >{{ items[isSelected.thingId].thingId }}</div>
-      <div class="card-header lead" v-show="isSelected.thingId === 'newThing'">
-        <input class="form-control" v-model="isSelected.thingId">
-      </div>
+  <div v-if="isReady" class="card shadow m-bottom-24px">
+    <div class="card-body lead" v-show="!isReady">No thing selected</div>
+    <div v-show="isReady">
+      <div class="card-header lead">{{ items[isSelected.thingId].thingId }}</div>
       <codemirror
         id="thing"
         :options="cmOptions"
@@ -40,22 +29,37 @@
       <div class="card-body">
         <div class="container">
           <div class="row">
-            <alert-view :alert="this.alert" alert-id="sendMessage"></alert-view>
+            <alert-view class="middle-out" :alert="this.alert" alert-id="sendMessage"></alert-view>
           </div>
-          <div class="row">
+          <div class="row" style="margin-bottom: 18px;">
             <button
               id="sendButton"
               @click="sendMessage"
               type="button"
-              class="btn btn-outline-primary col-md-4"
+              class="btn btn-outline-primary col middle-out"
+              :disabled="isSending"
             >
               <font-awesome-icon style="margin-right: 5px;" icon="upload"/>Send message
             </button>
-            <div class="input-group col-md-8">
+          </div>
+
+          <div class="row">
+            <div class="input-group col">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">Topic</span>
               </div>
               <input class="form-control" type="text" placeholder="topic" v-model="topic">
+            </div>
+            <div class="input-group col">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Cor-Id</span>
+              </div>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="Correlation id"
+                v-model="correlation"
+              >
             </div>
           </div>
         </div>
@@ -81,6 +85,7 @@ export default {
   data() {
     return {
       isReady: false,
+      isSending: false,
       localcopy: {},
       cmOptions: {
         theme: "idea",
@@ -105,7 +110,8 @@ export default {
         b: 0,
         w: 0
       },
-      topic: "switch_led"
+      topic: "switch_led",
+      correlation: "message-example"
     };
   },
   computed: {
@@ -128,21 +134,46 @@ export default {
       }
     }
   },
+  watch: {
+    isSelected: function(val) {
+      this.isReady = true;
+    },
+    isConnected: function(val) {
+      if (!val) {
+        this.isReady = false;
+      }
+    }
+  },
   methods: {
     updateMessage(event) {
-      this.message = JSON.parse(event);
+      try {
+        this.isSending = false;
+        this.message = JSON.parse(event);
+      } catch (e) {
+        if (e) {
+          this.isSending = true;
+          this.showAlert(false, "sendMessage", "JSON not valid");
+        }
+      }
     },
     sendMessage() {
+      this.isSending = true;
       this.$store
-        .dispatch("sendMessage", { message: this.message, topic: this.topic })
+        .dispatch("sendMessage", {
+          message: this.message,
+          topic: this.topic,
+          corrId: this.correlation
+        })
         .then(res => {
           this.showAlert(
             true,
             "sendMessage",
             `Response: ${JSON.stringify(res.data)}`
           );
+          this.isSending = false;
         })
         .catch(err => {
+          this.isSending = false;
           this.showAlert(false, "sendMessage", err.message);
         });
     },
@@ -178,5 +209,10 @@ export default {
 
 .m-bottom-24px {
   margin-bottom: 24px;
+}
+
+.middle-out {
+  margin-right: 15px;
+  margin-left: 15px;
 }
 </style>

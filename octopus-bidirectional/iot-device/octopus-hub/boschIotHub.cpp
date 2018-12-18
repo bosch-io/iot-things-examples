@@ -31,38 +31,47 @@
 
 StaticJsonBuffer<MSG_LENGTH> jsonBuffer;
 
-BoschIotHub::BoschIotHub(const char* mqttBroker_, const int mqttPort_, const unsigned char* mqttServerCA_, const unsigned int mqttServerCALen_)
-  : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerCA(mqttServerCA_), mqttServerCALen(mqttServerCALen_) {
+BoschIotHub::BoschIotHub(const char *mqttBroker_, const int mqttPort_, const unsigned char *mqttServerCA_, const unsigned int mqttServerCALen_)
+    : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerCA(mqttServerCA_), mqttServerCALen(mqttServerCALen_)
+{
 }
 
-void (*onDittoProtocolMessage)(JsonObject&,String,String);
+void (*onDittoProtocolMessage)(JsonObject &, String, String);
 
-void BoschIotHub::registerOnDittoProtocolMessage(HUB_COMMAND_CALLBACK_SIGNATURE) {
+void BoschIotHub::registerOnDittoProtocolMessage(HUB_COMMAND_CALLBACK_SIGNATURE)
+{
   onDittoProtocolMessage = callback;
 }
 
-void hubCommandReceived(char* topic, byte* payload, unsigned int length) {
+void hubCommandReceived(char *topic, byte *payload, unsigned int length)
+{
   Printer::printMsg("Bosch IoT Hub", "Received command on topic: ");
   Serial.println(topic);
 
   String topicStr = String(topic);
-  topicStr.replace("control///req/","");
+  topicStr.replace("control///req/", "");
   String replyTopic = "control///res/" + topicStr.substring(0, topicStr.lastIndexOf("/")) + "/";
-  String command = topicStr.substring(topicStr.lastIndexOf("/")+1, topicStr.length());
+  String command = topicStr.substring(topicStr.lastIndexOf("/") + 1, topicStr.length());
 
   // Allocate the correct amount of memory for the payload copy
-  byte* p = (byte*)malloc(length);
+  byte *p = (byte *)malloc(length);
   // Copy the payload to the new buffer
-  memcpy(p,payload,length);  
-  JsonObject& root = jsonBuffer.parseObject(p);
+  memcpy(p, payload, length);
+  JsonObject &root = jsonBuffer.parseObject(p);
 
-  if (root.size() > 0 && root.containsKey("topic") && root.containsKey("path")) {
-    if (onDittoProtocolMessage) {
-      onDittoProtocolMessage(root, command, replyTopic);  
-    } else {
+  if (root.size() > 0 && root.containsKey("topic") && root.containsKey("path"))
+  {
+    if (onDittoProtocolMessage)
+    {
+      onDittoProtocolMessage(root, command, replyTopic);
+    }
+    else
+    {
       Serial.println("onDittoProtocolMessage function is not defined");
     }
-  } else if(!root.containsKey("topic")) {
+  }
+  else if (!root.containsKey("topic"))
+  {
     Serial.println("[error] - Invalid JSON Object.");
   }
   // Free the memory
@@ -70,86 +79,104 @@ void hubCommandReceived(char* topic, byte* payload, unsigned int length) {
   jsonBuffer.clear();
 }
 
-bool BoschIotHub::connect() {
+bool BoschIotHub::connect()
+{
   mqttClient.setServer(mqttBroker, mqttPort);
   mqttClient.setCallback(hubCommandReceived);
-  if (!wiFiClient.connect(mqttBroker, mqttPort)) {
+  if (!wiFiClient.connect(mqttBroker, mqttPort))
+  {
     Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");
     return false;
-  } else {
-    Printer::printlnMsg("Bosch IoT Hub", "Secure connection established"); 
+  }
+  else
+  {
+    Printer::printlnMsg("Bosch IoT Hub", "Secure connection established");
   }
 
-  if(!wiFiClient.setCACert(mqttServerCA, mqttServerCALen)){
+  if (!wiFiClient.setCACert(mqttServerCA, mqttServerCALen))
+  {
     Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
     return false;
   }
 
   int rc = wiFiClient.verifyCertChain(mqttBroker);
-  if (!rc) {
+  if (!rc)
+  {
     Printer::printlnMsg("Bosch IoT Hub", "Failed to verify certificate");
     return false;
-  } else {
-    Printer::printlnMsg("Bosch IoT Hub", "Server certificate verified"); 
+  }
+  else
+  {
+    Printer::printlnMsg("Bosch IoT Hub", "Server certificate verified");
   }
 
   return true;
 }
 
-bool BoschIotHub::deviceIsConnected() {
+bool BoschIotHub::deviceIsConnected()
+{
   return mqttClient.connected();
 }
 
-void BoschIotHub::connectDevice(const char* deviceId, const char* authId, const char* devicePassword) {
-    Printer::printMsg("Bosch IoT Hub", "Broker login");        
-    
-    while (!deviceIsConnected())
+void BoschIotHub::connectDevice(const char *deviceId, const char *authId, const char *devicePassword)
+{
+  Printer::printMsg("Bosch IoT Hub", "Broker login");
+
+  while (!deviceIsConnected())
+  {
+    Serial.print(".");
+    /* If connected to the MQTT broker... */
+    if (mqttClient.connect(deviceId, authId, devicePassword))
     {
-        Serial.print(".");
-        /* If connected to the MQTT broker... */
-        if (mqttClient.connect(deviceId, authId, devicePassword))
-        {
-            Serial.println("OK");
-        } else {
-            /* otherwise wait for 1 second before retrying */
-            delay(1000);
-        }
+      Serial.println("OK");
     }
-    
-    mqttClient.loop();
+    else
+    {
+      /* otherwise wait for 1 second before retrying */
+      delay(1000);
+    }
+  }
+
+  mqttClient.loop();
 }
 
-void BoschIotHub::publish(const char* topic, String payload) {
-  Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
-  Serial.println(topic);
-  Printer::printlnMsg("Bosch IoT Hub", payload);
+void BoschIotHub::publish(const char *topic, String payload)
+{
+  // Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
+  // Serial.println(topic);
+  // Printer::printlnMsg("Bosch IoT Hub", payload);
 
-  const size_t requiredLength = 5 + 2+strlen(topic) + payload.length();
+  const size_t requiredLength = 5 + 2 + strlen(topic) + payload.length();
 
-  if (requiredLength > MQTT_MAX_PACKET_SIZE) {
+  if (requiredLength > MQTT_MAX_PACKET_SIZE)
+  {
     Printer::printlnMsg("Bosch IoT Hub", "Cannot publish: Message is too big.");
     Printer::printMsg("Bosch IoT Hub", "Increase MQTT_MAX_PACKET_SIZE in PubSubClient.h to at least ");
     Serial.println(requiredLength);
   }
 
   int publishResult = mqttClient.publish(topic, payload.c_str());
-  if (!publishResult) {
+  if (!publishResult)
+  {
     Printer::printMsg("Bosch IoT Hub", "Publish failed");
     Serial.println(publishResult);
   }
 }
 
-void BoschIotHub::publish(String payload) {
-  const char* topic = "telemetry";
+void BoschIotHub::publish(String payload)
+{
+  const char *topic = "telemetry";
   this->publish(topic, payload);
 }
 
-void BoschIotHub::subscribe(const char* topic) {
+void BoschIotHub::subscribe(const char *topic)
+{
   Printer::printMsg("Bosch IoT Hub", "Subscribing to topic: ");
   Serial.println(topic);
   mqttClient.subscribe(topic);
 }
 
-void BoschIotHub::loop() {
+void BoschIotHub::loop()
+{
   mqttClient.loop();
 }

@@ -30,7 +30,7 @@ export default (window.Api = new class {
       policies: this.apiVersion + "/policies",
       searchThings:
         this.apiVersion +
-        "/search/things?&fields=thingId,policyId,attributes,features,_revision,_lastModified",
+        "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
       things: this.apiVersion + "/things",
       messages: this.apiVersion + "/things/" + this.vue.selected.thingId
     };
@@ -50,7 +50,20 @@ export default (window.Api = new class {
     );
   };
 
-  getConfig = () => {
+  getConfig = (additionalHeader = null) => {
+    if (additionalHeader) {
+      return {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: this.createAuthHeader(
+            this.vue.connection.username,
+            this.vue.connection.password
+          ),
+          "x-cr-api-token": this.vue.connection.api_token,
+          "x-correlation-id": additionalHeader
+        }
+      };
+    }
     return {
       headers: {
         "Content-Type": "application/json",
@@ -75,13 +88,13 @@ export default (window.Api = new class {
     );
   };
 
-  sendMessage = (message, topic) => {
+  sendMessage = (message, topic, corrId) => {
     return axios.post(
       `${this.routes.things}/${
         this.vue.selected.thingId
       }/inbox/messages/${topic}`,
       `${JSON.stringify(message)}`,
-      this.getConfig()
+      this.getConfig(corrId)
     );
   };
 }());

@@ -24,6 +24,7 @@
         v-show="!connectionStatus"
         class="btn btn-primary m-top-16px"
         @click="connect()"
+        :disabled="connectionEmpty"
       >Connect</button>
       <button
         v-show="connectionStatus"
@@ -38,6 +39,12 @@
 export default {
   name: "user-data-form",
 
+  data() {
+    return {
+      connectionEmpty: true
+    };
+  },
+
   computed: {
     connection: {
       get() {
@@ -48,6 +55,15 @@ export default {
       get() {
         return this.$store.getters.getConnectionStatus;
       }
+    }
+  },
+
+  watch: {
+    connection: function(val) {
+      let isOneEmpty = Object.keys(this.connection).map(
+        key => this.connection[key] === ""
+      );
+      this.connectionEmpty = isOneEmpty.includes(true);
     }
   },
 
@@ -72,7 +88,7 @@ export default {
 }
 
 .m-top-16px {
-  margin-top: 16px;
+  margin-top: 26px;
 }
 
 .grey {

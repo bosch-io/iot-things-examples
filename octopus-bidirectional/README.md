@@ -171,7 +171,6 @@ Send the message:
 
 ```json
 {
-  // Choose the value of the colors by yourself
   "r": 0,
   "g": 0,
   "b": 0,

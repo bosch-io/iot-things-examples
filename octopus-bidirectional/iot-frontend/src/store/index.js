@@ -94,9 +94,8 @@ const store = new Vuex.Store({
       });
     },
     sendMessage({ state }, payload) {
-      console.log("im store: ", payload.message, payload.topic);
       return new Promise((resolve, reject) => {
-        Api.sendMessage(payload.message, payload.topic)
+        Api.sendMessage(payload.message, payload.topic, payload.corrId)
           .then(res => resolve(res))
           .catch(err => reject(err));
       });

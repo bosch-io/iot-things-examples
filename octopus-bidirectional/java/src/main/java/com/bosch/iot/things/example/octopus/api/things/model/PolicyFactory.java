@@ -45,46 +45,44 @@ import com.bosch.iot.things.example.octopus.api.things.SolutionInformation;
 
 public class PolicyFactory {
 
-    private static final String WRITE_PERMISSION = "WRITE";
-    private static final String READ_PERMISSION = "READ";
-    public static final String POLICY_ID = getPropertyOrThrowException("solution.namespace") + ":octopus";
+  private static final String WRITE_PERMISSION = "WRITE";
+  private static final String READ_PERMISSION = "READ";
+  public static final String POLICY_ID = getPropertyOrThrowException("solution.namespace") + ":octopus";
 
-    public static Policy newInstance() {
-        return Policy.newBuilder(POLICY_ID)
-                .set(buildOwnerEntry())
-                .set(buildHubEntry())
-                .build();
-    }
+  public static Policy newInstance() {
+    return Policy.newBuilder(POLICY_ID).set(buildOwnerEntry()).set(buildHubEntry()).build();
+  }
 
-    private static PolicyEntry buildOwnerEntry() {
+  private static PolicyEntry buildOwnerEntry() {
 
-        final Resources resources = Resources.newInstance(
-                Resource.newInstance(ResourceKey.newInstance("thing:/"), buildOwnerEffectedPermissions()),
-                Resource.newInstance(ResourceKey.newInstance("message:/"), buildOwnerEffectedPermissions()),
-                Resource.newInstance(ResourceKey.newInstance("policy:/"), buildOwnerEffectedPermissions()));
+    final Resources resources = Resources.newInstance(
+        Resource.newInstance(ResourceKey.newInstance("thing:/"), buildOwnerEffectedPermissions()),
+        Resource.newInstance(ResourceKey.newInstance("message:/"), buildOwnerEffectedPermissions()),
+        Resource.newInstance(ResourceKey.newInstance("policy:/"), buildOwnerEffectedPermissions()));
 
-        return PolicyEntry.newInstance("owner", Subjects.newInstance(Collections.emptyList()), resources);
-    }
+    return PolicyEntry.newInstance("owner", Subjects.newInstance(Collections.emptyList()), resources);
+  }
 
-    private static EffectedPermissions buildOwnerEffectedPermissions() {
-        return EffectedPermissions.newInstance(Arrays.asList(READ_PERMISSION, WRITE_PERMISSION),
-                Collections.emptyList());
-    }
+  private static EffectedPermissions buildOwnerEffectedPermissions() {
+    return EffectedPermissions.newInstance(Arrays.asList(READ_PERMISSION, WRITE_PERMISSION), Collections.emptyList());
+  }
 
-    private static PolicyEntry buildHubEntry() {
-        final Subjects subjects = Subjects.newInstance(
-                Subject.newInstance(
-                        "integration:" + SolutionInformation.SOLUTION_ID + ":octopus",
-                        SubjectType.newInstance("iot-things-clientid")));
+  private static PolicyEntry buildHubEntry() {
+    final Subjects subjects = Subjects.newInstance(Subject.newInstance(
+        "integration:" + SolutionInformation.SOLUTION_ID + ":octopus", SubjectType.newInstance("iot-things-clientid")));
 
-        final Resources resources = Resources.newInstance(
-                Resource.newInstance(ResourceKey.newInstance("thing:/features"), buildHubEffectedPermissions()),
-                Resource.newInstance(ResourceKey.newInstance("message:/"), buildHubEffectedPermissions()));
+    final Resources resources = Resources.newInstance(
+        Resource.newInstance(ResourceKey.newInstance("thing:/features"), buildHubEffectedPermissions()),
+        Resource.newInstance(ResourceKey.newInstance("message:/"), buildHubEffectedPermissionsWithRead()));
 
-        return PolicyEntry.newInstance("hub", subjects, resources);
-    }
+    return PolicyEntry.newInstance("hub", subjects, resources);
+  }
 
-    private static EffectedPermissions buildHubEffectedPermissions() {
-        return EffectedPermissions.newInstance(Collections.singletonList(WRITE_PERMISSION), Collections.emptyList());
-    }
+  private static EffectedPermissions buildHubEffectedPermissions() {
+    return EffectedPermissions.newInstance(Collections.singleton(WRITE_PERMISSION), Collections.emptyList());
+  }
+
+  private static EffectedPermissions buildHubEffectedPermissionsWithRead() {
+    return EffectedPermissions.newInstance(Arrays.asList(WRITE_PERMISSION, READ_PERMISSION), Collections.emptyList());
+  }
 }

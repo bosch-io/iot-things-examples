@@ -1,7 +1,7 @@
 <template>
   <div class="card shadow">
     <div class="card-header lead">
-      <div class="row">
+      <div class="center-content">
         <div class="col-md-6">
           CONNECTION
           <span v-show="connectionStatus === true" class="badge badge-success">established</span>
@@ -11,7 +11,7 @@
         </div>
       </div>
     </div>
-    <div class="card-body" v-show="!connectionStatus || collapsed">
+    <div class="card-body" v-show="collapsed">
       <div class="row">
         <div class="col-sm-6">
           <user-data-form></user-data-form>
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       gettingTelemetry: false,
-      collapsed: false
+      collapsed: true
     };
   },
   computed: {
@@ -84,6 +84,7 @@ export default {
       if (val === true) {
         // Connect to server sent events
         this.initSSE();
+        this.showData();
       } else {
         this.stopSSE();
       }
@@ -106,4 +107,8 @@ export default {
 </script>
 
 <style>
+.center-content {
+  display: flex;
+  align-items: center;
+}
 </style>

@@ -61,7 +61,6 @@ void setup()
 
 void customMessageHandler(JsonObject &root, String command, String replyTopic)
 {
-
   const char *dittoTopic = root["topic"];
   JsonObject &headers = root["headers"];
 

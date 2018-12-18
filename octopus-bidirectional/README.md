@@ -4,49 +4,49 @@
 
 ## Summary
 
-This example shows how to use the services Bosch IoT Things and Bosch IoT Hub to connect your device with your frontend 
-solution. It shows how to subscribe to these Bosch services, how to use the HTTP endpoints and how to send data within 
+This example shows how to use the services Bosch IoT Things and Bosch IoT Hub to connect your device with your frontend
+solution. It shows how to subscribe to these Bosch services, how to use the HTTP endpoints and how to send data within
 these services.
-Furthermore will be shown how to prototype a real world device based on the Octopus board (ESP8266) and a web 
+Furthermore will be shown how to prototype a real world device based on the Octopus board (ESP8266) and a web
 application to manage your things.
-The device will be able to connect automatically to a given wireless internet access, to send telemetry data to the 
+The device will be able to connect automatically to a given wireless internet access, to send telemetry data to the
 things service and react to messages which will be sent by the web application.
-The web application will use Bosch IoT Things HTTP endpoints to communicate with the service itself and the device. 
+The web application will use Bosch IoT Things HTTP endpoints to communicate with the service itself and the device.
 We will use the telemetry, event as well as the command & control pattern of the Bosch IoT Hub.
 
 ![](img/octo.png)
 
 ## Setting up Bosch IoT Things and Hub
 
-All Bosch IoT Suite services can be booked online at 
-[Bosch IoT Suite Portal](https://accounts.bosch-iot-suite.com/subscriptions). For all subscriptions, you will need a 
-Bosch ID for authentication. If you don't have a Bosch ID yet, feel free to register a new account.<br/> 
+All Bosch IoT Suite services can be booked online at
+[Bosch IoT Suite Portal](https://accounts.bosch-iot-suite.com/subscriptions). For all subscriptions, you will need a
+Bosch ID for authentication. If you don't have a Bosch ID yet, feel free to register a new account.<br/>
 Once you are successfully registered, you will be redirected to the Bosch IoT Suite Portal.
 
-For a more detailed guidance, see 
+For a more detailed guidance, see
 [Octopus Telemetry example](../octopus-telemetry).
 
-Once you are set and there is a description for Bosch Iot Things and Bosch IoT Hub, we can open a new connection on 
-the Things Dashboard. You will find a Link to the Things Dashboard under point 'actions' in your 
+Once you are set and there is a description for Bosch Iot Things and Bosch IoT Hub, we can open a new connection on
+the Bosch IoT Things dashboard. You will find a Link to the Things Dashboard under point 'actions' in your
 [service subscriptions table](https://accounts.bosch-iot-suite.com/subscriptions/).
 
 Under menu item `Connections`, we will create our first connection.
-There are several possibilities - depending on your need, you can create the connection type that fits them.
-For this usecase, we choose "Bosch IoT Hub" connection. The wizard will guide you through the creation process. 
-The questioned credentials can be found under point 'actions' in your 
-[service subscriptions table](https://accounts.bosch-iot-suite.com/subscriptions/).<br/> 
-The connection creation wizard will ask for a authorization context and in this example we will use 
+There are several possibilities - depending on your needs, you can create the connection type that fits them.
+In this example, we go for the "Bosch IoT Hub" connection. The wizard will guide you through the creation process.
+The questioned credentials can be found under point 'actions' in your
+[service subscriptions table](https://accounts.bosch-iot-suite.com/subscriptions/).<br/>
+The connection creation wizard will ask for a authorization context and in this example we will use
 `integration:<YOUR-SOLUTION-ID>:octopus`.<br/>
-In the next step we will use a little java program, which will create a thing and a policy with this authorization context.
 
-This example provides a small Java program, which adds a thing and a policy to Bosch IoT Things.
+The next step is to use a little java program, which will create a thing and a policy with this authorization context.
+This small Java program is provided by this example.
 Furthermore, the program adds this thing with valid credentials to the Bosch IoT Hub.
 
 #### Configure the Java program
 
 Before we can start using this program, we have to configure the `java/src/main/resource/application.properties` file.
 
-If you have filled out the empty fields with valid credentials we can start the program with: 
+If you have filled out the empty fields with valid credentials we can start the program with:
 `mvn clean compile exec:java` in the java folder.
 
 ## Connecting an Arduino Device to Bosch IoT Things and Hub
@@ -69,7 +69,7 @@ If you have filled out the empty fields with valid credentials we can start the 
    6. [PubSubClient library](https://github.com/knolleary/pubsubclient)
    7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
    8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping)
-3. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
+3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
 
 ### Getting started
@@ -78,7 +78,7 @@ The Arduino Sketch, we have prepared, publishes the sensor information via the B
 
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
-All properties have to be set in `iot-device/octopus-hub/settings.h`. 
+All properties have to be set in `iot-device/octopus-hub/settings.h`.
 Just create this file from the following template and replace XXX placeholders with your configuration properties.
 
 ```cpp
@@ -119,7 +119,7 @@ extern const unsigned int mqtt_server_ca_len;
 Once you have done that, you can flash the Sketch to your developer board.
 The device will connect automatically to Bosch IoT Hub which manages the connection for Bosch IoT Things.
 
-The provided Arduino sketch is capable of connecting to the Bosch IoT Hub with TLS standard, 
+The provided Arduino sketch is capable of connecting to the Bosch IoT Hub with TLS standard,
 sending and receiving MQTT messages, read it's sensors and to set it's built in LED's depending on incoming messages.
 Feel free to play around with code.
 
@@ -135,8 +135,8 @@ The example in [iot-frontend](iot-frontend/) uses following frameworks:
 
 ### Getting started
 
-We are hosting the [Command & Control Example](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/) for you.<br/> 
-All the code can be found under [iot-frontend](iot-frontend/). 
+We are hosting the [Command & Control Example](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/) for you.<br/>
+All the code can be found under [iot-frontend](iot-frontend/).
 
 You can run the example locally as well - just follow the the instructions below.
 
@@ -145,33 +145,29 @@ Installation:
 ```bash
 $ cd iot-frontend
 
-// install dependencies using yarn
-$ yarn install
-
 // or install dependencies using npm
-$ npm -i
+$ npm i
+// or
+$ npm install
 ```
 
 Running Dev-Server (with hot reloading):
 
 ```bash
 // serving the ui using yarn
-$ yarn serve
-
-// or serving the ui using npm
 $ npm run serve
 ```
 
 ## Conclusion
 
-When everything is set up properly, you should have access to the Command & Control Example through
- `http://localhost:3000` or alternatively to the hosted version 
- [https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/). 
- After you have added your credentials and pressed _connect_, you should see a list with your added things 
- (at least the octopus one). Just click on the thing you want to observe or send data to it.<br/> 
- Depending on your device you can now send command messages to it. This example provides LED control via messages. 
- 
- Send the message:
+When everything is set up properly, you have access to the Command & Control Example through
+`http://localhost:3000` or alternatively to the hosted version
+[https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/).
+After you have added your credentials and pressed _connect_, you should see a list with your added things
+(at least the octopus one). Just click on the thing you want to observe or send data to it.<br/>
+Depending on your device you can now send command messages to it. This example provides LED control via messages.
+
+Send the message:
 
 ```json
 {
@@ -184,8 +180,8 @@ When everything is set up properly, you should have access to the Command & Cont
 ```
 
 to the Topic `switch_led`. You will receive a _success_ or an _error_ message as the response from the message POST request.
-The telemetry data send by the device updates the digital twin. 
-If you activate SSE ('server sent events') you will get live updates from Bosch IoT Things - these updates are directly 
+The telemetry data send by the device updates the digital twin.
+If you activate SSE ('server sent events') you will get live updates from Bosch IoT Things - these updates are directly
 reflected in the web application.
 
 From this point on you are fully set up and free to extend the code and build your first IoT infrastructure!

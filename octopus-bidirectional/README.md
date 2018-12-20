@@ -44,10 +44,10 @@ Furthermore, the program adds this thing with valid credentials to the Bosch IoT
 
 #### Configure the Java program
 
-Before we can start using this program, we have to configure the `java/src/main/resource/application.properties` file.
+Before we can start using this program, we have to configure the `src/main/resource/application.properties` file.
 
 If you have filled out the empty fields with valid credentials we can start the program with:
-`mvn clean compile exec:java` in the java folder.
+`mvn clean compile exec:java` in the root folder of the project.
 
 ## Connecting an Arduino Device to Bosch IoT Things and Hub
 

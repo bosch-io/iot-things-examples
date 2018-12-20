@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.ditto.model.things.Feature;
+import org.eclipse.ditto.model.things.FeatureDefinition;
 import org.eclipse.ditto.model.things.Thing;
 
 public class OctopusFactory {

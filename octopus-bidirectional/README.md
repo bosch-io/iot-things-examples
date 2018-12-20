@@ -162,7 +162,7 @@ $ npm run serve
 
 When everything is set up properly, you have access to the Command & Control Example through
 `http://localhost:3000` or alternatively to the hosted version
-[https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/).
+[https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/](https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
 After you have added your credentials and pressed _connect_, you should see a list with your added things
 (at least the octopus one). Just click on the thing you want to observe or send data to it.<br/>
 Depending on your device you can now send command messages to it. This example provides LED control via messages.

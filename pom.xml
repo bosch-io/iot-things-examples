@@ -48,7 +48,8 @@
         <module>openid-jwt-login</module>
         <module>things-client-examples</module>
         <module>things-http-java-examples</module>
-        <module>octopus-hub-things-example</module>
+        <module>octopus-telemetry</module>
+        <module>octopus-bidirectional</module>
     </modules>
 
     <properties>

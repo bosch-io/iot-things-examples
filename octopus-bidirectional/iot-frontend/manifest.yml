@@ -1,0 +1,7 @@
+applications:
+  - name: octopus-bidirectional
+    memory: 64M
+    instances: 1
+    disk_quota: 128M
+    buildpack: https://github.com/cloudfoundry/staticfile-buildpack.git
+    path: ./dist/

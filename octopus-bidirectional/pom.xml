@@ -35,7 +35,7 @@
         <groupId>com.bosch.iot.things.examples</groupId>
         <artifactId>iot-things-examples</artifactId>
         <version>0-SNAPSHOT</version>
-        <relativePath>../../</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>octopus-bidirectional-java</artifactId>

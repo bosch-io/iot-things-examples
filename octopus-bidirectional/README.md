@@ -135,7 +135,7 @@ The example in [iot-frontend](iot-frontend/) uses following frameworks:
 
 ### Getting started
 
-We are hosting the [Command & Control Example](https://octopus-cc-demo.apps.de1.bosch-iot-cloud.com/) for you.<br/>
+We are hosting the [Command & Control Example](https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) for you.<br/>
 All the code can be found under [iot-frontend](iot-frontend/).
 
 You can run the example locally as well - just follow the the instructions below.

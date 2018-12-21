@@ -33,10 +33,13 @@ import deepmerge from "deepmerge";
 
 Vue.use(Vuex);
 
+const AWS = "https://things-int.eu-1.bosch-iot-suite.com";
+const BIC = "https://things.s-apps.de1.bosch-iot-cloud.com";
+
 const store = new Vuex.Store({
   state: {
     connection: {
-      http_endpoint: "https://things.s-apps.de1.bosch-iot-cloud.com",
+      http_endpoint: "",
       api_token: "",
       username: "",
       password: ""
@@ -89,6 +92,9 @@ const store = new Vuex.Store({
       state.connectionStatus = false;
       state.selected = "No thing selected.";
       state.items = {};
+    },
+    updatePlatform(state, value) {
+      state.connection.http_endpoint = value;
     }
   },
 
@@ -143,6 +149,18 @@ const store = new Vuex.Store({
     },
     telemetryUpdate({ commit }, thing) {
       this.commit("setItem", thing);
+    },
+    setPlatform({ commit }, platformIndex) {
+      switch (platformIndex) {
+        case "1":
+          this.commit("updatePlatform", AWS);
+          break;
+        case "2":
+          this.commit("updatePlatform", BIC);
+          break;
+        default:
+          break;
+      }
     }
   }
 });

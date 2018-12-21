@@ -50,16 +50,18 @@ export default (window.Api = new class {
       }
     });
 
-    this.base = this.vue.connection.http_endpoint;
-    this.apiVersion = this.base + "/api/2";
-
     this.routes = {
-      policies: this.apiVersion + "/policies",
+      policies: this.vue.connection.http_endpoint + "/api/2" + "/policies",
       searchThings:
-        this.apiVersion +
+        this.vue.connection.http_endpoint +
+        "/api/2" +
         "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
-      things: this.apiVersion + "/things",
-      messages: this.apiVersion + "/things/" + this.vue.selected.thingId
+      things: this.vue.connection.http_endpoint + "/api/2" + "/things",
+      messages:
+        this.vue.connection.http_endpoint +
+        "/api/2" +
+        "/things/" +
+        this.vue.selected.thingId
     };
   }
 
@@ -104,20 +106,17 @@ export default (window.Api = new class {
   };
 
   getAllThings = () => {
-    return axios.get(this.routes.searchThings, this.getConfig());
-  };
-
-  saveChanges = thing => {
-    return axios.put(
-      this.routes.things + "/" + thing.thingId,
-      thing,
+    return axios.get(
+      `${
+        this.vue.connection.http_endpoint
+      }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
       this.getConfig()
     );
   };
 
   sendMessage = (message, topic, corrId) => {
     return axios.post(
-      `${this.routes.things}/${
+      `${this.vue.connection.http_endpoint}/api/2/things/${
         this.vue.selected.thingId
       }/inbox/messages/${topic}`,
       `${JSON.stringify(message)}`,

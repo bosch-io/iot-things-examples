@@ -30,6 +30,16 @@
 <template>
   <div>
     <div class="form-group">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="inputGroupSelect01">Platform</label>
+        </div>
+        <select class="custom-select" id="inputGroupSelect01" @change="onChange($event)">
+          <option selected>Choose...</option>
+          <option value="1" @select="onChange($event)">Amazon Webservices (AWS)</option>
+          <option value="2">Bosch IoT Cloud (BIC)</option>
+        </select>
+      </div>
       <div
         class="m-top-10px"
         v-for="key in Object.keys(connection)"
@@ -106,6 +116,9 @@ export default {
     },
     disconnect() {
       this.$store.dispatch("disconnect");
+    },
+    onChange(event) {
+      this.$store.dispatch("setPlatform", event.target.value);
     }
   }
 };

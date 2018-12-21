@@ -33,7 +33,7 @@ import deepmerge from "deepmerge";
 
 Vue.use(Vuex);
 
-const AWS = "https://things-int.eu-1.bosch-iot-suite.com";
+const AWS = "https://things.eu-1.bosch-iot-suite.com";
 const BIC = "https://things.s-apps.de1.bosch-iot-cloud.com";
 
 const store = new Vuex.Store({

@@ -25,10 +25,10 @@ Once you are successfully registered, you will be redirected to the Bosch IoT Su
 
 You will need to subscribe
 
-  * Bosch IoT Hub - for the connection from the board to the cloud
-  * Bosch IoT Things - for the digital representation of the device towards a web application
-  * Bosch IoT Permissions - for the basic auth flow on the example web application. 
-  
+- Bosch IoT Hub - for the connection from the board to the cloud
+- Bosch IoT Things - for the digital representation of the device towards a web application
+- Bosch IoT Permissions - for the basic auth flow on the example web application.
+
 Once you have an own service instance of Bosch IoT Things and Bosch IoT Hub, we can create a connection between these services using the Bosch IoT Things dashboard. You will find a link to the Things dashboard under point 'Actions' in your
 [service subscriptions](https://accounts.bosch-iot-suite.com/subscriptions/) view.
 
@@ -39,8 +39,8 @@ Select the connection category "Bosch IoT Hub" and the wizard will guide you thr
 `integration:<YOUR-SOLUTION-ID>:octopus`, as the Octopus board will be prepared accordingly.</br>
 Find details at [Manage your connections](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection).
 
-
 ## Configure the Java program
+
 The next step is to use a little Java program, which will create a thing and a policy with the authorization context `integration:<YOUR-SOLUTION-ID>:octopus`.
 
 Furthermore, the program registers the Octopus device with valid credentials at the Bosch IoT Hub.
@@ -135,10 +135,6 @@ The example in [iot-frontend](iot-frontend/) uses following frameworks:
 
 ### Getting started
 
-<<<<<<< HEAD
-We are hosting the [Command & Control Example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) for you.<br/>
-=======
->>>>>>> 5cbc28450a5bb8a722658b20d4247db24477b9ad
 All the code can be found under [iot-frontend](iot-frontend/).
 
 **Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) online.<br/>
@@ -164,15 +160,7 @@ $ npm run serve
 ```
 
 When everything is set up properly, you have access to the Command & Control Example through
-<<<<<<< HEAD
-`http://localhost:3000` or alternatively to the hosted version
-[https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
-After you have added your credentials and pressed _connect_, you should see a list with your added things
-(at least the octopus one). Just click on the thing you want to observe or send data to it.<br/>
-Depending on your device you can now send command messages to it. This example provides LED control via messages.
-=======
 `http://localhost:3000`
->>>>>>> 5cbc28450a5bb8a722658b20d4247db24477b9ad
 
 ## Use the web app to remotely change the LED setting
 
@@ -182,14 +170,14 @@ We assume you work with the version hosted at our demo
 Log in with your user credentials. Find details at [Register Evaluation User](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) and make sure the user is empowered in the [policy of the octopus](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:policy_connection:policy_connection#dempower_a_device_to_update_the_hello_world_thing).
 
 After you have added your credentials and pressed _connect_, you should see a list with your things
-(at least the octopus). 
+(at least the octopus).
 
 Just click on the thing you want to observe or send data to.<br/>
-Depending on your device, you can now send command messages to it. 
+Depending on your device, you can now send command messages to it.
 
 This example provides LED control on the Octopus board via messages.
 
-Send following message to the topic `switch_led`. 
+Send following message to the topic `switch_led`.
 
 ```json
 {
@@ -199,6 +187,7 @@ Send following message to the topic `switch_led`.
   "w": 0
 }
 ```
+
 This is in fact a POST request at the [Messages API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Messages).
 
 The response will be either _success_ or an _error_ message.

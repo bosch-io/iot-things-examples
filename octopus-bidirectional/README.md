@@ -137,7 +137,8 @@ The example in [iot-frontend](iot-frontend/) uses following frameworks:
 
 All the code can be found under [iot-frontend](iot-frontend/).
 
-**Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) online.<br/>
+**Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud
+.com/octopus-bidirectional/) online.<br/>
 
 You can run the example locally as well - just follow the instructions below.
 
@@ -165,7 +166,7 @@ When everything is set up properly, you have access to the Command & Control Exa
 ## Use the web app to remotely change the LED setting
 
 We assume you work with the version hosted at our demo
-[Octopus-bidirectional example](https://demos.apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
+[Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
 
 Log in with your user credentials. Find details at [Register Evaluation User](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) and make sure the user is empowered in the [policy of the octopus](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:policy_connection:policy_connection#dempower_a_device_to_update_the_hello_world_thing).
 

@@ -137,8 +137,7 @@ The example in [iot-frontend](iot-frontend/) uses following frameworks:
 
 All the code can be found under [iot-frontend](iot-frontend/).
 
-**Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud
-.com/octopus-bidirectional/) online.<br/>
+**Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) online.<br/>
 
 You can run the example locally as well - just follow the instructions below.
 

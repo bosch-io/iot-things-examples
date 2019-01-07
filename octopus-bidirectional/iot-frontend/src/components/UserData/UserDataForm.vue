@@ -60,7 +60,12 @@
         >
       </div>
 
-      <alert-view class="m-top-16px" :alert="this.alert" alert-id="connectionError"></alert-view>
+      <alert-view
+        v-if="this.alert.alertId"
+        class="m-top-26px"
+        :alert="this.alert"
+        alert-id="connectionError"
+      ></alert-view>
 
       <button
         v-show="!connectionStatus"

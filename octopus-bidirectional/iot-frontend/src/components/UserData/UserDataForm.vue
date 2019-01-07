@@ -59,9 +59,12 @@
           @input="setUserData($event)"
         >
       </div>
+
+      <alert-view class="m-top-16px" :alert="this.alert" alert-id="connectionError"></alert-view>
+
       <button
         v-show="!connectionStatus"
-        class="btn btn-primary m-top-16px"
+        class="btn btn-primary m-top-26px"
         @click="connect()"
         :disabled="connectionEmpty"
       >Connect</button>
@@ -75,12 +78,22 @@
 </template>
 
 <script>
+import AlertView from "../shared/AlertView.vue";
+
 export default {
   name: "user-data-form",
 
+  components: {
+    AlertView
+  },
+
   data() {
     return {
-      connectionEmpty: true
+      connectionEmpty: true,
+      alert: {
+        alertId: "",
+        isError: false
+      }
     };
   },
 
@@ -112,13 +125,27 @@ export default {
       this.$store.commit("setConnectionData", this.connection);
     },
     connect() {
-      this.$store.dispatch("getAllThings");
+      this.$store.dispatch("getAllThings").then(res => {
+        this.showAlert(res.toString());
+      });
     },
     disconnect() {
       this.$store.dispatch("disconnect");
     },
     onChange(event) {
       this.$store.dispatch("setPlatform", event.target.value);
+    },
+    showAlert(errMessage) {
+      if (errMessage !== "[object Object]") {
+        this.alert.alertId = "connectionError";
+        this.alert.errorMessage = errMessage;
+        this.alert.isError = true;
+        setTimeout(() => {
+          this.alert.errorMessage = "";
+          this.alert.alertId = "";
+          this.alert.isError = false;
+        }, 5000);
+      }
     }
   }
 };
@@ -130,6 +157,10 @@ export default {
 }
 
 .m-top-16px {
+  margin-top: 16px;
+}
+
+.m-top-26px {
   margin-top: 26px;
 }
 

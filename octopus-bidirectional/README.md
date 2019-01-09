@@ -75,6 +75,9 @@ Before you can start using this program, you will need to configure the `src/mai
 
 The Arduino Sketch we have prepared publishes the sensor information via the Bosch IoT Hub to Bosch IoT Things.
 
+**Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
+http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
+
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
 All properties have to be set in `iot-device/octopus-hub/settings.h`.

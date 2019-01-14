@@ -26,7 +26,6 @@
  */
 package com.bosch.iot.things.example.octopus.api.things;
 
-
 import static com.bosch.iot.things.example.octopus.api.permissions.PermissionsUserInformation.PASSWORD;
 import static com.bosch.iot.things.example.octopus.api.permissions.PermissionsUserInformation.USERNAME;
 import static com.bosch.iot.things.example.octopus.utils.HttpUtils.buildBasicAuthHeaderValue;
@@ -47,94 +46,82 @@ import com.bosch.iot.things.example.octopus.utils.FutureUtils;
 import com.bosch.iot.things.example.octopus.utils.HttpUtils;
 import com.bosch.iot.things.example.octopus.utils.ResponseHandlerFactory;
 
+import static com.bosch.iot.things.example.octopus.api.things.ConfigurationProperties.getPropertyOrThrowException;
 
 public class ThingsApiImpl implements ThingsApi {
 
-    private static final String API_TOKEN_HEADER_NAME = "x-cr-api-token";
-    private static final String API_URL = "https://things.s-apps.de1.bosch-iot-cloud.com/api/2";
-    private static final String POLICIES_URL = API_URL + "/policies";
-    private static final String THINGS_URL = API_URL + "/things";
+  private static final String API_TOKEN_HEADER_NAME = "x-cr-api-token";
+  private static final String API_URL = getPropertyOrThrowException("platform.http-endpoint");
+  private static final String POLICIES_URL = API_URL + "/policies";
+  private static final String THINGS_URL = API_URL + "/things";
 
-    @Override
-    public Policy registerPolicy(final Policy policy) {
-        final String policyId = policy.getId()
-                .orElseThrow(() -> {
-                    final String msgPattern = "Mandatory field <{0}> is missing!";
-                    return new IllegalArgumentException(
-                            MessageFormat.format(msgPattern, Policy.JsonFields.ID.getPointer()));
-                });
-        final JsonObject ownerSubject = JsonObject.newBuilder()
-                .set("${request.subjectId}",
-                        JsonObject.newBuilder().set("type", "iot-permissions-userid").build())
-                .build();
+  @Override
+  public Policy registerPolicy(final Policy policy) {
+    final String policyId = policy.getId().orElseThrow(() -> {
+      final String msgPattern = "Mandatory field <{0}> is missing!";
+      return new IllegalArgumentException(MessageFormat.format(msgPattern, Policy.JsonFields.ID.getPointer()));
+    });
+    final JsonObject ownerSubject = JsonObject.newBuilder()
+        .set("${request.subjectId}", JsonObject.newBuilder().set("type", "iot-permissions-userid").build()).build();
 
-        final JsonObject jsonPolicy = policy.toJson()
-                .setValue(JsonPointer.of("/entries/owner/subjects"), ownerSubject);
+    final JsonObject jsonPolicy = policy.toJson().setValue(JsonPointer.of("/entries/owner/subjects"), ownerSubject);
 
-        final JsonObject createdPolicy = register(POLICIES_URL, jsonPolicy, policyId);
+    final JsonObject createdPolicy = register(POLICIES_URL, jsonPolicy, policyId);
 
-        return PoliciesModelFactory.newPolicy(createdPolicy);
-    }
+    return PoliciesModelFactory.newPolicy(createdPolicy);
+  }
 
-    @Override
-    public void deletePolicy(final String policyId) {
-        delete(POLICIES_URL, policyId);
-    }
+  @Override
+  public void deletePolicy(final String policyId) {
+    delete(POLICIES_URL, policyId);
+  }
 
-    @Override
-    public Thing registerThing(final Thing thing) {
-        final JsonObject createdThing = register(THINGS_URL, thing.toJson(), thing.getId()
-                .orElseThrow(() -> {
-                    final String msgPattern = "Mandatory field <{0}> is missing!";
-                    return new IllegalArgumentException(
-                            MessageFormat.format(msgPattern, Thing.JsonFields.ID.getPointer()));
-                }));
+  @Override
+  public Thing registerThing(final Thing thing) {
+    final JsonObject createdThing = register(THINGS_URL, thing.toJson(), thing.getId().orElseThrow(() -> {
+      final String msgPattern = "Mandatory field <{0}> is missing!";
+      return new IllegalArgumentException(MessageFormat.format(msgPattern, Thing.JsonFields.ID.getPointer()));
+    }));
 
-        return ThingsModelFactory.newThing(createdThing);
-    }
+    return ThingsModelFactory.newThing(createdThing);
+  }
 
-    @Override
-    public void deleteThing(final String thingId) {
-        delete(THINGS_URL, thingId);
-    }
+  @Override
+  public void deleteThing(final String thingId) {
+    delete(THINGS_URL, thingId);
+  }
 
-    @Override
-    public JsonObject getThing(final String thingId) {
-        final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
-        final Request request = httpClient.prepareGet(THINGS_URL + "/" + thingId)
-                .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
-                .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME,
-                        buildBasicAuthHeaderValue(USERNAME, PASSWORD))
-                .build();
+  @Override
+  public JsonObject getThing(final String thingId) {
+    final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
+    final Request request = httpClient.prepareGet(THINGS_URL + "/" + thingId)
+        .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
+        .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME, buildBasicAuthHeaderValue(USERNAME, PASSWORD)).build();
 
-        return FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.defaultResponseHandler()),
-                HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
-    }
+    return FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.defaultResponseHandler()),
+        HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+  }
 
-    private JsonObject register(final String baseUrl, final JsonObject entityToRegister, final String entityId) {
-        final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
-        final Request request = httpClient.preparePut(baseUrl + "/" + entityId)
-                .setHeader(HttpUtils.CONTENT_TYPE_HEADER_NAME, HttpUtils.APPLICATION_JSON_CONTENT_TYPE)
-                .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
-                .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME,
-                        buildBasicAuthHeaderValue(USERNAME, PASSWORD))
-                .setBody(entityToRegister.toString())
-                .build();
+  private JsonObject register(final String baseUrl, final JsonObject entityToRegister, final String entityId) {
+    final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
+    final Request request = httpClient.preparePut(baseUrl + "/" + entityId)
+        .setHeader(HttpUtils.CONTENT_TYPE_HEADER_NAME, HttpUtils.APPLICATION_JSON_CONTENT_TYPE)
+        .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
+        .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME, buildBasicAuthHeaderValue(USERNAME, PASSWORD))
+        .setBody(entityToRegister.toString()).build();
 
-        return FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.defaultResponseHandler()),
-                HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
-    }
+    return FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.defaultResponseHandler()),
+        HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+  }
 
-    private void delete(final String baseUrl, final String entityId) {
+  private void delete(final String baseUrl, final String entityId) {
 
-        final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
-        final Request request = httpClient.prepareDelete(baseUrl + "/" + entityId)
-                .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
-                .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME,
-                        buildBasicAuthHeaderValue(USERNAME, PASSWORD))
-                .build();
+    final AsyncHttpClient httpClient = HttpUtils.getConfiguredHttpClient();
+    final Request request = httpClient.prepareDelete(baseUrl + "/" + entityId)
+        .setHeader(API_TOKEN_HEADER_NAME, SolutionInformation.API_TOKEN)
+        .setHeader(HttpUtils.AUTHORIZATION_HEADER_NAME, buildBasicAuthHeaderValue(USERNAME, PASSWORD)).build();
 
-        FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.deleteResponseHandler()),
-                HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
-    }
+    FutureUtils.get(httpClient.executeRequest(request, ResponseHandlerFactory.deleteResponseHandler()),
+        HttpUtils.REQUEST_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+  }
 }

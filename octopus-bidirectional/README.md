@@ -85,7 +85,7 @@ Just create this file from the following template and replace XXX placeholders w
 
 ```cpp
 #ifndef SETTINGS_H
-#define SETTING_H
+#define SETTINGS_H
 
 // ---- WiFi configuration ----
 #define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to connect to

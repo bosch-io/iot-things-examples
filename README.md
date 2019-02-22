@@ -113,7 +113,7 @@ After adding the public repository as described above, you can simply use the Th
 <dependency>
    <groupId>com.bosch.iot.things.client</groupId>
    <artifactId>things-client</artifactId>
-   <version>3.2.1</version>
+   <version>4.0.0</version>
 </dependency>
 ```
 
@@ -122,8 +122,8 @@ We also provide an OSGi-bundle:
 ```
 <dependency>
    <groupId>com.bosch.iot.things.client</groupId>
-      <artifactId>things-client-osgi</artifactId>
-   <version>3.2.1</version>
+   <artifactId>things-client-osgi</artifactId>
+   <version>4.0.0</version>
 </dependency>
 ```
 ## License

@@ -54,20 +54,20 @@ Before you can start using this program, you will need to configure the `src/mai
 
 1. An Arduino or another developer board like "Funduino" etc. </br> This example will work with an
    Octopus-board, </br>however, most of the code will work with every other board with an ESP8266 on it.
-2. [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+2. [Arduino IDE](https://www.arduino.cc/en/Main/Software) (tested with 1.8.5)
 
 ### Preparing
 
-1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino).
+1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino)(tested with 1.1.0).
 2. Install the following libraries (Sketch -> Include Library -> Manage Libraries)
-   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor)
-   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)
-   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280)
-   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
-   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
-   6. [PubSubClient library](https://github.com/knolleary/pubsubclient)
-   7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
-   8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping)
+   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor)(tested with 1.0.2)
+   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)(tested with 1.0.7)
+   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280)(tested with 1.0.7)
+   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)(tested with 1.1.6)
+   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)(tested with 1.1.7)
+   6. [PubSubClient library](https://github.com/knolleary/pubsubclient)(tested with 2.7.0)
+   7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson)(tested with 5.13.4)
+   8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping)(tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
 

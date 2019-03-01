@@ -31,7 +31,7 @@ import static com.bosch.iot.things.example.octopus.api.things.ConfigurationPrope
 public class HubDeviceRegistryInformation {
 
     private static final String TENANT = getPropertyOrThrowException("hub.tenant");
-    private static final String REGISTRY_URL = "https://device-registry.bosch-iot-hub.com";
+    private static final String REGISTRY_URL = "https://manage.bosch-iot-hub.com";
 
     static final String REGISTRATION_URL = REGISTRY_URL + "/registration/" + TENANT;
     static final String CREDENTIALS_URL = REGISTRY_URL + "/credentials/" + TENANT;

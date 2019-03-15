@@ -1,0 +1,6 @@
+.idea
+*.iml
+completedFiles.txt
+errorFile.txt
+retryFile.txt
+*-tmpFile.txt

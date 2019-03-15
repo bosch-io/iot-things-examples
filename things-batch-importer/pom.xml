@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!--
+    /**
+     *                                            Bosch SI Example Code License
+     *                                              Version 1.0, January 2016
+     *
+     * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+     *
+     * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+     * following conditions are met:
+     *
+     * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+     * disclaimer.
+     *
+     * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+     * following disclaimer in the documentation and/or other materials provided with the distribution.
+     *
+     * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+     * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+     * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+     * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+     * BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+     * LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+     * THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+     * UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+     * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+     * EMPLOYEES, REPRESENTATIVES AND ORGANS.
+     */
+    -->
+    <parent>
+        <groupId>com.bosch.iot.things.examples</groupId>
+        <artifactId>iot-things-examples</artifactId>
+        <version>0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    
+    <artifactId>things-batch-importer</artifactId>
+    <name>Bosch IoT Things :: Things Batch Importer</name>
+    <description>Bosch IoT Things Batch Importer</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+
+        <ditto.version>0.8.0</ditto.version>
+        <things-client.version>4.0.0</things-client.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <logback.version>1.2.3</logback.version>
+        <maven-assembly.version>3.1.0</maven-assembly.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.ditto</groupId>
+            <artifactId>ditto-model-things</artifactId>
+            <version>${ditto.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.ditto</groupId>
+            <artifactId>ditto-json</artifactId>
+            <version>${ditto.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bosch.iot.things.client</groupId>
+            <artifactId>things-client</artifactId>
+            <version>${things-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.bosch.iot.things.examples.BatchImporter</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

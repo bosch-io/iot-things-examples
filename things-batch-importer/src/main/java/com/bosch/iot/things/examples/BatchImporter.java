@@ -1,3 +1,29 @@
+/*
+ *                                            Bosch SI Example Code License
+ *                                              Version 1.0, January 2016
+ *
+ * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ * disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+ * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
+ * BOSCH SI HAS FRAUDULENTLY CONCEALED. APART FROM THE CASES STIPULATED ABOVE, BOSCH SI SHALL BE LIABLE WITHOUT
+ * LIMITATION FOR INTENT OR GROSS NEGLIGENCE, FOR INJURIES TO LIFE, BODY OR HEALTH AND ACCORDING TO THE PROVISIONS OF
+ * THE GERMAN PRODUCT LIABILITY ACT (PRODUKTHAFTUNGSGESETZ). THE SCOPE OF A GUARANTEE GRANTED BY BOSCH SI SHALL REMAIN
+ * UNAFFECTED BY LIMITATIONS OF LIABILITY. IN ALL OTHER CASES, LIABILITY OF BOSCH SI IS EXCLUDED. THESE LIMITATIONS OF
+ * LIABILITY ALSO APPLY IN REGARD TO THE FAULT OF VICARIOUS AGENTS OF BOSCH SI AND THE PERSONAL LIABILITY OF BOSCH SI'S
+ * EMPLOYEES, REPRESENTATIVES AND ORGANS.
+ */
 package com.bosch.iot.things.examples;
 
 import java.io.File;
@@ -59,7 +85,9 @@ public class BatchImporter {
 
     public static void main(String[] args) throws InterruptedException {
 
-        final int numOfCores = Runtime.getRuntime().availableProcessors() / 8;
+        final int numOfCoresFraction = Runtime.getRuntime().availableProcessors() / 8;
+
+        final int parallelism = Math.max(1, numOfCoresFraction);
 
         retryFilePath = createFile(RETRY_FILE);
         errorFilePath = createFile(ERROR_FILE);
@@ -71,21 +99,12 @@ public class BatchImporter {
 
         initWebsocketClient();
 
-        forkJoinPool = new ForkJoinPool(numOfCores);
+        forkJoinPool = new ForkJoinPool(parallelism);
 
-        if (numberOfFiles > numOfCores) {
-            while (!fileList.isEmpty()) {
-                final List<File> subList;
-                if (fileList.size() < numOfCores) {
-                    subList = fileList.subList(0, fileList.size());
-                } else {
-                    subList = fileList.subList(0, numOfCores);
-                }
-                uploadFiles(subList);
-                fileList.removeAll(subList);
-            }
-        } else {
-            uploadFiles(fileList);
+        while (!fileList.isEmpty()) {
+            final List<File> subList = fileList.subList(0, Math.min(fileList.size(), parallelism));
+            uploadFiles(subList);
+            fileList.removeAll(subList);
         }
 
         checkForRetryFile();
@@ -131,6 +150,7 @@ public class BatchImporter {
             LOGGER.error("Exception during read of retryFile '{}' - {}", retryFilePath.toFile().getName(),
                     e.getMessage());
         }
+        // wait for termination of all operations before allowing thread pool and websocket client to shutdown
         countDownLatch.countDown();
     }
 
@@ -205,11 +225,10 @@ public class BatchImporter {
                 final long lastLines = numLinesInFile - i;
                 final long limit = (lastLines < readAndUploadAtOnce) ? lastLines : readAndUploadAtOnce;
                 LOGGER.info("Parsing things #{} to #{} for file '{}'", i, i + limit, fileToParse.getName());
-                JsonArray jsonArray = getLinesAsArray(fileToParse, i, limit);
+                final JsonArray jsonArray = getLinesAsArray(fileToParse, i, limit);
                 LOGGER.info("Parsing is done - now uploading things #{} to #{} ", i, i + limit);
 
                 uploadThingsViaClient(jsonArray, pathToTmpFile, i);
-                jsonArray = null; // try to avoid OutOfMemoryException
             }
         } catch (IOException e) {
             LOGGER.error("Error during File access!");
@@ -217,15 +236,14 @@ public class BatchImporter {
         }
     }
 
-    private static void uploadThingsViaClient(final JsonValue jsonArray, final Path pathToTmpFile,
-            final int index) {
+    private static void uploadThingsViaClient(final JsonArray jsonArray, final Path pathToTmpFile, final int index) {
 
         LOGGER.info("Beginning to upload things ...");
 
         final ExecutorService executorService = Executors.newFixedThreadPool(NUM_OF_THREADS);
         final AtomicInteger lineCounter = new AtomicInteger(index);
 
-        jsonArray.asArray().forEach(jsonValue -> {
+        jsonArray.forEach(jsonValue -> {
                     try {
                         twin.create((JsonObject) jsonValue).whenCompleteAsync((thing, throwable) -> {
                             if (throwable != null) {

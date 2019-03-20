@@ -58,6 +58,10 @@ Then you can import this example. It contains several collections of HTTP reques
 
 Additional to the prepared requests you will need valid user credentials and an API token.
 
+### Example "things-batch-importer"
+
+With this tool it is possible to upload multiple things stored in a file. This example is using the things client for uploading the things.
+
 ### Example "things-client-examples"
 
 This example shows how to use the Things Client for Java.

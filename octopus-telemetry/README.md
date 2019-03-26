@@ -44,19 +44,20 @@ To program your board you can use the [Arduino IDE](https://www.arduino.cc/en/Ma
 There you can write the code that should be executed on your board and upload it to your board.
 
 ### Setup IDE
-1. Download [Arduino IDE](https://www.arduino.cc/en/Main/Software)
-2. Configure [ESP8266 board support](https://learn.adafruit.com/adafruit-feather-huzzah-esp8266/using-arduino-ide#install-the-esp8266-board-package)
-3. Install the following libraries (Sketch > Include Library > Manage Libraries)
-    * [Adafruit Unified Sensor library](https://github.com/adafruit/Adafruit_Sensor)
-    * [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680) (If your board has a BME680 instead of BME280)
-    * [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280) (If your board has a BME280 instead of BME680)
-    * [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
-    * [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
-    * [PubSubClient library](https://github.com/knolleary/pubsubclient)
-4. Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the MQTT_MAX_PACKET_SIZE
-to 2560. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
+1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino) (tested with 2.4.1).
+2. Install the following libraries (Sketch > Include Library > Manage Libraries)
+   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor) (tested with 1.0.2)
+   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680) (tested with 1.0.7) (If your board has a BME680 instead of BME280) 
+   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280) (tested with 1.0.7) (If your board has a BME280 instead of BME680)
+   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.1.6)
+   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.1.7)
+   6. [PubSubClient library](https://github.com/knolleary/pubsubclient) (tested with 2.7.0)
+
+3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
+   `MQTT_MAX_PACKET_SIZE` to `2048`. This is required because the size of our MQTT messages sent using the PubSubClient library have to fit into
 an array of this size. Unfortunately, we cannot define MQTT_MAX_PACKET_SIZE in our sources because of the way Arduino IDE
 compiles.
+
 
 With this setup, you can run our example that demonstrates how to retrieve the sensor values of your
 board. Open `src/main/octopus/octopus-sensor-only/octopus-sensor-only.ino` in Arduino IDE and upload it to your

@@ -30,31 +30,38 @@
 import Vue from "vue";
 import store from "../store";
 import axios from "axios";
+import qs from "qs";
 
 export default (window.Api = new class {
   constructor() {
     this.vue = new Vue({
-      name: "api",
-      store,
-      computed: {
-        connection: {
-          get() {
-            return this.$store.getters.getConnection;
-          }
-        },
-        selected: {
-          get() {
-            return this.$store.getters.getSelected;
-          }
-        }
-      }
-    });
+                         name: "api",
+                         store,
+                         computed: {
+                           connection: {
+                             get() {
+                               return this.$store.getters.getConnection;
+                             }
+                           },
+                           selected: {
+                             get() {
+                               return this.$store.getters.getSelected;
+                             }
+                           },
+                           suiteAuthHost: {
+                             get() {
+                               return this.$store.getters.getSuiteAuthHost;
+                             }
+
+                           }
+                         }
+                       });
 
     this.routes = {
-      policies: this.vue.connection.http_endpoint + "/api/2" + "/policies",
+      policies:
+        this.vue.connection.http_endpoint + "/api/2" + "/policies",
       searchThings:
-        this.vue.connection.http_endpoint +
-        "/api/2" +
+        this.vue.connection.http_endpoint + "/api/2" +
         "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
       things: this.vue.connection.http_endpoint + "/api/2" + "/things",
       messages:
@@ -93,32 +100,67 @@ export default (window.Api = new class {
         }
       };
     }
-    return {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: this.createAuthHeader(
-          this.vue.connection.username,
-          this.vue.connection.password
-        ),
-        "x-cr-api-token": this.vue.connection.api_token
+    if (!additionalHeader && !this.vue.connection.suiteAuthActive) {
+      return {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: this.createAuthHeader(
+            this.vue.connection.username,
+            this.vue.connection.password
+          ),
+          "x-cr-api-token": this.vue.connection.api_token
+        }
+      };
+    }
+    if (this.vue.connection.suiteAuthActive) {
+      return {
+        // TODO - Call Things with SuiteAuthActive
       }
-    };
+    }
   };
+
 
   getAllThings = () => {
     return axios.get(
       `${
         this.vue.connection.http_endpoint
-      }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+        }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
       this.getConfig()
     );
   };
+
+
+  getJWTToken = () => {
+    var bodyFormData = new FormData();
+
+    bodyFormData.set('grant_type', 'client_credentials');
+    bodyFormData.set('client_id', this.vue.connection.client_id);
+    bodyFormData.set('client_secret', this.vue.connection.client_secret);
+    bodyFormData.set('scope', this.vue.connection.scope);
+
+    const data = {
+      'grant_type': 'client_credentials',
+      'client_id': this.vue.connection.client_id,
+      'client_secret': this.vue.connection.client_secret,
+      'scope': this.vue.connection.scope
+    }
+
+    const dataString = qs.stringify(data);
+
+    return axios({
+            method: 'post',
+            url: this.vue.suiteAuthHost,
+            data: dataString,
+            config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
+          })
+  };
+
 
   sendMessage = (message, topic, corrId) => {
     return axios.post(
       `${this.vue.connection.http_endpoint}/api/2/things/${
         this.vue.selected.thingId
-      }/inbox/messages/${topic}`,
+        }/inbox/messages/${topic}`,
       `${JSON.stringify(message)}`,
       this.getConfig(corrId)
     );

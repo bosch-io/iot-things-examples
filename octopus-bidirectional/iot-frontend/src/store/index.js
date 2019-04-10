@@ -35,19 +35,29 @@ Vue.use(Vuex);
 
 const AWS = "https://things.eu-1.bosch-iot-suite.com";
 const BIC = "https://things.s-apps.de1.bosch-iot-cloud.com";
+const SUITEAUTHHOST = "https://access.bosch-iot-suite.com";
+
+
 
 const store = new Vuex.Store({
   state: {
+    suiteAuthActive: true,
     connection: {
-      http_endpoint: "",
-      api_token: "",
+      http_endpoint: AWS,
+      api_token: "1234567",
       username: "",
-      password: ""
+      password: "",
+      client_id: "c5124c68-d88d-4774-8e54-836e881268c8",
+      client_secret: "2286494DCB39EE17C8651A7DC03E22F2",
+      scope: "service:iot-hub-prod:tf02ef68db31348fba60684c43e2eeb68_hub/full-access service:iot-things-eu-1:f02ef68d-b313-48fb-a606-84c43e2eeb68_things/full-access",
+      suiteAuthToken: "",
     },
     items: {},
     selected: "No thing selected",
     connectionStatus: false,
-    telemetryCount: 0
+    telemetryCount: 0,
+    suiteAuthHost: "https://access.bosch-iot-suite.com/token",
+    accessToken: ''
   },
 
   getters: {
@@ -65,49 +75,94 @@ const store = new Vuex.Store({
     },
     getTelemetryCount: state => {
       return state.telemetryCount;
-    }
-  },
+    },
+    getSuiteAuthActive: state => {
+      return state.suiteAuthActive;
+      },
+    getSuiteAuthHost: state => {
+      return state.suiteAuthHost;
+    },
+
+    },
+
 
   mutations: {
-    setSelected(state, thing) {
+    setSelected(state, thing)
+    {
       state.selected = thing;
-    },
-    setItems(state, items) {
+    }
+  ,
+    setItems(state, items)
+    {
       state.items = items;
-    },
-    setItem(state, item) {
+    }
+  ,
+    setItem(state, item)
+    {
       let thing = JSON.parse(item);
       state.items[thing.thingId] = deepmerge(state.items[thing.thingId], thing);
-    },
-    setConnectionData(state, value) {
+    }
+  ,
+    setConnectionData(state, value)
+    {
       state.connection = Object.assign({}, state.connection, value);
-    },
-    setConnectionStatus(state, status) {
+
+    }
+  ,
+    setConnectionStatus(state, status)
+    {
       state.connectionStatus = status;
-    },
-    incrementTelemetryCount(state) {
+    }
+  ,
+    incrementTelemetryCount(state)
+    {
       state.telemetryCount += 1;
-    },
-    setDisconnected(state) {
+    }
+  ,
+    setDisconnected(state)
+    {
       state.connectionStatus = false;
       state.selected = "No thing selected.";
       state.items = {};
-    },
-    updatePlatform(state, value) {
-      state.connection.http_endpoint = value;
     }
+  ,
+    updatePlatform(state, value)
+    {
+      state.connection.http_endpoint = value;
+
+
+    }
+  ,
+    setSuiteAuthActive(state, value)
+    {
+      state.suiteAuthActive = value;
+    }
+
   },
+
 
   actions: {
     /*
      * API action calls
      */
+
+    setSuiteAuthActive({ commit }, authenticationIndex) {
+      switch (authenticationIndex) {
+        case "1":
+          this.commit("setSuiteAuthActive", true);
+          break;
+        case "2":
+          this.commit("setSuiteAuthActive", false);
+          break;
+        default:
+          break;
+      }
+    },
     getAllThings({ commit }) {
       return new Promise((resolve, reject) => {
         Api.getAllThings()
           .then(res => {
-            this.commit(
-              "setItems",
+            this.commit("setItems",
               res.data.items.reduce(function(map, item) {
                 map[item.thingId] = item;
                 return map;
@@ -119,6 +174,23 @@ const store = new Vuex.Store({
           .catch(err => resolve(err));
       });
     },
+
+
+    getJWTToken ( { commit } ) {
+      return new Promise((resolve, reject) => {
+        Api.getJWTToken()
+          .then(res => {
+
+            console.log(res);
+
+            resolve(res)
+
+          })
+          .catch(err => resolve(err));
+      });
+    },
+
+
     saveChanges({ state }, thing) {
       return new Promise((resolve, reject) => {
         Api.saveChanges(thing)
@@ -126,6 +198,7 @@ const store = new Vuex.Store({
           .catch(err => reject(err));
       });
     },
+
     sendMessage({ state }, payload) {
       return new Promise((resolve, reject) => {
         Api.sendMessage(payload.message, payload.topic, payload.corrId)
@@ -161,7 +234,7 @@ const store = new Vuex.Store({
         default:
           break;
       }
-    }
+    },
   }
 });
 

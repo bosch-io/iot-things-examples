@@ -17,6 +17,7 @@
     "es6-promise": "^4.2.5",
     "event-source-polyfill": "^1.0.4",
     "node-sass": "^4.9.3",
+    "qs": "^6.7.0",
     "sass-loader": "^7.1.0",
     "vue": "^2.5.17",
     "vue-codemirror": "^4.0.5",

@@ -64,6 +64,8 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
   const char *dittoTopic = root["topic"];
   JsonObject &headers = root["headers"];
 
+  Serial.println(command);
+
   if (command.equals("switch_led"))
   {
     JsonObject &value = root["value"];

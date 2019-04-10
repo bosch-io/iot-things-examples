@@ -51,7 +51,7 @@ import com.bosch.iot.things.example.octopus.utils.ResponseHandlerFactory;
 public class ThingsApiImpl implements ThingsApi {
 
     private static final String API_TOKEN_HEADER_NAME = "x-cr-api-token";
-    private static final String API_URL = "https://things.s-apps.de1.bosch-iot-cloud.com/api/2";
+    private static final String API_URL = "https://things.eu-1.bosch-iot-suite.com/api/2";
     private static final String POLICIES_URL = API_URL + "/policies";
     private static final String THINGS_URL = API_URL + "/things";
 

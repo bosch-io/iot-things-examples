@@ -35,27 +35,31 @@ import qs from "qs";
 export default (window.Api = new class {
   constructor() {
     this.vue = new Vue({
-                         name: "api",
-                         store,
-                         computed: {
-                           connection: {
-                             get() {
-                               return this.$store.getters.getConnection;
-                             }
-                           },
-                           selected: {
-                             get() {
-                               return this.$store.getters.getSelected;
-                             }
-                           },
-                           suiteAuthHost: {
-                             get() {
-                               return this.$store.getters.getSuiteAuthHost;
-                             }
-
-                           }
-                         }
-                       });
+      name: "api",
+      store,
+      computed: {
+        connection: {
+          get() {
+            return this.$store.getters.getConnection;
+          }
+        },
+        selected: {
+          get() {
+            return this.$store.getters.getSelected;
+          }
+        },
+        suiteAuthHost: {
+          get() {
+            return this.$store.getters.getSuiteAuthHost;
+          }
+        },
+        suiteAuthActive: {
+          get() {
+            return this.$store.getters.getSuiteAuthActive;
+          }
+          },
+      }
+    });
 
     this.routes = {
       policies:
@@ -72,7 +76,8 @@ export default (window.Api = new class {
     };
   }
 
-  createAuthHeader = (username, password) => {
+
+  createAuthHeaderBasic = (username, password) => {
     return (
       "Basic " +
       btoa(
@@ -87,11 +92,11 @@ export default (window.Api = new class {
   };
 
   getConfig = (additionalHeader = null) => {
-    if (additionalHeader) {
+    if (additionalHeader && !this.vue.suiteAuthActive) {
       return {
         headers: {
           "Content-Type": "application/json",
-          Authorization: this.createAuthHeader(
+          Authorization: this.createAuthHeaderBasic(
             this.vue.connection.username,
             this.vue.connection.password
           ),
@@ -100,11 +105,20 @@ export default (window.Api = new class {
         }
       };
     }
-    if (!additionalHeader && !this.vue.connection.suiteAuthActive) {
+    if (additionalHeader && this.vue.suiteAuthActive) {
+      return {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization' : 'Bearer ' +  this.vue.connection.oAuth2_Token,
+          'x-correlation-id': additionalHeader
+        }
+      };
+    }
+    if (!additionalHeader && !this.vue.suiteAuthActive) {
       return {
         headers: {
           "Content-Type": "application/json",
-          Authorization: this.createAuthHeader(
+          Authorization: this.createAuthHeaderBasic(
             this.vue.connection.username,
             this.vue.connection.password
           ),
@@ -112,55 +126,55 @@ export default (window.Api = new class {
         }
       };
     }
-    if (this.vue.connection.suiteAuthActive) {
+    if (!additionalHeader && this.vue.suiteAuthActive) {
       return {
-        // TODO - Call Things with SuiteAuthActive
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization' : 'Bearer ' +  this.vue.connection.oAuth2_Token
+        }
       }
     }
   };
 
-
   getAllThings = () => {
     return axios.get(
       `${
-        this.vue.connection.http_endpoint
-        }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+      this.vue.connection.http_endpoint
+      }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
       this.getConfig()
-    );
+    );  
   };
 
-
-  getJWTToken = () => {
-    var bodyFormData = new FormData();
-
-    bodyFormData.set('grant_type', 'client_credentials');
-    bodyFormData.set('client_id', this.vue.connection.client_id);
-    bodyFormData.set('client_secret', this.vue.connection.client_secret);
-    bodyFormData.set('scope', this.vue.connection.scope);
-
-    const data = {
-      'grant_type': 'client_credentials',
-      'client_id': this.vue.connection.client_id,
-      'client_secret': this.vue.connection.client_secret,
-      'scope': this.vue.connection.scope
-    }
-
-    const dataString = qs.stringify(data);
-
-    return axios({
-            method: 'post',
-            url: this.vue.suiteAuthHost,
-            data: dataString,
-            config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
-          })
-  };
-
+  /*  getJWTToken = () => {
+     var bodyFormData = new FormData();
+ 
+     bodyFormData.set('grant_type', 'client_credentials');
+     bodyFormData.set('client_id', this.vue.connection.client_id);
+     bodyFormData.set('client_secret', this.vue.connection.client_secret);
+     bodyFormData.set('scope', this.vue.connection.scope);
+ 
+     const data = {
+       'grant_type': 'client_credentials',
+       'client_id': this.vue.connection.client_id,
+       'client_secret': this.vue.connection.client_secret,
+       'scope': this.vue.connection.scope
+     }
+ 
+     const dataString = qs.stringify(data);
+ 
+     return axios({
+       method: 'post',
+       url: this.vue.suiteAuthHost,
+       data: dataString,
+       config: { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+     })
+   }; */
 
   sendMessage = (message, topic, corrId) => {
     return axios.post(
       `${this.vue.connection.http_endpoint}/api/2/things/${
-        this.vue.selected.thingId
-        }/inbox/messages/${topic}`,
+      this.vue.selected.thingId
+      }/inbox/messages/${topic}`,
       `${JSON.stringify(message)}`,
       this.getConfig(corrId)
     );

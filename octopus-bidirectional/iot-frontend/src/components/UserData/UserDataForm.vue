@@ -43,7 +43,11 @@
         <div class="input-group-prepend">
           <label class="input-group-text" for="inputGroupSelect02">Authent.</label>
         </div>
-        <select class="custom-select" id="inputGroupSelect02" @change="onChangeAuthentication($event)">
+        <select
+          class="custom-select"
+          id="inputGroupSelect02"
+          @change="onChangeAuthentication($event)"
+        >
           <option value="1" @select="onChangeAuthentication($event)">OAuth2</option>
           <option value="2">BasicAuth</option>
         </select>
@@ -56,11 +60,7 @@
         :key="key"
         v-show="key !== 'http_endpoint' && key !== 'suiteAuthToken'"
       >
-        <div
-          :for="key"
-          v-if="suiteAuthActive"
-          v-show="key !== 'username' && key !== 'password'"
-        >
+        <div :for="key" v-if="suiteAuthActive" v-show="key !== 'username' && key !== 'password'">
           <label :for="key">
             <small class="grey">
               <i>{{ key }}:</i>
@@ -75,11 +75,7 @@
           >
         </div>
         <!-- Basic Auth Form -->
-        <div
-          :for="key"
-          v-else
-          v-show="key !== 'client_id' && key !== 'client_secret' && key !== 'scope'"
-        >
+        <div :for="key" v-else v-show="key !== 'oAuth2_Token'">
           <label :for="key">
             <small class="grey">
               <i>{{ key }}:</i>
@@ -108,151 +104,153 @@
         class="btn btn-primary m-top-26px"
         @click="connect()"
         :disabled="connectionEmpty"
-      >Connect
-      </button>
+      >Connect</button>
       <button
         v-show="connectionStatus"
         class="btn btn-sencondary m-top-16px"
         @click="disconnect()"
-      >Disconnect
-      </button>
+      >Disconnect</button>
     </div>
   </div>
 </template>
 
 <script>
-  import AlertView from "../shared/AlertView.vue";
+import AlertView from "../shared/AlertView.vue";
 
-  export default {
-    name: "user-data-form",
+export default {
+  name: "user-data-form",
 
-    components: {
-      AlertView
-    },
+  components: {
+    AlertView
+  },
 
-    data() {
-      return {
-        connectionEmpty: true,
-        alert: {
-          alertId: "",
-          isError: false
-        },
-      };
-    },
+  data() {
+    return {
+      connectionEmpty: true,
+      alert: {
+        alertId: "",
+        isError: false
+      }
+    };
+  },
 
-    computed: {
-      connection: {
-        get() {
-          return this.$store.getters.getConnection;
-        }
-      },
-      connectionStatus: {
-        get() {
-          return this.$store.getters.getConnectionStatus;
-        }
-      },
-      suiteAuthActive: {
-        get() {
-          return this.$store.getters.getSuiteAuthActive;
-        }
+  computed: {
+    connection: {
+      get() {
+        return this.$store.getters.getConnection;
       }
     },
-
-    watch: {
-      connection: function (val) {
-        // let isOneEmpty = Object.keys(this.connection).map(key => this.connection[key] === "");
-        //  this.connectionEmpty = isOneEmpty.includes(true);
-
-        if (this.suiteAuthActive && this.connection.api_token != "" && this.connection.client_secret != ""
-            && this.connection.client_id != "" && this.connection.scope != "") {
-          this.connectionEmpty = false;
-        } else if (!this.suiteAuthActive && this.connection.api_token != "" && this.connection.username != ""
-                   && this.connection.password != "") {
-          this.connectionEmpty = false;
-        } else {
-          this.connectionEmpty = true;
-        }
+    connectionStatus: {
+      get() {
+        return this.$store.getters.getConnectionStatus;
       }
     },
-    methods: {
-      setUserData(event) {
-        this.connection[event.target.id] = event.target.value;
-        this.$store.commit("setConnectionData", this.connection);
-      },
-
-      connect() {
-        if (!this.suiteAuthActive) {
-          this.$store.dispatch("getAllThings")
-            .then(res => {
-
-
-              //this.showAlert(res.toString());
-            })
-            .catch(err => console.log(err))
-        } else {
-          //TODO - get token.then(getAllThings) - Promise
-          this.$store.dispatch("getJWTToken").then(res => {
-
-            console.log(res);
-
-
-          }).catch(err => console.log(err));
-        }
-      },
-
-      disconnect() {
-        this.$store.dispatch("disconnect");
-      },
-      onChangePlatform(event) {
-        this.$store.dispatch("setPlatform", event.target.value);
-      },
-      onChangeAuthentication(event) {
-        this.$store.dispatch("setSuiteAuthActive", event.target.value);
-        // Clear all Input-Fields by keys
-        Object.keys(this.connection).map(key => this.connection[key] = "");
-        // Set Connection back to empty
-        this.connectionEmpty = true;
-      },
-      showAlert(errMessage) {
-        if (errMessage !== "[object Object]") {
-          this.alert.alertId = "connectionError";
-          this.alert.errorMessage = errMessage;
-          this.alert.isError = true;
-          setTimeout(() => {
-            this.alert.errorMessage = "";
-            this.alert.alertId = "";
-            this.alert.isError = false;
-          }, 5000);
-        }
+    suiteAuthActive: {
+      get() {
+        return this.$store.getters.getSuiteAuthActive;
       }
     }
-  };
+  },
+
+  watch: {
+    connection: function(val) {
+ 
+      if (
+        this.suiteAuthActive &&
+        this.connection.api_token != "" &&
+        this.connection.oAuth2_Token != ""
+      ) {
+        this.connectionEmpty = false;
+      } else if (
+        !this.suiteAuthActive &&
+        this.connection.api_token != "" &&
+        this.connection.username != "" &&
+        this.connection.password != ""
+      ) {
+        this.connectionEmpty = false;
+      } else {
+        this.connectionEmpty = true;
+      }
+    }
+  },
+  methods: {
+    setUserData(event) {
+      this.connection[event.target.id] = event.target.value;
+      this.$store.commit("setConnectionData", this.connection);
+    },
+
+    connect() {
+      if (!this.suiteAuthActive) {
+        this.$store
+          .dispatch("getAllThings")
+          .then(res => {
+            this.showAlert(res.toString());
+          
+          })
+          .catch(err => console.log(err));
+      } else if(this.suiteAuthActive){
+      
+        this.$store
+          .dispatch("getAllThings")
+          .then(res => {
+            console.log(res);
+          })
+          .catch(
+            err => console.log(err),
+            this.showAlert(err)
+            );
+      }
+    },
+
+    disconnect() {
+      this.$store.dispatch("disconnect");
+    },
+    onChangePlatform(event) {
+      this.$store.dispatch("setPlatform", event.target.value);
+    },
+    onChangeAuthentication(event) {
+      this.$store.dispatch("setSuiteAuthActive", event.target.value);
+      // Clear all Input-Fields by keys
+      Object.keys(this.connection).map(key => (this.connection[key] = ""));
+      // Set Connection back to empty
+      this.connectionEmpty = true;
+    },
+    showAlert(errMessage) {
+      if (errMessage !== "[object Object]") {
+        this.alert.alertId = "connectionError";
+        this.alert.errorMessage = errMessage;
+        this.alert.isError = true;
+        setTimeout(() => {
+          this.alert.errorMessage = "";
+          this.alert.alertId = "";
+          this.alert.isError = false;
+        }, 5000);
+      }
+    }
+  }
+};
 </script>
 
 <style>
-  .m-top-10px {
-    margin-top: 10px;
-  }
+.m-top-10px {
+  margin-top: 10px;
+}
 
-  .m-top-16px {
-    margin-top: 16px;
-  }
+.m-top-16px {
+  margin-top: 16px;
+}
 
-  .m-top-26px {
-    margin-top: 26px;
-  }
+.m-top-26px {
+  margin-top: 26px;
+}
 
-  .grey {
-    color: grey;
-  }
+.grey {
+  color: grey;
+}
 
-  .input-group mb-3 {
-
-    margin: 10px 0 0 10px;
-    width: 100%;
-    float: left;
-
-  }
-
-
+.input-group mb-3 {
+  margin: 10px 0 0 10px;
+  width: 100%;
+  float: left;
+}
 </style>

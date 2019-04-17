@@ -4,7 +4,7 @@
 
 ## Summary
 
-This example shows how to use Bosch IoT Things and Bosch IoT Hub to connect your device with our cloud services and a frontend solution. It shows how to subscribe to our Bosch IoT Suite services, how to use their HTTP endpoints, and how to send data within these services.</br>
+This example shows how to use Bosch IoT Things and Bosch IoT Hub to connect your device with our cloud services and a frontend solution. It shows how to subscribe to our Bosch IoT Suite for Asset Communication service, how to use its HTTP endpoints, and how to send data within these services.</br>
 Furthermore, the example provides a prototype of a real world device - based on the Octopus board (ESP8266) - and a web application to manage your things.
 
 The **device** will be able to connect automatically to a given wireless internet access, to send telemetry data to the
@@ -16,20 +16,27 @@ We will use the _telemetry_, _event_ as well as the _command & control_ pattern 
 
 ![](img/octo.png)
 
-## Setting up Bosch IoT Things and Hub
+## Setting up Bosch IoT Suite for Asset Communication
 
-All services can be booked online at
-[Bosch IoT Suite](https://bosch-iot-suite.com/tutorials/howtosubscribe/) portal. For all subscriptions, you will need a
-_Bosch ID_ for authentication. If you don't have a Bosch ID yet, feel free to register a new account.<br/>
-Once you are successfully registered, you will be redirected to the Bosch IoT Suite portal.
+All services can be booked online at [Bosch IoT Suite](https://bosch-iot-suite.com/tutorials/howtosubscribe/) portal. For your subscription, you will need a
+_Bosch ID_ for authentication. If you don't have a Bosch ID yet, feel free to register a new account. Once you are successfully registered, you will be redirected to the Bosch IoT Suite portal.
 
-You will need to subscribe
+You will need to subscribe for **Bosch IoT Suite for Asset Communication** - a ready-to-use integration of Bosch IoT Hub and Bosch IoT Things. Furthermore, you will get a preconfigured connection between both services and a thing-dashboard for your real world octopus-device.
 
-- Bosch IoT Hub - for the connection from the board to the cloud
-- Bosch IoT Things - for the digital representation of the device towards a web application
-- Bosch IoT Permissions - for the basic auth flow on the example web application.
+Once you have an own service instance of Bosch IoT Things and Bosch IoT Hub, ....
 
-Once you have an own service instance of Bosch IoT Things and Bosch IoT Hub, we can create a connection between these services using the Bosch IoT Things dashboard. You will find a link to the Things dashboard under point 'Actions' in your
+
+
+// TODO - Buchungsprozess (Asset Communication package - MIT oder OHNE Screenshots?)
+// TODO - Device Provisioning Call über Swagger durchführen (Für Einträge siehe Screenshot)
+// TODO - Settings File vom Arduino anpassen und speichern.
+// TODO - ARDUINO konfigurieren und Response verwenden für Credentials
+// -------------------------------------Bis hierhin wie telemetry ------------------------------------------------
+// TODO - Frontend verwenden und beide Authentifizierungs-Varianten kurz vorstellen.
+
+
+
+You will find a link to the Things dashboard under point 'Actions' in your
 [service subscriptions](https://accounts.bosch-iot-suite.com/subscriptions/) view.
 
 Select the connection category "Bosch IoT Hub" and the wizard will guide you through the creation process. Find your Hub credentials in your

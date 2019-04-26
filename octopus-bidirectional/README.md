@@ -8,52 +8,207 @@ This example shows how to use Bosch IoT Things and Bosch IoT Hub to connect your
 Furthermore, the example provides a prototype of a real world device - based on the Octopus board (ESP8266) - and a web application to manage your things.
 
 The **device** will be able to connect automatically to a given wireless internet access, to send telemetry data to the
-Things service, and to react to messages which will be sent by the web application.
+Things service, and to react to messages which will be sent by the provided web application.
 
-The **web application** will use our Bosch IoT Things HTTP endpoints to communicate with the "digital twin" of the device and the device itself.
+The **web application** will use our Bosch IoT Things HTTP endpoints to communicate with the "digital twin" of the device and the physical device itself.
+
+Before you can start, you have to prepare your setup. This includes the following steps:
+1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
+2. [Set a Policy for your thing](#set-a-policy-for-your-thing)  
+3. [Request the Device Provisioning API](#device-provisioning-api)
+4. [Setting up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
+5. [Send messages to your octopus and switch LEDs via Web Application](#getting-started)
 
 We will use the _telemetry_, _event_ as well as the _command & control_ pattern of the Bosch IoT Hub.
 
 ![](img/octo.png)
+
+## About the Octopus board
+The Octopus board is created by Guido Burger. Its original purpose was to be used as a teaching tool for Hackathons in
+secondary schools in Germany. It features a number of sensors, and the ability to connect sensors, inputs, and
+actuators in a relatively simple way. More information and the source code for the schematics can be found on the
+<a href="https://www.tindie.com/products/FabLab/iot-octopus-badge-for-iot-evaluation/">Fab-Lab.eu Octopus page</a>.
+While Guido Burger offers some boards in his Tindie store, overall the Octopus board is a not-for-profit activity.
+The Octopus board is a small board based on a ESP8266 Chip that can be programmed e.g. using the Arduino IDE.
+The special thing about this board is, that it already contains components that makes it a ready-to-run starter-kit
+to experiment with the Internet of Things.
+Here you can see a detailed description of the official Octopus Board used for the "Nationaler IT Gipfel".
+
+<img alt="Drawing" style="width: 640px;height: 360px" src="https://cdn.tindiemedia.com/images/resize/tPhVtjN_DuxDKaRkY0-bOKacDbU=/p/74x59:1024x692/full-fit-in/2400x1600/i/52962/products/2016-12-08T20%3A25%3A54.337Z-octo_pinout_final_top.jpg"/>
+
+Source: [Tindimedia](https://cdn.tindiemedia.com/images/resize/tPhVtjN_DuxDKaRkY0-bOKacDbU=/p/74x59:1024x692/full-fit-in/2400x1600/i/52962/products/2016-12-08T20%3A25%3A54.337Z-octo_pinout_final_top.jpg)
+
+For example, the Bosch IoT Suite edition board contains the following sensors:
+* [Bosch Sensortec BNO055](https://www.bosch-sensortec.com/bst/products/all_products/bno055)
+9-axis absolute orientation sensor – provides acceleration, gyroscope, spatial positioning, magnetic field etc.
+* [Bosch Sensortec BME680](https://www.bosch-sensortec.com/bst/products/all_products/bme680)
+environmental sensor – provides temperature, humidity, air pressure, altitude, air quality
 
 ## Setting up Bosch IoT Suite for Asset Communication
 
 All services can be booked online at [Bosch IoT Suite](https://bosch-iot-suite.com/tutorials/howtosubscribe/) portal. For your subscription, you will need a
 _Bosch ID_ for authentication. If you don't have a Bosch ID yet, feel free to register a new account. Once you are successfully registered, you will be redirected to the Bosch IoT Suite portal.
 
-You will need to subscribe for **Bosch IoT Suite for Asset Communication** - a ready-to-use integration of Bosch IoT Hub and Bosch IoT Things. Furthermore, you will get a preconfigured connection between both services and a thing-dashboard for your real world octopus-device.
+You will need to subscribe for **Bosch IoT Suite for Asset Communication** - a ready-to-use integration of Bosch IoT Hub and Bosch IoT Things. Furthermore, you will get a preconfigured connection between both services and a thing-dashboard for your real world octopus-device. In order to book your **Bosch IoT Suite for Asset Communication** subscription, please stick to the [Booking a package](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#booking) and [First configuration steps](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#configuration) sections of our [Getting Started Guide](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/).
 
-Once you have an own service instance of Bosch IoT Things and Bosch IoT Hub, ....
+### Namespace
 
+Once you have an own service instance of Bosch IoT Things and Bosch IoT Hub, we can define a **Namespace** for your solution. All things, policies and topologies are required to be created with a namespace. In order to set a namespace, go to your _Service Subscription page_ of the Bosch IoT Suite. Click on the **Go to Dashboard** button and find the **Namespace** tab. Here you can type in your namespace in the dedicated input field.
 
+The `namespace` must conform to the reserve domain name notation:
+* _must_ start with a lower- or uppercase character from a-z
+* _can_ use dots `(.)` to separate characters
+* a dot `(.)` must be followed by a lower- or uppercase character from a-z
+* numbers _can_ be used
+* underscore _can_ be used
 
-// TODO - Buchungsprozess (Asset Communication package - MIT oder OHNE Screenshots?)
-// TODO - Device Provisioning Call über Swagger durchführen (Für Einträge siehe Screenshot)
-// TODO - Settings File vom Arduino anpassen und speichern.
-// TODO - ARDUINO konfigurieren und Response verwenden für Credentials
-// -------------------------------------Bis hierhin wie telemetry ------------------------------------------------
-// TODO - Frontend verwenden und beide Authentifizierungs-Varianten kurz vorstellen.
+## Set a policy for your thing
 
+A Policy enables developers to configure fine-grained access control for Things and other entities in an easy way. A specific policy provides someone (called subject), permission to read and/or write a given resource.
 
+In order to set a policy, go to the [Bosch IoT Things HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/), which is a JSON-based, REST-like API for the Bosch IoT Things service.
 
-You will find a link to the Things dashboard under point 'Actions' in your
-[service subscriptions](https://accounts.bosch-iot-suite.com/subscriptions/) view.
+You will need a Suite authorization token for the authorization on our API. Please follow the **Authorize** section within the [Getting Started Guide](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#provisioning) and get such a token with an OAuth2 client from the _Service Subscription page_ of the Bosch IoT Suite.
 
-Select the connection category "Bosch IoT Hub" and the wizard will guide you through the creation process. Find your Hub credentials in your
-[service subscriptions](https://accounts.bosch-iot-suite.com/subscriptions/) view.
+You will need to do the following steps:
+1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated **bearerAuth  (http, Bearer)** input field.
+2. Find the _Create or update a Policy with a specific ID_ entry in **Policies**> `PUT`/policies/{policyId}.
+3. Click on the **Try out** button and provide a _policyId_. It must contain your previously created _namespace_ followed by a specific id e.g. `yourNamespace:octopus`.
+4. Edit the request body as below.
 
-**Tip:** The connection creation wizard will ask for an authorization context. For this example, please use
-`integration:<YOUR-SOLUTION-ID>:octopus`, as the Octopus board will be prepared accordingly.</br>
-Find details at [Manage your connections](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection).
+```json
+{
+  "entries": {
+    "DEVICE": {
+      "subjects": {
+        "integration:yourSolutionId:hub": {
+          "type": "iot-things-integration"
+        }
+      },
+      "resources": {
+        "thing:/features": {
+          "grant": [
+            "WRITE"
+          ],
+          "revoke": []
+        },
+        "message:/": {
+          "grant": [
+            "READ"
+          ],
+          "revoke": []
+        }
+      }
+    },
+    "DEFAULT": {
+      "subjects": {
+        "iot-suite:YourSuiteAuthClientId": {
+          "type": "suite-auth"
+        }
+      },
+      "resources": {
+        "policy:/": {
+          "grant": [
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        },
+        "thing:/": {
+          "grant": [
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        },
+        "message:/": {
+          "grant": [
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        }
+      }
+    },
+    "OtherUser": {
+      "subjects": {
+        "bosch:YourTechnicalUserId": {
+          "type": "bosch-id"
+        }
+      },
+      "resources": {
+        "thing:/": {
+          "grant": [
+            "READ"
+          ],
+          "revoke": []
+        }
+      }
+    }
+  }
+}
+```
 
-## Configure the Java program
+You will need to edit the following boldface marked fields:
+* "integration:**yourSolutionId**:hub" - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
+* "iot-suite:**YourSuiteAuthClientId**": - _You can find your Suite Auth Client ID on the Service Subscriptions Page under My Account>OAuth2 Clients_.
+* "bosch:**YourTechnicalUserId**" - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
 
-The next step is to use a little Java program, which will create a thing and a policy with the authorization context `integration:<YOUR-SOLUTION-ID>:octopus`.
+Click _Execute_ to submit the request.
 
-Furthermore, the program registers the Octopus device with valid credentials at the Bosch IoT Hub.
+Upon success, you created a valid Policy which you can pass your things with the access authorization for the command and control use case.
 
-Before you can start using this program, you will need to configure the `src/main/resource/application.properties` file. Fill out the empty fields with valid credentials, then start the program with:
-`mvn clean compile exec:java` in the root folder of the project.
+## Device Provisioning API
+
+With just one request at our API, you will be able to register a device (in the context of the Bosch IoT Hub service) and create a digital twin representation of this device (in the context of the Bosch IoT Things service) in thing notation. In order to do so, you will need a Suite authorization token and a valid request body for your device registration. Please follow the **Authorize** section within the [Getting Started Guide](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#provisioning) and get such a token with an OAuth2 client from the _Service Subscription page_ of the Bosch IoT Suite.
+
+Subsequently, open the [Bosch IoT Suite - Device Provisioning API](https://apidocs.bosch-iot-suite.com/index.html?urls.primaryName=Bosch%20IoT%20Suite%20-%20Device%20Provisioning#/provisioning/post__service_instance_id__devices), where you can execute your device registration.
+
+You will need to do the following steps:
+1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated input field.
+2. Provide your _service-instance-id_ on the required input-field. You can find your _service-instance-id_ under the **Show Credentials** button of your  _Service Subscription page_ in the Bosch IoT Suite.
+3. Edit the request body to send a valid message to the server.
+
+Your request body should contain the following informations:
+
+```json
+{
+  "id": "com.awesome.example:my-device-id",
+  "hub": {
+    "device": {
+      "enabled": true
+    },
+    "credentials": {
+      "type": "hashed-password",
+      "auth-id": "yourAuthId",
+      "secrets": [
+        {
+          "password": "yourPlainTextPassword"   
+        }
+      ]
+    }
+  },
+  "things": {
+    "thing": {
+      "policyId": "yourPolicyId",
+      "attributes": {
+        "manufacturer": "MyAwesomeCompany"
+      }
+    }
+  }
+}
+```
+
+You will need to edit the following boldface marked fields:
+* "id": "**com.awesome.example:my-device-id**" - _Use your created namespace followed by_ `:` _and your specific thing ID. In our use case it should be_ `yourNamespace:octopus`.
+* "password": "**yourPlainTextPassword**" - _Type in a secure password in plain text. It will be hashed on our server._
+* "auth-id": "**yourAuthId**" - _Set a short AuthID e.g._ `octopus`.
+* "policyId": "**yourPolicyId**" - _Pass the ID of your previously created Policy, to set your preconfigured Policy on your thing._
+* "manufacturer": "**MyAwesomeCompany**" - _Type in your company Name._
+
+Click _Execute_ to submit the request.
+
+Upon success, you have created a _device_ in the context of Bosch IoT Hub associated with credentials, an empty _digital twin_ in _thing_ notation associated with a policy and a _default policy_, which can be refined as fine grained as your usage scenario requires.
 
 ## Prepare the Octopus device with Arduino
 
@@ -61,20 +216,20 @@ Before you can start using this program, you will need to configure the `src/mai
 
 1. An Arduino or another developer board like "Funduino" etc. </br> This example will work with an
    Octopus-board, </br>however, most of the code will work with every other board with an ESP8266 on it.
-2. [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+2. Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 ### Preparing
 
-1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino).
+1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino) (tested with 2.4.1).
 2. Install the following libraries (Sketch -> Include Library -> Manage Libraries)
-   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor)
-   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680)
-   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280)
-   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055)
-   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel)
-   6. [PubSubClient library](https://github.com/knolleary/pubsubclient)
-   7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
-   8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping)
+   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor) (tested with 1.0.2)
+   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680) (tested with 1.0.7)
+   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280) (tested with 1.0.7)
+   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.1.6)
+   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.1.7)
+   6. [PubSubClient library](https://github.com/knolleary/pubsubclient) (tested with 2.7.0)
+   7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (tested with 5.13.4)
+   8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
 
@@ -88,25 +243,25 @@ http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
 All properties have to be set in `iot-device/octopus-hub/settings.h`.
-Just create this file from the following template and replace XXX placeholders with your configuration properties.
+Just find this file from the following template and replace XXX placeholders with your configuration properties.
 
 ```cpp
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
 // ---- WiFi configuration ----
-#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to connect to
-#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to connect to
+#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to connect to.
+#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to connect to.
 
 // ---- Things registration properties ----
-#define THINGS_NAMESPACE "XXX" // The namespace you created in your solution
-#define THING_NAME "octopus" // should not be changed unless you changed code in the java preparation program. This is the thing id without the namespace.
+#define THINGS_NAMESPACE "XXX" // The namespace you created in your solution.
+#define THING_NAME "octopus" // Should not be changed - This is the thing id without the namespace.
 
 // ---- Hub registration properties ----
-#define HUB_TENANT "XXX" // The tenant id of your hub instance
-#define HUB_DEVICE_ID "XXX" // The device id that was printed out by the java preparation program
-#define HUB_DEVICE_AUTH_ID "XXX" // The auth id that was printed out by the java preparation program
-#define HUB_DEVICE_PASSWORD "XXX" // The device password that was printed out by the java preparation program
+#define HUB_TENANT "XXX" // The tenant id of your hub instance, which is provided by the credentials of the Bosch IoT Suite - service subscriptions page.
+#define HUB_DEVICE_ID "XXX" // The device id that was included in the response of the device provisioning API request.
+#define HUB_DEVICE_AUTH_ID "XXX" // The auth id that was included in the response of the device provisioning API request.
+#define HUB_DEVICE_PASSWORD "XXX" // The unhashed device password that was used for the device provisioning API request.
 
 // ---- Update rate of sensors ----
 #define SENSOR_UPDATE_RATE_MS 5000 // Print updated sensor value every 5 seconds
@@ -177,7 +332,9 @@ When everything is set up properly, you have access to the Command & Control Exa
 We assume you work with the version hosted at our demo
 [Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
 
-Log in with your user credentials. Find details at [Register Evaluation User](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) and make sure the user is empowered in the [policy of the octopus](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:policy_connection:policy_connection#dempower_a_device_to_update_the_hello_world_thing).
+You can use your _SuiteAuth_ authentication by choosing from the dropdown input and logging in with a valid Token. Please follow the **Authorize** section within the [Getting Started Guide](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#provisioning) and get such a token with an OAuth2 client from the _Service Subscription page_ of the Bosch IoT Suite. **Your Token will be valid for 5 minutes**. If your Token expires, you will need to get a new Token for authentication. In this case, please paste your new Token in the dedicated input field of the web application.
+
+Find details at [Register Evaluation User](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) and make sure the user is empowered in the [policy of the octopus](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:policy_connection:policy_connection#dempower_a_device_to_update_the_hello_world_thing).
 
 After you have added your credentials and pressed _connect_, you should see a list with your things
 (at least the octopus).

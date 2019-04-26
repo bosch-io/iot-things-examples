@@ -42,7 +42,7 @@ const store = new Vuex.Store({
     suiteAuthActive: true,
     connection: {
       http_endpoint: AWS,
-      api_token: "fccf4fd5561445ce8debbaca4cb669d8",
+      api_token: "",
       username: "",
       password: "",
       //client_id: "c5124c68-d88d-4774-8e54-836e881268c8",
@@ -55,7 +55,8 @@ const store = new Vuex.Store({
     connectionStatus: false,
     telemetryCount: 0,
     suiteAuthHost: "https://access.bosch-iot-suite.com/token",
-    accessToken: ''
+    accessToken: '',
+    userDataFormCollapsed: true,
   },
 
   getters: {
@@ -80,6 +81,9 @@ const store = new Vuex.Store({
     getSuiteAuthHost: state => {
       return state.suiteAuthHost;
     },
+    getUserDataFormCollapsed: state => {
+      return state.userDataFormCollapsed;
+    }
 
   },
 
@@ -123,15 +127,18 @@ const store = new Vuex.Store({
     ,
     setSuiteAuthActive(state, value) {
       state.suiteAuthActive = value;
+    },
+    setUserDataFormCollapsed(state, value) {
+      state.userDataFormCollapsed = value;
     }
-
+ 
   },
 
 
   actions: {
     /*
      * API action calls
-     */
+     */ 
 
     setSuiteAuthActive({ commit }, authenticationIndex) {
       switch (authenticationIndex) {
@@ -163,21 +170,6 @@ const store = new Vuex.Store({
     },
 
 
-  /*   getJWTToken({ commit }) {
-      return new Promise((resolve, reject) => {
-        Api.getJWTToken()
-          .then(res => {
-
-            console.log(res);
-
-            resolve(res)
-
-          })
-          .catch(err => resolve(err));
-      });
-    },
- */
-
     saveChanges({ state }, thing) {
       return new Promise((resolve, reject) => {
         Api.saveChanges(thing)
@@ -186,23 +178,28 @@ const store = new Vuex.Store({
       });
     },
 
+    collapseUserDataView({ state }, value) {
+        this.commit("setUserDataFormCollapsed", value);
+    },
+
     sendMessage({ state }, payload) {
       return new Promise((resolve, reject) => {
         Api.sendMessage(payload.message, payload.topic, payload.corrId)
           .then(res => {
-          
-            const myMessage = JSON.stringify(res.data);
-            console.log(myMessage);
 
-            resolve(res)           
-          
+            console.log(res)
+        
+            resolve(res)
+
           })
           .catch(err => {
-            
-            const myMessage = JSON.stringify(err.data);
-            
-            reject(err)
+           // console.log(err.response.data.description, err.response.data.status);
+           //this.commit("setDisconnected");
+          // this.commit("setUserDataFormCollapsed", true);
+             this.commit("setDisconnected");
+             this.commit("setUserDataFormCollapsed", true);
           
+            reject(err)
           });
       });
     },

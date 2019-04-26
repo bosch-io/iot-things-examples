@@ -80,6 +80,7 @@
   </div>
 </template>
 
+
 <script>
 import UserDataForm from "./UserDataForm.vue";
 
@@ -92,8 +93,7 @@ export default {
 
   data() {
     return {
-      gettingTelemetry: false,
-      collapsed: true
+      gettingTelemetry: false
     };
   },
   computed: {
@@ -105,6 +105,11 @@ export default {
     telemetryCount: {
       get() {
         return this.$store.getters.getTelemetryCount;
+      }
+    },
+    collapsed: {
+      get() {
+        return this.$store.getters.getUserDataFormCollapsed;
       }
     }
   },
@@ -129,8 +134,10 @@ export default {
       Event.fire("connectionError");
     },
     showData() {
-      this.collapsed = !this.collapsed;
+      //this.collapsed = !this.collapsed;
+      this.$store.dispatch("collapseUserDataView", !this.collapsed);
     }
+    
   }
 };
 </script>

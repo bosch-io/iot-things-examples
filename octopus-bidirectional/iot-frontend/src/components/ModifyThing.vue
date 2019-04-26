@@ -104,6 +104,7 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css";
 import "codemirror/addon/selection/active-line.js";
 import AlertView from "./shared/AlertView.vue";
+import UserDataViewVue from './UserData/UserDataView.vue';
 
 export default {
   name: "ModifyThing",
@@ -200,10 +201,16 @@ export default {
             `Response: ${JSON.stringify(res.data)}`
           );
           this.isSending = false;
+
         })
         .catch(err => {
+
+        //  console.log('KOMPLETT NICHT ACCEPTED: ', err);
+
           this.isSending = false;
           this.showAlert(false, "sendMessage", err.message);
+          
+
         });
     },
     showAlert(isOkay, alertId, alertMessage) {

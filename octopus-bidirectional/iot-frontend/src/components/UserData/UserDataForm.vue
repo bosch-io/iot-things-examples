@@ -60,7 +60,7 @@
         :key="key"
         v-show="key !== 'http_endpoint' && key !== 'suiteAuthToken'"
       >
-        <div :for="key" v-if="suiteAuthActive" v-show="key !== 'username' && key !== 'password'">
+        <div :for="key" v-if="suiteAuthActive" v-show="key !== 'username' && key !== 'password' && key !== 'api_token'">
           <label :for="key">
             <small class="grey">
               <i>{{ key }}:</i>
@@ -157,7 +157,6 @@ export default {
  
       if (
         this.suiteAuthActive &&
-        this.connection.api_token != "" &&
         this.connection.oAuth2_Token != ""
       ) {
         this.connectionEmpty = false;
@@ -193,12 +192,10 @@ export default {
         this.$store
           .dispatch("getAllThings")
           .then(res => {
-            console.log(res);
+            this.showAlert(res.toString());
           })
           .catch(
-            err => console.log(err),
-            this.showAlert(err)
-            );
+            err => console.log(err));
       }
     },
 

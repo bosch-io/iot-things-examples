@@ -11,10 +11,10 @@ In the image below, we illustrated the components of this example and how they w
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
-2. [Set a Policy for your thing](#set-a-policy-for-your-thing)
-3. [Request the Device Provisioning API](#device-provisioning-api)
-4. [Setting up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
-5. [Show Telemetry Data on Things Dashboard](#show-the-telemetry-data-on-things-dashboard)
+2. [Set a policy for your thing](#set-a-policy-for-your-thing)
+3. [Register the device via the Device Provisioning API](#device-provisioning-api)
+4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
+5. [Show telemetry data on Things-Dashboard](#show-the-telemetry-data-on-things-dashboard)
 
 We will use the _telemetry event_ pattern of the Bosch IoT Hub.
 

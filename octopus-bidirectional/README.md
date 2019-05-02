@@ -14,10 +14,10 @@ The **web application** will use our Bosch IoT Things HTTP endpoints to communic
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
-2. [Set a Policy for your thing](#set-a-policy-for-your-thing)  
-3. [Request the Device Provisioning API](#device-provisioning-api)
-4. [Setting up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
-5. [Send messages to your octopus and switch LEDs via Web Application](#getting-started)
+2. [Set a policy for your thing](#set-a-policy-for-your-thing)  
+3. [Register the device via Device Provisioning API](#device-provisioning-api)
+4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
+5. [Send messages to your device and switch LEDs via the web application](#getting-started)
 
 We will use the _telemetry_, _event_ as well as the _command & control_ pattern of the Bosch IoT Hub.
 

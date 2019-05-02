@@ -64,14 +64,11 @@
                 if (thing === "newThing") {
                     thing = this.createNewThingTemplate();
                 }
-                this.$store.dispatch("handleSelected", thing).then(res = > {
-                    if(res.status && res.status === 200
-            )
-                {
-                    this.isActiveId = thing.thingId;
-                }
-            })
-                ;
+                this.$store.dispatch("handleSelected", thing).then(res => {
+                    if (res.status && res.status === 200 && thing.thingId !== undefined) {
+                        this.isActiveId = thing.thingId;
+                    }
+                });
             },
             formatDate(item) {
                 /**
@@ -86,9 +83,7 @@
                 let yearMonth = item.split("-");
                 let day = yearMonth[2].split("T");
                 let time = day[1].split(".");
-                return `_modified: ${day[0]}.${yearMonth[1]}.${yearMonth[0]} - ${
-                    time[0]
-                    }`;
+                return `_modified: ${day[0]}.${yearMonth[1]}.${yearMonth[0]} - ${time[0]}`;
             }
         },
         computed: {

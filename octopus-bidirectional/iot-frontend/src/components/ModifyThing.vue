@@ -68,7 +68,8 @@
               class="btn btn-outline-primary col middle-out"
               :disabled="isSending"
             >
-              <font-awesome-icon style="margin-right: 5px;" icon="upload"/>Send message
+              <font-awesome-icon style="margin-right: 5px;" icon="upload"/>
+              Send message
             </button>
           </div>
 
@@ -81,7 +82,7 @@
             </div>
             <div class="input-group col">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">Cor-Id</span>
+                <span class="input-group-text" id="basic-addon2">Cor-Id</span>
               </div>
               <input
                 class="form-control"
@@ -98,157 +99,153 @@
 </template>
 
 <script>
-import { codemirror } from "vue-codemirror";
-import "codemirror/mode/javascript/javascript.js";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/idea.css";
-import "codemirror/addon/selection/active-line.js";
-import AlertView from "./shared/AlertView.vue";
-import UserDataViewVue from './UserData/UserDataView.vue';
+    import {codemirror} from "vue-codemirror";
+    import "codemirror/mode/javascript/javascript.js";
+    import "codemirror/lib/codemirror.css";
+    import "codemirror/theme/idea.css";
+    import "codemirror/addon/selection/active-line.js";
+    import AlertView from "./shared/AlertView.vue";
+    import UserDataViewVue from './UserData/UserDataView.vue';
 
-export default {
-  name: "ModifyThing",
-  components: {
-    codemirror,
-    AlertView
-  },
-  data() {
-    return {
-      isReady: false,
-      isSending: false,
-      localcopy: {},
-      cmOptions: {
-        theme: "idea",
-        tabSize: 2,
-        mode: "application/json",
-        lineNumbers: true,
-        matchBrackets: true,
-        line: false,
-        lines: 1,
-        lineWrapping: true
-      },
-      alert: {
-        alertId: "",
-        isSuccess: false,
-        isError: false,
-        successMessage: "",
-        errorMessage: ""
-      },
-      message: {
-        r: 0,
-        g: 0,
-        b: 0,
-        w: 0
-      },
-      topic: "switch_led",
-      correlation: "message-example"
-    };
-  },
-  computed: {
-    isSelected: {
-      get() {
-        return this.$store.getters.getSelected;
-      },
-      set(value) {
-        this.$store.commit("setSelected", value);
-      }
-    },
-    items: {
-      get() {
-        return this.$store.getters.getItems;
-      }
-    },
-    isConnected: {
-      get() {
-        return this.$store.getters.getConnectionStatus;
-      }
-    }
-  },
-  watch: {
-    isSelected: function(val) {
-      this.isReady = true;
-    },
-    isConnected: function(val) {
-      if (!val) {
-        this.isReady = false;
-      }
-    }
-  },
-  methods: {
-    updateMessage(event) {
-      try {
-        this.isSending = false;
-        this.message = JSON.parse(event);
-      } catch (e) {
-        if (e) {
-          this.isSending = true;
-          this.showAlert(false, "sendMessage", "JSON not valid");
+    export default {
+        name: "ModifyThing",
+        components: {
+            codemirror,
+            AlertView
+        },
+        data() {
+            return {
+                isReady: false,
+                isSending: false,
+                localcopy: {},
+                cmOptions: {
+                    theme: "idea",
+                    tabSize: 2,
+                    mode: "application/json",
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    line: false,
+                    lines: 1,
+                    lineWrapping: true
+                },
+                alert: {
+                    alertId: "",
+                    isSuccess: false,
+                    isError: false,
+                    successMessage: "",
+                    errorMessage: ""
+                },
+                message: {
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    w: 0
+                },
+                topic: "switch_led",
+                correlation: "message-example"
+            };
+        },
+        computed: {
+            isSelected: {
+                get() {
+                    return this.$store.getters.getSelected;
+                },
+                set(value) {
+                    this.$store.commit("setSelected", value);
+                }
+            },
+            items: {
+                get() {
+                    return this.$store.getters.getItems;
+                }
+            },
+            isConnected: {
+                get() {
+                    return this.$store.getters.getConnectionStatus;
+                }
+            }
+        },
+        watch: {
+            isSelected: function (val) {
+                this.isReady = true;
+            },
+            isConnected: function (val) {
+                if (!val) {
+                    this.isReady = false;
+                }
+            }
+        },
+        methods: {
+            updateMessage(event) {
+                try {
+                    this.isSending = false;
+                    this.message = JSON.parse(event);
+                } catch (e) {
+                    if (e) {
+                        this.isSending = true;
+                        this.showAlert(false, "sendMessage", "JSON not valid");
+                    }
+                }
+            },
+            sendMessage() {
+                this.isSending = true;
+                this.$store
+                    .dispatch("sendMessage", {
+                        message: this.message,
+                        topic: this.topic,
+                        corrId: this.correlation
+                    })
+                    .then(res => {
+                        this.showAlert(
+                            true,
+                            "sendMessage",
+                            `Response: ${JSON.stringify(res.data)}`
+                        );
+                        this.isSending = false;
+
+                    })
+                    .catch(err => {
+                        this.isSending = false;
+                        this.showAlert(false, "sendMessage", err.message);
+
+                    });
+            },
+            showAlert(isOkay, alertId, alertMessage) {
+                this.alert.alertId = alertId;
+                if (isOkay) {
+                    this.alert.isSuccess = true;
+                    this.alert.successMessage = alertMessage;
+                } else {
+                    this.alert.isError = true;
+                    this.alert.errorMessage = alertMessage;
+                }
+                setTimeout(() => {
+                    this.alert.alertId = "";
+                    this.alert.isSuccess = false;
+                    this.alert.isError = false;
+                    this.alert.successMessage = "";
+                    this.alert.errorMessage = "";
+                }, 5000);
+            }
         }
-      }
-    },
-    sendMessage() {
-      this.isSending = true;
-      this.$store
-        .dispatch("sendMessage", {
-          message: this.message,
-          topic: this.topic,
-          corrId: this.correlation
-        })
-        .then(res => {
-          this.showAlert(
-            true,
-            "sendMessage",
-            `Response: ${JSON.stringify(res.data)}`
-          );
-          this.isSending = false;
-
-        })
-        .catch(err => {
-
-        //  console.log('KOMPLETT NICHT ACCEPTED: ', err);
-
-          this.isSending = false;
-          this.showAlert(false, "sendMessage", err.message);
-          
-
-        });
-    },
-    showAlert(isOkay, alertId, alertMessage) {
-      this.alert.alertId = alertId;
-      if (isOkay) {
-        this.alert.isSuccess = true;
-        this.alert.successMessage = alertMessage;
-      } else {
-        this.alert.isError = true;
-        this.alert.errorMessage = alertMessage;
-      }
-      setTimeout(() => {
-        this.alert.alertId = "";
-        this.alert.isSuccess = false;
-        this.alert.isError = false;
-        this.alert.successMessage = "";
-        this.alert.errorMessage = "";
-      }, 5000);
-    }
-  }
-};
+    };
 </script>
 
 <style>
-.CodeMirror {
-  height: 600px;
-}
+  .CodeMirror {
+    height: 600px;
+  }
 
-#sendMessage .CodeMirror {
-  height: 160px;
-}
+  #sendMessage .CodeMirror {
+    height: 160px;
+  }
 
-.m-bottom-24px {
-  margin-bottom: 24px;
-}
+  .m-bottom-24px {
+    margin-bottom: 24px;
+  }
 
-.middle-out {
-  margin-right: 15px;
-  margin-left: 15px;
-}
+  .middle-out {
+    margin-right: 15px;
+    margin-left: 15px;
+  }
 </style>

@@ -33,150 +33,124 @@ import axios from "axios";
 import qs from "qs";
 
 export default (window.Api = new class {
-  constructor() {
-    this.vue = new Vue({
-      name: "api",
-      store,
-      computed: {
-        connection: {
-          get() {
-            return this.$store.getters.getConnection;
-          }
-        },
-        selected: {
-          get() {
-            return this.$store.getters.getSelected;
-          }
-        },
-        suiteAuthHost: {
-          get() {
-            return this.$store.getters.getSuiteAuthHost;
-          }
-        },
-        suiteAuthActive: {
-          get() {
-            return this.$store.getters.getSuiteAuthActive;
-          }
-          },
-      }
-    });
+    constructor() {
+        this.vue = new Vue({
+                               name: "api",
+                               store,
+                               computed: {
+                                   connection: {
+                                       get() {
+                                           return this.$store.getters.getConnection;
+                                       }
+                                   },
+                                   selected: {
+                                       get() {
+                                           return this.$store.getters.getSelected;
+                                       }
+                                   },
+                                   suiteAuthHost: {
+                                       get() {
+                                           return this.$store.getters.getSuiteAuthHost;
+                                       }
+                                   },
+                                   suiteAuthActive: {
+                                       get() {
+                                           return this.$store.getters.getSuiteAuthActive;
+                                       }
+                                   },
+                               }
+                           });
 
-    this.routes = {
-      policies:
-        this.vue.connection.http_endpoint + "/api/2" + "/policies",
-      searchThings:
-        this.vue.connection.http_endpoint + "/api/2" +
-        "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
-      things: this.vue.connection.http_endpoint + "/api/2" + "/things",
-      messages:
-        this.vue.connection.http_endpoint +
-        "/api/2" +
-        "/things/" +
-        this.vue.selected.thingId
+        this.routes = {
+            policies:
+                this.vue.connection.http_endpoint + "/api/2" + "/policies",
+            searchThings:
+                this.vue.connection.http_endpoint + "/api/2" +
+                "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
+            things: this.vue.connection.http_endpoint + "/api/2" + "/things",
+            messages:
+                this.vue.connection.http_endpoint +
+                "/api/2" +
+                "/things/" +
+                this.vue.selected.thingId
+        };
+    }
+
+    createAuthHeaderBasic = (username, password) => {
+        return (
+            "Basic " +
+            btoa(
+                encodeURIComponent(username + ":" + password).replace(
+                    /%([0-9A-F]{2})/g,
+                    function toSolidBytes(match, p1) {
+                        return String.fromCharCode("0x" + p1);
+                    }
+                )
+            )
+        );
     };
-  }
 
-
-  createAuthHeaderBasic = (username, password) => {
-    return (
-      "Basic " +
-      btoa(
-        encodeURIComponent(username + ":" + password).replace(
-          /%([0-9A-F]{2})/g,
-          function toSolidBytes(match, p1) {
-            return String.fromCharCode("0x" + p1);
-          }
-        )
-      )
-    );
-  };
-
-  getConfig = (additionalHeader = null) => {
-    if (additionalHeader && !this.vue.suiteAuthActive) {
-      return {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: this.createAuthHeaderBasic(
-            this.vue.connection.username,
-            this.vue.connection.password
-          ),
-          "x-cr-api-token": this.vue.connection.api_token,
-          "x-correlation-id": additionalHeader
+    getConfig = (additionalHeader = null) => {
+        if (additionalHeader && !this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: this.createAuthHeaderBasic(
+                        this.vue.connection.username,
+                        this.vue.connection.password
+                    ),
+                    "x-cr-api-token": this.vue.connection.api_token,
+                    "x-correlation-id": additionalHeader
+                }
+            };
         }
-      };
-    }
-    if (additionalHeader && this.vue.suiteAuthActive) {
-      return {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization' : 'Bearer ' +  this.vue.connection.oAuth2_Token,
-          'x-correlation-id': additionalHeader
+        if (additionalHeader && this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token,
+                    'x-correlation-id': additionalHeader
+                }
+            };
         }
-      };
-    }
-    if (!additionalHeader && !this.vue.suiteAuthActive) {
-      return {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: this.createAuthHeaderBasic(
-            this.vue.connection.username,
-            this.vue.connection.password
-          ),
-          "x-cr-api-token": this.vue.connection.api_token
+        if (!additionalHeader && !this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: this.createAuthHeaderBasic(
+                        this.vue.connection.username,
+                        this.vue.connection.password
+                    ),
+                    "x-cr-api-token": this.vue.connection.api_token
+                }
+            };
         }
-      };
-    }
-    if (!additionalHeader && this.vue.suiteAuthActive) {
-      return {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization' : 'Bearer ' +  this.vue.connection.oAuth2_Token
+        if (!additionalHeader && this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token
+                }
+            }
         }
-      }
-    }
-  };
+    };
 
-  getAllThings = () => {
-    return axios.get(
-      `${
-      this.vue.connection.http_endpoint
-      }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
-      this.getConfig()
-    );  
-  };
+    getAllThings = () => {
+        return axios.get(
+            `${
+                this.vue.connection.http_endpoint
+                }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+            this.getConfig()
+        );
+    };
 
-  /*  getJWTToken = () => {
-     var bodyFormData = new FormData();
- 
-     bodyFormData.set('grant_type', 'client_credentials');
-     bodyFormData.set('client_id', this.vue.connection.client_id);
-     bodyFormData.set('client_secret', this.vue.connection.client_secret);
-     bodyFormData.set('scope', this.vue.connection.scope);
- 
-     const data = {
-       'grant_type': 'client_credentials',
-       'client_id': this.vue.connection.client_id,
-       'client_secret': this.vue.connection.client_secret,
-       'scope': this.vue.connection.scope
-     }
- 
-     const dataString = qs.stringify(data);
- 
-     return axios({
-       method: 'post',
-       url: this.vue.suiteAuthHost,
-       data: dataString,
-       config: { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-     })
-   }; */
-
-  sendMessage = (message, topic, corrId) => {
-    return axios.post(
-      `${this.vue.connection.http_endpoint}/api/2/things/${
-      this.vue.selected.thingId
-      }/inbox/messages/${topic}`,
-      `${JSON.stringify(message)}`,
-      this.getConfig(corrId)
-    );
-  };
+    sendMessage = (message, topic, corrId) => {
+        return axios.post(
+            `${this.vue.connection.http_endpoint}/api/2/things/${
+                this.vue.selected.thingId
+                }/inbox/messages/${topic}`,
+            `${JSON.stringify(message)}`,
+            this.getConfig(corrId)
+        );
+    };
 }());

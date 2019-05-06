@@ -156,12 +156,12 @@
 
         watch: {
             connection: function (val) {
-                this.connectionEmpty = !this.suiteAuthActive &&
-                                       this.connection.api_token !== "" &&
-                                       this.connection.username !== "" &&
-                                       this.connection.password !== "" ||
-                                       this.connection.oAuth2_Token !== "" &&
-                                       this.suiteAuthActive;
+                this.connectionEmpty = this.suiteAuthActive &&
+                                       this.connection.oAuth2_Token === "" ||
+                                       !this.suiteAuthActive &&
+                                       this.connection.api_token === "" &&
+                                       this.connection.username === "" &&
+                                       this.connection.password === "";
             }
         },
         methods: {

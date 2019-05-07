@@ -142,9 +142,9 @@ void BoschIotHub::connectDevice(const char *deviceId, const char *authId, const 
 
 void BoschIotHub::publish(const char *topic, String payload)
 {
-  // Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
-  // Serial.println(topic);
-  // Printer::printlnMsg("Bosch IoT Hub", payload);
+  Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
+  Serial.println(topic);
+  Printer::printlnMsg("Bosch IoT Hub", payload);
 
   const size_t requiredLength = 5 + 2 + strlen(topic) + payload.length();
 

@@ -76,7 +76,7 @@ You will need to do the following steps:
   "entries": {
     "DEFAULT": {
       "subjects": {
-        "iot-suite:service:iot-hub-prod:<hub-tenant_id>/full-access": {
+        "iot-suite:service:iot-hub-prod:<hub-tenant-id>/full-access": {
           "type": "suite-auth"
         }
       },
@@ -106,7 +106,7 @@ You will need to do the following steps:
     },
     "solution-owner": {
       "subjects": {
-        "bosch:<technical-user_id>": {
+        "bosch:<technical-user-id>": {
           "type": "bosch id"
         }
       },
@@ -129,7 +129,7 @@ You will need to do the following steps:
     },
     "DEVICE": {
       "subjects": {
-        "integration:<things-solution_id>:hub": {
+        "integration:<things-solution-id>:hub": {
           "type": "iot-things-integration"
         }
       },
@@ -155,9 +155,9 @@ You will need to do the following steps:
 ```
 
 You will need to replace all `<placeholders>` respectively:
-* `<hub-tenant_id>` - _You can find your Hub-Tenant ID on the Service Subscriptions Page under the Show Credentials button._
-* `<technical-user_id>` - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
-* `<things-solution_id>` - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
+* `<hub-tenant-id>` - _You can find your Hub-Tenant ID on the Service Subscriptions Page under the Show Credentials button._
+* `<technical-user-id>` - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
+* `<things-solution-id>` - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
 
 Click _Execute_ to submit the request.
 

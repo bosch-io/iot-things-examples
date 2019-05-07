@@ -136,13 +136,16 @@ const store = new Vuex.Store({
                                          state.userDataFormCollapsed = value;
                                      },
                                      setHTTPErrorRequestMessage(state, value) {
-                                         console.log("Jo it happened: ", value);
                                          state.httpErrorRequestAlert.alertId = "httpError";
                                          state.httpErrorRequestAlert.isError = true;
-                                         state.httpErrorRequestAlert.errorMessage = value;
+                                         if (value.contains('401')) {
+                                             state.httpErrorRequestAlert.errorMessage =
+                                                 value + ' - check if your token is not expired.';
+                                         } else {
+                                             state.httpErrorRequestAlert.errorMessage = value;
+                                         }
                                      },
                                      resetHTTPErrorAlert(state) {
-                                         console.log("This aswell: D******NSCHISS");
                                          state.httpErrorRequestAlert.alertId = "";
                                          state.httpErrorRequestAlert.isError = false;
                                          state.httpErrorRequestAlert.errorMessage = "";

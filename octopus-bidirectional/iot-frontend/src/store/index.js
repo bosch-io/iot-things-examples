@@ -58,6 +58,13 @@ const store = new Vuex.Store({
                                      suiteAuthHost: "https://access.bosch-iot-suite.com/token",
                                      accessToken: '',
                                      userDataFormCollapsed: true,
+                                     httpErrorRequestAlert: {
+                                         alertId: "",
+                                         isSuccess: false,
+                                         isError: false,
+                                         successMessage: "",
+                                         errorMessage: ""
+                                     }
                                  },
 
                                  getters: {
@@ -86,7 +93,11 @@ const store = new Vuex.Store({
                                      getUserDataFormCollapsed:
                                          state => {
                                              return state.userDataFormCollapsed;
-                                         }
+                                         },
+                                     getHTTPErrorRequestAlert: state => {
+                                         return state.httpErrorRequestAlert;
+                                     }
+
                                  },
 
                                  mutations: {
@@ -123,6 +134,18 @@ const store = new Vuex.Store({
                                      },
                                      setUserDataFormCollapsed(state, value) {
                                          state.userDataFormCollapsed = value;
+                                     },
+                                     setHTTPErrorRequestMessage(state, value) {
+                                         console.log("Jo it happened: ", value);
+                                         state.httpErrorRequestAlert.alertId = "httpError";
+                                         state.httpErrorRequestAlert.isError = true;
+                                         state.httpErrorRequestAlert.errorMessage = value;
+                                     },
+                                     resetHTTPErrorAlert(state) {
+                                         console.log("This aswell: D******NSCHISS");
+                                         state.httpErrorRequestAlert.alertId = "";
+                                         state.httpErrorRequestAlert.isError = false;
+                                         state.httpErrorRequestAlert.errorMessage = "";
                                      }
                                  },
 
@@ -154,6 +177,9 @@ const store = new Vuex.Store({
                                                                  }, {})
                                                      );
                                                      this.commit("setConnectionStatus", true);
+                                                     if (this.state.httpErrorRequestAlert.alertId !== "") {
+                                                         this.commit("resetHTTPErrorAlert");
+                                                     }
                                                      resolve(res);
                                                  }).catch(err => resolve(err)
                                              );
@@ -176,13 +202,15 @@ const store = new Vuex.Store({
                                          return new Promise((resolve, reject) => {
                                              Api.sendMessage(payload.message, payload.topic, payload.corrId)
                                                  .then(res => {
-                                                     console.log(res)
+                                                     if (res.status === 401) {
+                                                         this.commit("setHTTPErrorRequestMessage", res);
+                                                     }
                                                      resolve(res)
                                                  })
                                                  .catch(err => {
                                                      this.commit("setDisconnected");
                                                      this.commit("setUserDataFormCollapsed", true);
-
+                                                     this.commit("setHTTPErrorRequestMessage", err);
                                                      reject(err)
                                                  });
                                          });

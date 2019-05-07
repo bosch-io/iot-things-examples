@@ -106,7 +106,6 @@ export default (window.Event = new class {
                 }
             };
         } else if (event === "connectionError") {
-            console.log("ConnectionError: ", event);
             this.source.close();
         } else {
             this.vue.$emit(event, data);

@@ -55,46 +55,57 @@
         </div>
       </div>
     </div>
+    <alert-view :alert="this.alert" alert-id="httpError"></alert-view>
     <nav class="navbar fixed-bottom navbar-light bg-primary" style="margin-top: 25px"></nav>
   </div>
 </template>
 
 <script>
-import UserDataView from "./components/UserData/UserDataView.vue";
-import ModifyThing from "./components/ModifyThing.vue";
-import ThingList from "./components/ThingList.vue";
-import store from "./store";
+    import UserDataView from "./components/UserData/UserDataView.vue";
+    import ModifyThing from "./components/ModifyThing.vue";
+    import ThingList from "./components/ThingList.vue";
+    import AlertView from "./components/shared/AlertView";
+    import store from "./store";
 
-import "es6-promise/auto";
-import "./utils/bus.js";
-import "./utils/api.js";
+    import "es6-promise/auto";
+    import "./utils/bus.js";
+    import "./utils/api.js";
 
-export default {
-  name: "app",
-  store,
-  components: {
-    UserDataView,
-    ModifyThing,
-    ThingList
-  }
-};
+    export default {
+        name: "app",
+        store,
+        components: {
+            UserDataView,
+            ModifyThing,
+            ThingList,
+            AlertView
+        },
+
+        computed: {
+            alert: {
+                get() {
+                    return this.$store.getters.getHTTPErrorRequestAlert;
+                }
+            }
+        }
+    };
 </script>
 
 <style>
-span {
-  font-weight: 100;
-}
+  span {
+    font-weight: 100;
+  }
 
-.flex-container {
-  display: flex;
-  align-items: center;
-}
+  .flex-container {
+    display: flex;
+    align-items: center;
+  }
 
-.text-white {
-  color: white;
-}
+  .text-white {
+    color: white;
+  }
 
-.bold {
-  font-weight: 900;
-}
+  .bold {
+    font-weight: 900;
+  }
 </style>

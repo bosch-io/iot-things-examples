@@ -140,7 +140,7 @@ const store = new Vuex.Store({
                                          state.httpErrorRequestAlert.isError = true;
                                          if (value.toString().includes('401')) {
                                              state.httpErrorRequestAlert.errorMessage =
-                                                 value + ' - may your token is expired.';
+                                                 value + ' - token expired.';
                                          } else {
                                              state.httpErrorRequestAlert.errorMessage = value;
                                          }

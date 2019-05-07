@@ -79,30 +79,9 @@ You will need to do the following steps:
 ```json
 {
   "entries": {
-    "DEVICE": {
-      "subjects": {
-        "integration:<your-Things-solution-ID>:hub": {
-          "type": "iot-things-integration"
-        }
-      },
-      "resources": {
-        "thing:/features": {
-          "grant": [
-            "WRITE"
-          ],
-          "revoke": []
-        },
-        "message:/": {
-          "grant": [
-            "READ"
-          ],
-          "revoke": []
-        }
-      }
-    },
     "DEFAULT": {
       "subjects": {
-        "iot-suite:<your-Suite-auth-client-ID>": {
+        "iot-suite:service:iot-hub-prod:<hub-tenant_id>/full-access": {
           "type": "suite-auth"
         }
       },
@@ -132,14 +111,45 @@ You will need to do the following steps:
     },
     "solution-owner": {
       "subjects": {
-        "bosch:<your-technical-user-ID>": {
-          "type": "bosch-id"
+        "bosch:<technical-user_id>": {
+          "type": "bosch id"
         }
       },
       "resources": {
         "thing:/": {
           "grant": [
-            "READ"
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        },
+        "message:/": {
+          "grant": [
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        }
+      }
+    },
+    "DEVICE": {
+      "subjects": {
+        "integration:<things-solution_id>:hub": {
+          "type": "iot-things-integration"
+        }
+      },
+      "resources": {
+        "thing:/": {
+          "grant": [
+            "READ",
+            "WRITE"
+          ],
+          "revoke": []
+        },
+        "message:/": {
+          "grant": [
+            "READ",
+            "WRITE"
           ],
           "revoke": []
         }
@@ -150,9 +160,9 @@ You will need to do the following steps:
 ```
 
 You will need to replace all `<placeholders>` respectively:
-* `<your-Things-solution-ID>` - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
-* `<your-Suite-auth-client-ID>` - _You can find your Suite Auth Client ID on the Service Subscriptions Page under My Account>OAuth2 Clients_.
-* `<your-technical-user-ID>` - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
+* `<hub-tenant_id>` - _You can find your Hub-Tenant ID on the Service Subscriptions Page under the Show Credentials button._
+* `<technical-user_id>` - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
+* `<things-solution_id>` - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
 
 Click _Execute_ to submit the request.
 
@@ -175,26 +185,171 @@ Your request body should contain the following information:
 
 ```json
 {
-  "id": "<your.namespace:your-device-id>",
+  "id": "<your-namespace>:<your-device-id>",
   "hub": {
     "device": {
       "enabled": true
     },
     "credentials": {
+      "authId": "<any-aut-id>",
       "type": "hashed-password",
-      "auth-id": "<your-auth-id>",
       "secrets": [
         {
-          "password": "<your-plain-text-password>"   
+          "password": "<any-password>"
         }
       ]
     }
   },
   "things": {
     "thing": {
-      "policyId": "<your.namespace:octopus-policy>",
+      "policyId": "<existing-policy-id>",
       "attributes": {
         "manufacturer": "<my-awesome-company>"
+      },
+      "features": {
+        "acceleration": {
+          "definition": [
+            "com.ipso.smartobjects:Accelerometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "m/s^2"
+            }
+          }
+        },
+        "ambient_temperature": {
+          "definition": [
+            "com.ipso.smartobjects:Temperature:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "sensorValue": 0,
+              "minMeasuredValue": 0,
+              "maxMeasuredValue": 0,
+              "sensorUnits": "°C"
+            }
+          }
+        },
+        "orientation": {
+          "definition": [
+            "com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "°"
+            }
+          }
+        },
+        "linear_acceleration": {
+          "definition": [
+            "com.ipso.smartobjects:Accelerometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "m/s^2"
+            }
+          }
+        },
+        "magnetometer": {
+          "definition": [
+            "com.ipso.smartobjects:Magnetometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "uT"
+            }
+          }
+        },
+        "gravity": {
+          "definition": [
+            "com.ipso.smartobjects:Accelerometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "m/s^2"
+            }
+          }
+        },
+        "temperature": {
+          "definition": [
+            "com.ipso.smartobjects:Temperature:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "sensorValue": 0,
+              "minMeasuredValue": 0,
+              "maxMeasuredValue": 0,
+              "sensorUnits": "°C"
+            }
+          }
+        },
+        "humidity": {
+          "definition": [
+            "com.ipso.smartobjects:Humidity:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "sensorValue": 0,
+              "minMeasuredValue": 0,
+              "maxMeasuredValue": 0,
+              "sensorUnits": "%"
+            }
+          }
+        },
+        "pressure": {
+          "definition": [
+            "com.ipso.smartobjects:Barometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "sensorValue": 0,
+              "minMeasuredValue": 0,
+              "maxMeasuredValue": 0,
+              "sensorUnits": "hPa"
+            }
+          }
+        },
+        "angular_velocity": {
+          "definition": [
+            "com.ipso.smartobjects:Gyrometer:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "xValue": 0,
+              "yValue": 0,
+              "zValue": 0,
+              "sensorUnits": "rad/s"
+            }
+          }
+        },
+        "voltage": {
+          "definition": [
+            "com.ipso.smartobjects:Voltage:1.1.0"
+          ],
+          "properties": {
+            "status": {
+              "sensorValue": 0,
+              "minMeasuredValue": 0,
+              "maxMeasuredValue": 0,
+              "sensorUnits": "V"
+            }
+          }
+        }
       }
     }
   }
@@ -202,10 +357,10 @@ Your request body should contain the following information:
 ```
 
 You will need to edit the following <placeholders>:
-* "id": "`<your.namespace:your-device-id>`" - _Use your created namespace followed by_ `:` _and your specific thing ID. In our use case it should be_ `yourNamespace:octopus`.
-* "password": "`your-plain-text-password`" - _Type in a secure password in plain text. It will be hashed on our server._
-* "auth-id": "`your-auth-id`" - _You can set a short AuthID e.g._ `octopus`. _In case you omit this line, your auth-id will be_ `your.namespace_your-device-id`
-* "policyId": "`<your.namespace:octopus-policy>`" - _Pass the ID of your previously created Policy, to set your preconfigured Policy on your thing._
+* "id": "`<your-namespace>:<your-device-id>`" - _Use your created namespace followed by_ `:` _and your specific thing ID. In our use case it should be_ `yourNamespace:octopus`.
+* "auth-id": "`any-auth-id`" - _You can set a short AuthID e.g._ `octopus`. _In case you omit this line, your auth-id will be_ `your.namespace_your-device-id` by default.
+* "password": "`any-password`" - _Type in a secure password in plain text. It will be hashed on our server._
+* "policyId": "`<existing-policy-id>`" - _Pass the ID of your previously created Policy, to set your preconfigured Policy on your thing._
 * "manufacturer": "`<my-awesome-company>`" - _Type in your company Name._
 
 Click _Execute_ to submit the request.

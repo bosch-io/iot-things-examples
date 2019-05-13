@@ -193,9 +193,9 @@ The Arduino Sketch we have prepared publishes the sensor information via the Bos
 **Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
 http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
 
-Open  src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
+Open `src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `src/main/octopus/octopus-mqtt/settings.h`. Replace all XXX placeholders with your configuration properties.
+All properties relevant for the connection to our cloud services have to be set in `src/main/octopus/octopus-mqtt/settings.h`. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
 
 ```cpp
 #ifndef SETTINGS_H

@@ -200,7 +200,7 @@ http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
 
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `iot-device/octopus-hub/settings.h`. Replace all XXX placeholders with your configuration properties.
+All properties relevant for the connection to our cloud services have to be set in `iot-device/octopus-hub/settings.h`. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
 
 ```cpp
 #ifndef SETTINGS_H

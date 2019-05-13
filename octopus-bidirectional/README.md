@@ -102,145 +102,57 @@ Your request body should contain the following information:
         "acceleration": {
           "definition": [
             "com.ipso.smartobjects:Accelerometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "m/s^2"
-            }
-          }
+          ]
         },
         "ambient_temperature": {
           "definition": [
             "com.ipso.smartobjects:Temperature:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "sensorValue": 0,
-              "minMeasuredValue": 0,
-              "maxMeasuredValue": 0,
-              "sensorUnits": "°C"
-            }
-          }
+          ]
         },
         "orientation": {
           "definition": [
             "com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "°"
-            }
-          }
+          ]
         },
         "linear_acceleration": {
           "definition": [
             "com.ipso.smartobjects:Accelerometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "m/s^2"
-            }
-          }
+          ]
         },
         "magnetometer": {
           "definition": [
             "com.ipso.smartobjects:Magnetometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "uT"
-            }
-          }
+          ]
         },
         "gravity": {
           "definition": [
             "com.ipso.smartobjects:Accelerometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "m/s^2"
-            }
-          }
+          ]
         },
         "temperature": {
           "definition": [
             "com.ipso.smartobjects:Temperature:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "sensorValue": 0,
-              "minMeasuredValue": 0,
-              "maxMeasuredValue": 0,
-              "sensorUnits": "°C"
-            }
-          }
+          ]
         },
         "humidity": {
           "definition": [
             "com.ipso.smartobjects:Humidity:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "sensorValue": 0,
-              "minMeasuredValue": 0,
-              "maxMeasuredValue": 0,
-              "sensorUnits": "%"
-            }
-          }
+          ]
         },
         "pressure": {
           "definition": [
             "com.ipso.smartobjects:Barometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "sensorValue": 0,
-              "minMeasuredValue": 0,
-              "maxMeasuredValue": 0,
-              "sensorUnits": "hPa"
-            }
-          }
+          ]
         },
         "angular_velocity": {
           "definition": [
             "com.ipso.smartobjects:Gyrometer:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "xValue": 0,
-              "yValue": 0,
-              "zValue": 0,
-              "sensorUnits": "rad/s"
-            }
-          }
+          ]
         },
         "voltage": {
           "definition": [
             "com.ipso.smartobjects:Voltage:1.1.0"
-          ],
-          "properties": {
-            "status": {
-              "sensorValue": 0,
-              "minMeasuredValue": 0,
-              "maxMeasuredValue": 0,
-              "sensorUnits": "V"
-            }
-          }
+          ]
         }
       }
     }

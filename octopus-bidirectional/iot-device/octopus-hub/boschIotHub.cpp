@@ -26,7 +26,6 @@
 #include <Arduino.h>
 #include "boschIotHub.h"
 #include "printer.h"
-
 #define MSG_LENGTH 4096
 
 StaticJsonBuffer<MSG_LENGTH> jsonBuffer;

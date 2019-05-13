@@ -157,7 +157,6 @@ Your request body should contain the following information:
 
 You will need to edit the following <placeholders>:
 * "id": "`<your-namespace>:<your-device-id>`" - _Use your created namespace followed by_ `:` _and your specific thing ID. In our use case it should be_ `yourNamespace:octopus`.
-* "auth-id": "`any-auth-id`" - _You can set a short AuthID e.g._ `octopus`. _In case you omit this line, your auth-id will be_ `your.namespace_your-device-id` by default.
 * "password": "`any-password`" - _Type in a secure password in plain text. It will be hashed on our server._
 * "policyId": "`<existing-policy-id>`" - _Pass the ID of your previously created Policy, to set your preconfigured Policy on your thing._
 * "manufacturer": "`<my-awesome-company>`" - _Type in your company Name._

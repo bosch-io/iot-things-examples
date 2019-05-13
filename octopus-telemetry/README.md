@@ -198,7 +198,7 @@ http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
 
 Open  src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `src/main/octopus/octopus-mqtt`. Replace all XXX placeholders with your configuration properties.
+All properties relevant for the connection to our cloud services have to be set in `src/main/octopus/octopus-mqtt/settings.h`. Replace all XXX placeholders with your configuration properties.
 
 ```cpp
 #ifndef SETTINGS_H

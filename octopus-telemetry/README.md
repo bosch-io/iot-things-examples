@@ -7,7 +7,7 @@
 This example shows how to use the Octopus board (Bosch IoT Suite edition) with the Bosch IoT Suite.
 In the image below, we illustrated the components of this example and how they will interact with each other.
 
-![](images/Telemetry_View_New.png)
+![](images/Telemetry_Overview.png)
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)

@@ -161,7 +161,7 @@ You will need to edit the following <placeholders>:
 
 Click _Execute_ to submit the request.
 
-Upon success, you have created a _device_ in the context of Bosch IoT Hub associated with credentials, and an empty _digital twin_ in _thing_ notation associated with your policy.
+Upon success, you have created a _device_ in the context of Bosch IoT Hub associated with credentials, and an empty _digital twin_ in _thing_ notation associated with a default policy.
 
 ## Prepare the Octopus device with Arduino
 

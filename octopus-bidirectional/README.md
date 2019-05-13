@@ -14,7 +14,6 @@ The **web application** will use our Bosch IoT Things HTTP endpoints to communic
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
-2. [Set a policy for your thing](#set-a-policy-for-your-thing)  
 3. [Register the device via Device Provisioning API](#device-provisioning-api)
 4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
 5. [Send messages to your device and switch LEDs via the web application](#getting-started)
@@ -61,112 +60,6 @@ The `namespace` must conform to the reserve domain name notation:
 * a dot `(.)` must be followed by a lower- or uppercase character from a-z
 * numbers _can_ be used
 * underscore _can_ be used
-
-## Set a policy for your thing
-
-A policy enables developers to configure fine-grained access control for things and other entities in an easy way. A specific policy provides someone (called subject), permission to read and/or write a given resource.
-
-In order to set a policy, use the [Bosch IoT Things HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/), which is a JSON-based, REST-like API for the Bosch IoT Things service. There, navigate to the Policy section.
-
-You will need a Suite authorization token for the authorization on our API. Please follow the **Authorize** section within the [Getting Started](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/#provisioning) and get such a token with an OAuth2 client from the _Service Subscription page_ of the Bosch IoT Suite.
-
-You will need to do the following steps:
-1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated **bearerAuth  (http, Bearer)** input field.
-2. Navigate to the _Create or update a Policy with a specific ID_ entry in **Policies**> `PUT`/policies/{policyId}.
-3. Click **Try out** and provide the _policyId_. It must contain your previously created _namespace_ followed by a specific ID e.g. `yourNamespace:octopus-policy`.
-4. Set the request body as below.
-
-```json
-{
-  "entries": {
-    "DEFAULT": {
-      "subjects": {
-        "iot-suite:service:iot-hub-prod:<hub-tenant-id>/full-access": {
-          "type": "suite-auth"
-        }
-      },
-      "resources": {
-        "policy:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        },
-        "thing:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        },
-        "message:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        }
-      }
-    },
-    "solution-owner": {
-      "subjects": {
-        "bosch:<technical-user-id>": {
-          "type": "bosch id"
-        }
-      },
-      "resources": {
-        "thing:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        },
-        "message:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        }
-      }
-    },
-    "DEVICE": {
-      "subjects": {
-        "integration:<things-solution-id>:hub": {
-          "type": "iot-things-integration"
-        }
-      },
-      "resources": {
-        "thing:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        },
-        "message:/": {
-          "grant": [
-            "READ",
-            "WRITE"
-          ],
-          "revoke": []
-        }
-      }
-    }
-  }
-}
-```
-
-You will need to replace all `<placeholders>` respectively:
-* `<hub-tenant-id>` - _You can find your Hub-Tenant ID on the Service Subscriptions Page under the Show Credentials button._
-* `<technical-user-id>` - _You can find your Technical User ID on the Service Subscriptions Page under the Show Credentials button_.
-* `<things-solution-id>` - _You can find the Solution ID on the Service Subscriptions Page under the Show Credentials button or on the starting page of Bosch IoT Things Dashboard._
-
-Click _Execute_ to submit the request.
-
-Upon success, you have created a valid policy, which you can associate to your things. The Suite Auth client will have enough permissions for the command and control use case.
 
 ## Device Provisioning API
 

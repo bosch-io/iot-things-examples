@@ -21,7 +21,7 @@ Before you can start, you have to prepare your setup. This includes the followin
 
 We will use the _telemetry_, _event_ as well as the _command & control_ pattern of the Bosch IoT Hub.
 
-![](img/Bidirectional_View.png)
+![](img/Bidirectional_Overview.png)
 
 ## About the Octopus board
 The Octopus board is created by Guido Burger. Its original purpose was to be used as a teaching tool for hackatons in

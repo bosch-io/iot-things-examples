@@ -33,7 +33,7 @@
     "sha.js": "^2.4.11",
     "ws": "~4.0.0",
     "sshpk": "~1.14.2",
-    "lodash": "4.17.10"
+    "lodash": "4.17.11"
   },
   "devDependencies": {
     "@types/jest": "~23.3.9",

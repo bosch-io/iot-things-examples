@@ -51,6 +51,7 @@ Create file "config.properties" in folder "src/main/resources". _Please change t
 
 ```
 thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
+thingsMessagingEndpointUrl=wss://things.s-apps.de1.bosch-iot-cloud.com
 clientId=###your solution id ###\:historian
 apiToken=###your historian solution API token###
 keyAlias=CR

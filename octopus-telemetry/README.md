@@ -11,7 +11,8 @@ In the image below, we illustrated the components of this example and how they w
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
-3. [Register the device via the Device Provisioning API](#device-provisioning-api)
+2. [Register the device via the Device Provisioning API](#device-provisioning-api)
+3. [Add a subject to your policy](#add-a-subject-to-your-policy)
 4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
 5. [Show telemetry data on Things-Dashboard](#show-the-telemetry-data-on-things-dashboard)
 
@@ -154,7 +155,7 @@ Your request body should contain the following information:
 }
 ```
 
-You will need to edit the following <placeholders>:
+You will need to edit the following `<placeholders>`:
 * "id": "`<your-namespace>:<your-device-id>`" - _Use your created namespace followed by_ `:` _and your specific thing ID. In our use case it should be_ `yourNamespace:octopus`.
 * "password": "`any-password`" - _Type in a secure password in plain text. It will be hashed on our server._
 * "manufacturer": "`<my-awesome-company>`" - _Type in your company Name._
@@ -162,6 +163,45 @@ You will need to edit the following <placeholders>:
 Click _Execute_ to submit the request.
 
 Upon success, you have created a _device_ in the context of Bosch IoT Hub associated with credentials, and an empty _digital twin_ in _thing_ notation associated with a default policy.
+
+## Add a subject to your policy
+
+A policy enables developers to configure **fine-grained** access control for Things and other entities in an easy way. A specific policy provides someone (called **subject**), permission to _read_ and/or _write_ at a given **resource**. Your Device Provisioning Request at our API generated a default policy for you.
+
+In order to get _read_ access to our registered thing on the things-dashboard, we have to create a new subject with our `bosch-id` by requesting the `PUT` `​/policies​/{policyId}​/entries​/{label}` route on our [Bosch IoT Things HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/).
+                                                                                                                                                                                                                   
+You will need to do the following steps:
+
+1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated input field.
+2. Provide your _policyId_ on the required input-field. You can find your _policyId_ in the response of your previous Device Provisioning request.
+3. Set any _label_ (e.g `solution-owner`) for your new **subject**, by typing it in the dedicated input-field.
+4. Edit the request body to send a valid message to the server.
+
+Your request body should contain the following information:
+
+```json
+{
+  "subjects": {
+    "bosch:<your-technical-user-id>": {
+      "type": "bosch-id"
+    }
+  },
+  "resources": {
+    "thing:/": {
+      "grant": [
+        "READ" 
+      ],
+      "revoke": []
+    }
+  }
+}
+```
+You will need to edit the following `<placeholders>`:
+* "bosch:`<your-technical-user-id>`" - You can find your _technical-user-id_  under the Show Credentials button of your Service Subscription page in the Bosch IoT Suite
+
+Click Execute to submit the request.
+
+Upon success, you have created a subject in your policy with _read_ access for your registered thing (octopus board).
 
 ## Prepare the Octopus device with Arduino
 

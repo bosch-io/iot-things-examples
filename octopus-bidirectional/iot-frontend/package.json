@@ -16,6 +16,7 @@
     "deepmerge": "^2.2.1",
     "es6-promise": "^4.2.5",
     "event-source-polyfill": "^1.0.4",
+    "node-gyp": "^4.0.0",
     "node-sass": "^4.9.3",
     "qs": "^6.7.0",
     "sass-loader": "^7.1.0",

@@ -43,7 +43,7 @@
     <description>Bosch IoT Things HTTP Examples for Java</description>
 
     <properties>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <async-http-client.version>2.0.37</async-http-client.version>
         <junit.version>4.12</junit.version>
     </properties>

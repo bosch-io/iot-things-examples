@@ -41,7 +41,7 @@ In addition the array is sliced to not exceed a fixed element count.
 
 ## Create a Solution with a private/public key
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 Create and add a Public Key to your solution and store the things-client.jks file to the folder "src/main/resources".
 

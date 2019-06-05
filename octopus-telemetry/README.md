@@ -10,7 +10,7 @@ In the image below, we illustrated the components of this example and how they w
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
 2. [Register the device via the Device Provisioning API](#device-provisioning-api)
-3. [Add a subject to your policy](#add-a-subject-to-your-policy)
+3. [Use the Things dashboard to view your Octopus](#use-the-things-dashboard-to-view-your-octopus)
 4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
 5. [Show telemetry data on Things-Dashboard](#show-the-telemetry-data-on-things-dashboard)
 

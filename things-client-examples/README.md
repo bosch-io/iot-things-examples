@@ -1,8 +1,8 @@
 # Bosch IoT Things Client examples
 
 These example shows how to use the Things Client to manage Things, Attributes and Features, register for changes on your Things, send messages.
-You can find more information about the Things Client at our [Wiki](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=dev_guide:java_api:start.
-Instructions how to generate the required keystore are available in our [Getting started](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-public-key) guide. 
+You can find more information about the Things Client at our [Wiki](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start).
+Instructions how to generate the required keystore are available in our [Getting started](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key) guide. 
 
 ## Configure
 

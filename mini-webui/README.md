@@ -1,7 +1,7 @@
 # Bosch IoT Things - Minimal Web UI
 
 This example shows how to create a simple user interface to list a thing.
-Find detailed instructions in our [tutorial](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_tutorial:java_client:web_business-view).
+Find detailed instructions in our [tutorial](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:java_client:web_business-view).
 
 ## Configure your settings
 

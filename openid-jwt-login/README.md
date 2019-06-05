@@ -4,7 +4,7 @@ This example shows how to create a simple user interface to authenticate with Op
 
 # Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 # Configure your API Token and other settings
 
@@ -49,7 +49,7 @@ java -jar target/openid-jwt-login.jar
 
 # Usage
 
-Use Bosch IoT Permissions to [register a demo user](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser).
+Use Bosch IoT Permissions to [Register a user](things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 Browse to the example web app: <http://localhost:8080/openid-jwt-login/> and click on "Create" in the UI to create an empty Thing.
 

@@ -38,11 +38,11 @@ The example implementation includes 3 components to illustrate the approach in o
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 ## Prepare user (subject)
 
-In real-world scenarios the 3 components would each run with it's own user context / technical user. For simplicity you can run them with one single user. For evaluation/example scenarios you can setup a evaluation user as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser).
+In real-world scenarios the 3 components would each run with it's own user context / technical user. For simplicity you can run them with one single user. For evaluation/example scenarios you can setup a evaluation user as described in [register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your settings
 

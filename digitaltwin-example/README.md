@@ -53,13 +53,13 @@ The following diagram shows deployment options for digital twins with Bosch IoT 
 
 This example illustrates the implementation of a digital twin with some typical aspects:
 - **Device**: a feature that represents the state of a connected device. The device regularly measures the temperature and has a configured threshold value to adjust the minimum temperature that should be reported to the digital twin.\
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device/D100/2.1.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device:D100:2.1.0]
 - **Commissioning**: a feature (separate to _Device_) that abstracts the "workflow" to execute all preparation steps for a new device, so that it can be connected afterwards. The workflow interface is included in the digital twin in order to be part of the overall orchestration including access control and to support reflecting status of the commissioning process within the digital twin. In the example, the commissioning implements the registration of the device in Bosch IoT Hub / Eclipse Hono.\
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto/HonoCommissioning/1.0.0]
+The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto:HonoCommissioning:1.0.0]
 - **Accessories**: a custom functionality to determine supported accessory products that can be combined with the device (e.g. batteries, spare parts). In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog/Accessories/2.0.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog:Accessories:2.0.0]
 - **Descriptive**: a small, reusable aspect with general-purpose descriptive information about a thing, defined as "static" state properties.
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.vorto.standard/Descriptive/1.0.0]
+The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.vorto.standard:Descriptive:1.0.0]
 - **ProductInfo**: an unstructured set of properties describing more information about the overall product. There is no contract for this feature.
 
 Adding all of these aspects in the general conceptual model gives the following picture:

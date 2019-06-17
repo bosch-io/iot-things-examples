@@ -74,6 +74,7 @@ You will need to do the following steps:
 1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated input field.
 2. Provide your _service-instance-id_ on the required input-field. You can find your _service-instance-id_ under the **Show Credentials** button of your  _Service Subscription page_ in the Bosch IoT Suite.
 3. Edit the request body to send a valid message to the server.
+4. Save the response as it will be needed later on
 
 Your request body should contain the following information:
 
@@ -230,6 +231,7 @@ Upon success, you have created a subject in your policy with _read_ access for y
    8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
+4. Change Board in Arduino IDE. Go to Tools -> Board: -> Adafruit Feather HUZZAH ESP8266
 
 ### Configure with valid credentials
 

@@ -31,10 +31,10 @@
 #include "time.h"
 
 void Octopus::begin() {
-   Serial.println("--- Initializing Octopus --- ");  
+   Serial.println("--- Initializing Octopus --- ");
 
   this->initLights();
-  
+
   delay(1000); // give sensors some time to start up
   #ifdef BME280
   this->initBme280();
@@ -43,7 +43,7 @@ void Octopus::begin() {
   #endif
   this->initBno055();
   delay(500);
-  
+
   this->showColor(0, 0, 0x80, 0, 0); // green
 }
 
@@ -51,7 +51,11 @@ void Octopus::connectToWifi(char* ssid, const char* password) {
 
   WiFi.mode(WIFI_STA);
   this->showColor(0, 0, 0, 0, 0x80); // white
-  Printer::printMsg("Octopus::WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
+
+  Printer::printMsg("WiFi", "Device MAC address: ");
+  Serial.println(WiFi.macAddress());
+
+  Printer::printMsg("WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -94,7 +98,7 @@ bool Octopus::readBno055(Bno055Values &values) {
 
   this->bno055.getCalibration(&values.calibrationSys, &values.calibrationGyro, &values.calibrationAccel, &values.calibrationMag);
   values.temperature = this->bno055.getTemp();
-  
+
   imu::Vector<3> bnoAccel = this->bno055.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   values.accelerationX = bnoAccel.x();
   values.accelerationY = bnoAccel.y();
@@ -109,7 +113,7 @@ bool Octopus::readBno055(Bno055Values &values) {
   values.gravityX = bnoGravity.x();
   values.gravityY = bnoGravity.y();
   values.gravityZ = bnoGravity.z();
-  
+
   imu::Vector<3> bnoGyro = this->bno055.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   values.angularVelocityX = bnoGyro.x();
   values.angularVelocityY = bnoGyro.y();
@@ -160,7 +164,7 @@ bool Octopus::readBme680(Bme680Values &values) {
     return false;
 
 
-  if (!this->bme680.performReading()) { 
+  if (!this->bme680.performReading()) {
     Serial.println("Sensor reading failure");
     return false;
   } else {
@@ -206,9 +210,9 @@ void Octopus::initBno055() {
 void Octopus::initLights() {
   Printer::printlnMsg("Octopus", "Initializing Neopixels");
   this->strip.begin();
-  this->strip.show(); 
+  this->strip.show();
   // Initialize all pixels to 'off'
   this->strip.setPixelColor(0,0,0,0);
   this->strip.setPixelColor(1,0,0,0);
-  this->strip.show(); 
+  this->strip.show();
 }

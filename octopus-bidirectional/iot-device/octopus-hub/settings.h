@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 // ---- WiFi configuration ----
-#define WIFI_SSID "TEst"     // The SSID of the WiFi you want your octopus board to connect to.
+#define WIFI_SSID "XXX"     // The SSID of the WiFi you want your octopus board to connect to.
 #define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to connect to.
 
 // ---- Things registration properties ----

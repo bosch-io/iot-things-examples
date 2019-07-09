@@ -10,7 +10,7 @@
 #define THING_NAME "octopus"   // Should not be changed - This is the thing id without the namespace.
 
 // ---- Hub registration properties ----
-#define HUB_TENANT "XXX"          // The tenant id of your hub instance, which is provided by the credentials of the Bosch IoT Suite - service subscriptions page.
+#define HUB_TENANT "TEST"         // The tenant id of your hub instance, which is provided by the credentials of the Bosch IoT Suite - service subscriptions page.
 #define HUB_DEVICE_ID "XXX"       // The device id that was included in the response of the device provisioning API request.
 #define HUB_DEVICE_AUTH_ID "XXX"  // The auth id that was included in the response of the device provisioning API request.
 #define HUB_DEVICE_PASSWORD "XXX" // The device password that was used for the device provisioning API request in plain text.

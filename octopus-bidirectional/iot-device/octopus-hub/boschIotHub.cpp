@@ -82,6 +82,13 @@ bool BoschIotHub::connect()
 {
   mqttClient.setServer(mqttBroker, mqttPort);
   mqttClient.setCallback(hubCommandReceived);
+
+  if (!wiFiClient.setCACert(mqttServerCA, mqttServerCALen))
+  {
+    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
+    return false;
+  }
+
   if (!wiFiClient.connect(mqttBroker, mqttPort))
   {
     Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");
@@ -90,12 +97,6 @@ bool BoschIotHub::connect()
   else
   {
     Printer::printlnMsg("Bosch IoT Hub", "Secure connection established");
-  }
-
-  if (!wiFiClient.setCACert(mqttServerCA, mqttServerCALen))
-  {
-    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
-    return false;
   }
 
   int rc = wiFiClient.verifyCertChain(mqttBroker);

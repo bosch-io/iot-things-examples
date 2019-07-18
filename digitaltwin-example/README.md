@@ -71,7 +71,7 @@ Adding all of these aspects in the general conceptual model gives the following 
 The example implementation includes all the microservices that provide the features of the digital twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated [command&control](see https://www.eclipse.org/hono/api/command-and-control-api/) pattern using MQTT, the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated command&control pattern (see https://www.eclipse.org/hono/docs/latest/concepts/command-and-control/) using MQTT, the simulation could be switched to it for both channels.
 
 Following the deployment model from above this looks like this:
 
@@ -171,14 +171,14 @@ Book the Bosch IoT Things cloud service: as described in our [documentation](htt
 
 ## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 
-Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT cloud service](https://www.bosch-iot-suite.com/service/hub/) for details.
+Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT Hub service](https://www.bosch-iot-suite.com/service/hub/) for details.
 
 After you have both instances (Things and Hub) in place, you can setup the integration between the two.
 See the [Bosch IoT Thing documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
 
 ## Prepare users (subjects) for each microservice
 
-As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/permissions/).
+As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/service/permissions/).
 For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your settings

@@ -78,6 +78,8 @@ public abstract class ExamplesBase {
     protected final String apiToken;
     protected final String namespace;
 
+    protected final String endpoint_ws;
+
     protected final String clientId;
     protected final String anotherClientId;
 
@@ -108,11 +110,14 @@ public abstract class ExamplesBase {
      */
     protected ExamplesBase() {
 
+        //Read config.properties
         final Properties props = loadConfigurationFromFile();
 
         solutionId = props.getProperty("solutionId");
         apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
+
+        endpoint_ws = props.getProperty("endpoint_ws");
 
         clientId = solutionId + ":example";
         anotherClientId = solutionId + ":example2";
@@ -187,10 +192,18 @@ public abstract class ExamplesBase {
                         .password(password)
                         .build();
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+
+        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
+                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
                 .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .build();
+                .authenticationConfiguration(credentialsAuthenticationConfiguration);
+
+        if (endpoint_ws != null) {
+            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
+        }
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
+                thingsWsMessagingProviderConfigurationBuilder.build();
 
         final CommonConfiguration.OptionalConfigurationStep configuration =
                 ThingsClientFactory.configurationBuilder()
@@ -214,10 +227,17 @@ public abstract class ExamplesBase {
                         .aliasPassword(keystoreAliasPassword)
                         .build();
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
+                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
                 .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
-                .build();
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration);
+
+        if (endpoint_ws != null) {
+            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
+        }
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
+                thingsWsMessagingProviderConfigurationBuilder.build();
 
         final MessageSerializerConfiguration serializerConfiguration = MessageSerializerConfiguration.newInstance();
         setupCustomMessageSerializer(serializerConfiguration);

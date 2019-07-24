@@ -103,7 +103,7 @@ export class Forwarder {
 
     if (m.channel === 'twin' && m.criterion === 'events' && m.action === 'modified') {
 
-      this.forward(m.thingId, m.path, m.value)
+      this.forward(m)
       return
     }
 
@@ -111,12 +111,20 @@ export class Forwarder {
   }
 
   /** Pushes modifications to external http endpoint. */
-  private async forward(thingId: string, path: string, value: any) {
+  private async forward(m: ThingMessage) {
 
-    const partialThing = Helpers.partial(path, value)
+    const partialThing = Helpers.partial(m.path, m.value)
+    partialThing.thingId = m.thingId
     partialThing._modified = new Date()
+    partialThing._context = {
+      topic: m.topic,
+      path: m.path,
+      headers: m.headers,
+      fields: m.fields,
+      status: m.status
+    }
 
-    // console.log(`thing ${thingId} modified: ${JSON.stringify(partialThing)}`)
+    // console.log(`thing ${m.thingId} modified: ${JSON.stringify(partialThing)}`)
 
     let r = requestPromise({
       url: this.config.forwarder.url,
@@ -124,7 +132,7 @@ export class Forwarder {
       auth: { sendImmediately: true, user: this.config.forwarder.username, pass: this.config.forwarder.password },
       json: true,
       resolveWithFullResponse: true,
-      body: JSON.stringify(partialThing)
+      body: partialThing
     } as requestPromise.Options)
     try {
       await r

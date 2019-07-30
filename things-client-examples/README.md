@@ -3,6 +3,13 @@
 These example shows how to use the Things Client to manage Things, Attributes/Features, register for changes on your Things and send messages.
 You can find more information about the Things Client at our [Wiki](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start).
 
+## Prerequisites
+
+The following background knowledge is required for this example
+- Java
+- Maven
+- Asymmetric cryptography
+- Publish–subscribe pattern
 
 ## Preperation
 

@@ -5,6 +5,15 @@ It shows how to collect and store the data in a MongoDB, how to make them access
 
 ![Screenshot](screenshot.png)
 
+## Prerequisites
+
+The following background knowledge is required for this example
+- Mongo DB
+- Java
+- Maven
+- Asymmetric cryptography
+- HTTP
+
 # How it works?
 
 ## Overview
@@ -13,11 +22,11 @@ The following diagram shows how the Example Data Historian could work:
 
 ![Overview](overview.png)
 
-Step by step:
+Overview:
 
 - Your (existing) IoT solution uses Bosch IoT Things to integrate it's devices
-- This Historian application can run separately to your applications
-- For things that it is allowed to it subscribes to all changes on the different Features of the managed Things
+- This Historian application can run separately from your other applications
+- Subscribes to all changes on the different Features of the managed Things
 - All fetched changes are stored as a time series record in a MongoDB database
 - The Historian application can be used by your business solution to access or to display history data of individual Thing properties
 
@@ -25,12 +34,12 @@ Step by step:
 
 The time serias data is recorded in a simple document structure in MongoDB.
 
-For each and every single (scalar) property of a Thing exactly one document is managed.
-This document has a unique id consisting of "<thing-id>/<feature-id>/properties/<property-path>".
-The documents have to array fields: a "values" array and a "timestamps" array.
-Both arrays are updated on every property change.
-The new value and timestamp is added to the end of the array
-In addition the array is sliced to not exceed a fixed element count.
+For each single (scalar) property of a Thing exactly one document is managed. This document has an unique id consisting of `<thing-id>/features/<feature-id>/properties/<property-path>`. Each document consists of two array fields: 
+1) "values" array 
+2) "timestamps" array
+
+Both arrays are updated on every property change.\
+The new value and timestamp is added to the end of the array. In addition the array is sliced, to not exceed a fixed element count.
 
 | Document Id | Content |
 | --- | --- |
@@ -39,27 +48,14 @@ In addition the array is sliced to not exceed a fixed element count.
 
 # How to run it?
 
-## Create a Solution with a private/public key
+## Create a Solution with a private/public key and User 
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
-
-Create and add a Public Key to your solution and store the things-client.jks file to the folder "src/main/resources".
+Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) and [key-pair](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key). Store the things-client.jks file to the folder "src/main/resources".\
+Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your Client Id and other settings
 
-Create file "config.properties" in folder "src/main/resources". _Please change the ids._
-
-```
-thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
-thingsMessagingEndpointUrl=wss://things.s-apps.de1.bosch-iot-cloud.com
-clientId=###your solution id ###\:historian
-apiToken=###your historian solution API token###
-keyAlias=CR
-keyStorePassword=#### your key password ###
-keyAliasPassword=#### your key alias password ###
-http.proxyHost=#### your http proxy host, if you need one ###
-http.proxyPort=#### your http proxy host, if you need one ###
-```
+Create the config file `src/main/resources/config.properties`. Use `src/main/resources/config.properties-default` as an template. 
 
 ## Install and start a local MongoDB
 
@@ -81,14 +77,14 @@ mvn exec:java -Dexec.mainClass=com.bosch.iot.things.example.historian.Applicatio
 
 ## Add ACL for "historian" to your things
 
-Add an ACL for the "historian"-client to any thing you already have. See the inventory-browser and vehicle-simulator examples.
-
+Add an ACL for the "historian"-client to any thing you already have with our [HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v1#/Features/put_things__thingId__features__featureId__properties__propertyPath_).\
+If you do not have a device yet, see the [inventory-browser](https://github.com/bsinno/iot-things-examples/tree/master/inventory-browser) example to create a device.
 ```
 {
    ...
    "acl": {
       ...
-      "###your historian solution id ###": {
+      "### solution id ###:historian": {
          "READ": true,
          "WRITE": false,
          "ADMINISTRATE": false
@@ -100,7 +96,7 @@ Add an ACL for the "historian"-client to any thing you already have. See the inv
 
 ## Usage
 
-Use the following URL to look at the collected data:
+Use the following URL to look at the collected data and authenticate with your permissions user:
 
 http://localhost:8080/history/data/###thingId###/features/###featureId###/properties/###propertyPath###
 
@@ -114,7 +110,7 @@ e.g.
 - http://localhost:8080/history/data/demo:vehicle-53/features/[geolocation/properties/geoposition/latitude,enginetemperature/properties/value]
 - http://localhost:8080/history/data/[demo:vehicle-53/features/geolocation/properties/geoposition/latitude,demo:vehicle-99/features/geolocation/properties/geoposition/latitude]
 
-Use the following URL to view at the collected data as a timeseries chart, following the same format above to take into account multiple feature/values.
+Use the following URL to view at the collected data as a timeseries chart, following the same format above to take into account multiple feature/values. Authenticate with your permissions user:
 
 http://localhost:8080/history/view/###thingId###/features/###featureId###/properties/###propertyPath###
 

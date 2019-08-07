@@ -1,23 +1,23 @@
 [
   {
-    "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
+    "websocketBaseUrl": "### your things endpoint_ws ###",
     "httpHeaders": {
-      "x-cr-api-token": "<<<your-things-api-token>>>"
+      "x-cr-api-token": "### your things api token ###"
     },
     "things": {
-      "username": "<<<name-of-user-with-access-to-things>>>",
-      "password": "<<<password>>>"
+      "username": "### permissionTenantName\\username ###",
+      "password": "### password ###"
     },
     "influxdb": {
       "write": {
-        "url": "<<<influx-url:e.g. http://localhost:8086/write?db=mydb>>>",
-        "username": "<<<influx-writer-username>>>",
-        "password": "<<<influx-writer-password>>>"
+        "url": "### influx-url:e.g. http://localhost:8086/write?db=mydb ###",
+        "username": "### influx writer username ###",
+        "password": "### influx writer password ###"
       },
       "read": {
-        "url": "<<<influx-url:e.g. http://localhost:8086/query?db=mydb>>>&q=",
-        "username": "<<<influx-reader-username>>>",
-        "password": "<<<influx-reader-password>>>"
+        "url": "### influx-url:e.g. http://localhost:8086/query?db=mydb ###&q=",
+        "username": "### influx reader username ###",
+        "password": "### influx reader password ###"
       }
     }
   }

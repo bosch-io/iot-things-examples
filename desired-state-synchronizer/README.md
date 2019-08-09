@@ -4,6 +4,13 @@ This example shows a simple implementation and usage scenario for an integration
 
 This example shows a preliminary implementation that could be refactored towards a core functionally of Bosch IoT Things / Eclipse Ditto. See [ditto#125](https://github.com/eclipse/ditto/issues/125) for the discussion/progress on this functionally/refactoring.
 
+# Prerequisites
+
+The following background knowledge is required for this example
+
+- npm
+- TypeScript
+
 # Chosen approach
 
 Whenever an IoT application has to distinguish between the two perspectives "desired" and "reported" (current) state of an IoT device it should maintain these two perspectives within the same Thing that represents the device.
@@ -46,7 +53,7 @@ In real-world scenarios the 3 components would each run with it's own user conte
 
 ## Configure your settings
 
-Set your credentials in the file "config.json". You can copy "config.json-template" as template and fill out placeholders.
+Set your credentials in the file "config.json". You can copy "config-template.json" as template and fill out placeholders.
 
 # Build and Run
 

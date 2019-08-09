@@ -1,14 +1,12 @@
-[
-  {
-    "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
-    "httpBaseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
-    "httpHeaders": {
-      "x-cr-api-token": "<<<your-things-api-token>>>"
-    },
-    "subject": "<<<subject-id-of-user",
-    "username": "<<<username>>>",
-    "password": "<<<password>>>",
-    "thingId": "<<<namespace:local-thing-id>>>",
-    "policyId": "<<<namespace:local-thing-id>>>"
-  }
-]
+{
+  "websocketBaseUrl": "### your-things-service-endpoint_ws ###",
+  "httpBaseUrl": "### your-things-service-endpoint_http ###",
+  "httpHeaders": {
+    "x-cr-api-token": "### your-things-service-api-token ###"
+  },
+  "subject": "### subject-id-of-user e.g. iot-permissions:d8xxxxxx-xxxx-xxxx-xxxx-xxxxxx6b3dfd ###",
+  "username": "### your-permission-service-imTenantName\\permission-username ###",
+  "password": "### permission-user-password ###",
+  "thingId": "### namespace:local-thing-id ###",
+  "policyId": "### namespace:local-thing-id ###"
+}

@@ -86,11 +86,11 @@ public class ProxyServlet extends HttpServlet {
         }
         System.out.println("Config: " + props);
         targetHost = HttpHost.create(
-                props.getProperty("thingsServiceEndpointUrl", "https://things.s-apps.de1.bosch-iot-cloud.com"));
+                props.getProperty("endpoint_http"));
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String auth = req.getHeader("Authorization");
         if (auth == null) {
             resp.setHeader("WWW-Authenticate", "BASIC realm=\"Proxy for Bosch IoT Things\"");

@@ -26,6 +26,7 @@
 package com.bosch.iot.things.examples;
 
 import static java.util.Optional.of;
+import static org.eclipse.ditto.model.base.auth.AuthorizationModelFactory.newAuthSubject;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import org.eclipse.ditto.model.things.AclEntry;
 import org.eclipse.ditto.model.things.Feature;
 import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +70,7 @@ public class DeviceIntegration {
     private static final String COUNTER = "counter";
     private static final String COUNTER_VALUE = "value";
 
+    private final String endpoint_ws;
     private final String solutionId;
     private final String apiToken;
     private final String namespace;
@@ -101,6 +104,7 @@ public class DeviceIntegration {
 
         final Properties props = loadConfigurationFromFile();
 
+        endpoint_ws = props.getProperty("endpoint_ws");
         solutionId = props.getProperty("solutionId");
         apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
@@ -112,7 +116,8 @@ public class DeviceIntegration {
             this.keystoreLocation = new File(keystoreLocationProperty).toURI().toURL();
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " + e.getMessage());
+                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " +
+                            e.getMessage());
         }
         keystorePassword = props.getProperty("keystorePassword");
         keystoreAlias = props.getProperty("keystoreAlias");
@@ -162,6 +167,7 @@ public class DeviceIntegration {
         final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
                 .thingsWebsocketProviderBuilder()
                 .authenticationConfiguration(credentialsAuthenticationConfiguration /* or publicKeyAuthenticationConfiguration */)
+                .endpoint(endpoint_ws)
                 .build();
 
 
@@ -186,8 +192,8 @@ public class DeviceIntegration {
             final FeatureHandle counter = createThingWithCounter();
 
             // Update the ACL with your User ID to see your thing in the Demo Web UI
-            updateACL();
-
+            // Uncomment this if you use Things-client 3.2 or below which use API1
+//            updateACL();
             // Log full Thing info (as JSON)
             LOGGER.info("Thing looks like this: {}", getThingById(thingId).toJson());
 
@@ -246,14 +252,14 @@ public class DeviceIntegration {
      * Delete a Thing.
      */
     public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        twin.delete(thingId) //
+        twin.delete(thingId)
                 .whenComplete((aVoid, throwable) -> {
                     if (null == throwable) {
                         LOGGER.info("Thing with ID deleted: {}", thingId);
                     } else {
                         LOGGER.error(throwable.getMessage());
                     }
-                }) //
+                })
                 .get(TIMEOUT, TimeUnit.SECONDS);
     }
 

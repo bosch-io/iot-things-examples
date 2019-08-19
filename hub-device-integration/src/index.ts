@@ -27,15 +27,16 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
+import * as fs from 'fs'
 import * as mqtt from 'mqtt'
 import * as requestPromise from 'request-promise-native'
 import * as shajs from 'sha.js'
-import * as fs from 'fs'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 const THING_ID = CONFIG.things.namespace + ':' + CONFIG.things.thingname
 const POLICY_ID = THING_ID
+const ENDPOINT_HTTP = CONFIG.things.endpoint_http
 const THINGS_HTTP_DEFAULT_OPTIONS = {
   json: true,
   auth: { username: CONFIG.things.username, password: CONFIG.things.password },
@@ -110,7 +111,7 @@ class HubDeviceIntegration {
     }
 
     await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-      url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/policies/' + POLICY_ID,
+      url: ENDPOINT_HTTP + '/api/2/policies/' + POLICY_ID,
       method: 'PUT',
       body: policy
     }))
@@ -120,14 +121,14 @@ class HubDeviceIntegration {
 
     try {
       await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-        url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + THING_ID,
+        url: ENDPOINT_HTTP + '/api/2/things/' + THING_ID,
         method: 'PUT',
         body: thing
       }))
     } catch (err) {
       // in case of errors: delete unwanted policy again
       await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-        url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/policies/' + POLICY_ID,
+        url: ENDPOINT_HTTP + '/api/2/policies/' + POLICY_ID,
         method: 'DELETE'
       }))
     }
@@ -182,7 +183,6 @@ class HubDeviceIntegration {
   }
 
   async sendDataMqtt(msg): Promise<void> {
-
     return new Promise<void>((resolve, reject) => {
       console.log('trying mqtt connection')
 
@@ -219,7 +219,7 @@ class HubDeviceIntegration {
   async sendDataHttp(msg): Promise<void> {
 
     await requestPromise({
-      url: 'https://rest.bosch-iot-hub.com/telemetry/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId,
+      url: 'https://http.bosch-iot-hub.com/telemetry/' + CONFIG.hub.tenant + '/' + CONFIG.hub.deviceId,
       auth: { user: CONFIG.hub.deviceAuthId + '@' + CONFIG.hub.tenant, pass: CONFIG.hub.devicePassword },
       method: 'PUT',
       json: true,
@@ -232,11 +232,11 @@ class HubDeviceIntegration {
   async checkUpdate(path: string, referenceValue: any): Promise<void> {
 
     // wait for some time ...
-    await this.sleep(2000)
+    await this.sleep(5000)
 
     // receive value from twin
     let result = await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-      url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + THING_ID + path,
+      url: ENDPOINT_HTTP + '/api/2/things/' + THING_ID + path,
       method: 'GET'
     }))
     let resultObj = JSON.parse(result)
@@ -277,7 +277,7 @@ class HubDeviceIntegration {
 
     try {
       const r = await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-        url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/things/' + THING_ID,
+        url: ENDPOINT_HTTP + '/api/2/things/' + THING_ID,
         method: 'DELETE'
       }))
       console.log(`cleanup: delete thing done; ${r}`)
@@ -287,7 +287,7 @@ class HubDeviceIntegration {
 
     try {
       const r = await requestPromise(Object.assign({}, THINGS_HTTP_DEFAULT_OPTIONS, {
-        url: 'https://things.s-apps.de1.bosch-iot-cloud.com/api/2/policies/' + POLICY_ID,
+        url: ENDPOINT_HTTP + '/api/2/policies/' + POLICY_ID,
         method: 'DELETE'
       }))
       console.log(`cleanup: delete policy done; ${r}`)
@@ -304,7 +304,6 @@ class HubDeviceIntegration {
   private async sleep(milliseconds): Promise<void> {
     return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
   }
-
 }
 
 console.log('\nstarting ...\n')

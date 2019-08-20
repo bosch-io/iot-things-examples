@@ -1,17 +1,17 @@
 [
   {
-    "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
+    "websocketBaseUrl": "### solution endpoint_ws ###",
     "httpHeaders": {
-      "x-cr-api-token": "<<<your-things-api-token>>>"
+      "x-cr-api-token": "### your-things-api-token ###"
     },
     "things": {
-      "username": "<<<name-of-user-with-access-to-things>>>",
-      "password": "<<<password>>>"
+      "username": "### name-of-user-with-access-to-things ###",
+      "password": "### password ###"
     },
     "forwarder": {
-      "url": "<<<http://localhost:8086/process>>>",
-      "username": "<<<username>>>",
-      "password": "<<<password>>>"
+      "url": "### http://localhost:8086/process ###",
+      "username": "### username ###",
+      "password": "### password ###"
     }
   }
 ]

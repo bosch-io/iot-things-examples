@@ -46,7 +46,8 @@ java -jar target/mini-webui.jar
 
 Browse to the example web app: <http://localhost:8080/mini-webui/>\
 Set your API token and the ID of the thing to be queried.\
-Then click "Submit" and authenticate with a user which has at least read access to the things-feature.
+Then click "Submit" and authenticate with a user which has at least read access to the thing.\
+The policy for your thing is automatically created in the "mini-device-integrator" example. Take a look at our [HTTP-API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Policies/get_policies__policyId_) to verify that your user had read access.
 
 ## License
 See the iot-things-examples top level README.md file for license details.

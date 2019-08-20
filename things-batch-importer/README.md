@@ -17,7 +17,7 @@ The file(s) should contain one thing per line in JSON format e.g.
 - [User of Bosch IoT Permissions](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) or - alternativly - [Public Key](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key) for authenticating the Things client.
 - WebsocketEndpoint have to be configured in config.properties.
 
-###Preperation
+### Preperation
 
 Create at least one [policy](https://docs.bosch-iot-suite.com/asset-communication/Initial-policy.html) which you can assigned to your things.\
 Set your credentials under "/src/main/resources/config.properties". 

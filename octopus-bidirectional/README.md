@@ -230,13 +230,11 @@ Upon success, you have created a subject in your policy with _read_ access for y
    8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
+4. Change the Board (Tools -> Board: -> Adafruit Feather HUZZAH ESP8266)
 
 ### Configure with valid credentials
 
 The Arduino Sketch we have prepared publishes the sensor information via the Bosch IoT Hub to Bosch IoT Things.
-
-**Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
-http://vorto.eclipse.org/#/details/com.bosch.iot.suite:OctopusSuiteEdition:1.0.0
 
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 

@@ -2,10 +2,10 @@
   {
     "websocketBaseUrl": "### solution endpoint_ws ###",
     "httpHeaders": {
-      "x-cr-api-token": "### your-things-api-token ###"
+      "x-cr-api-token": "### your things api token ###"
     },
     "things": {
-      "username": "### name-of-user-with-access-to-things ###",
+      "username": "### Permission-TenantName\\Permission-username ###",
       "password": "### password ###"
     },
     "forwarder": {

@@ -39,7 +39,7 @@ The following sequence diagram shows the interaction between device, Bosch IoT T
 The example implementation includes 3 components to illustrate the approach in one single runtime application based on Node.js:
 - a Frontend that is a placeholder for an IoT application that set's up a Thing entity, periodically tries to set a desired configuration value and also periodically reads the whole state (reported and desired). The Frontend communicates with Bosch IoT Things / Eclipse Ditto using the HTTP API.
 - a DeviceSimulation that acts as a replacement for a real device. This DeviceSimulation uses a WebSocket channel to integrate with Bosch IoT Things / Eclipse Ditto. This integration is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it.
-* a Synchronizer that support calculating the different between reported and desired state. The calculation is triggered using a message-based interaction pattern ("determineDesiredPatch").
+- a Synchronizer that support calculating the different between reported and desired state. The calculation is triggered using a message-based interaction pattern ("determineDesiredPatch").
 
 # Prepare
 

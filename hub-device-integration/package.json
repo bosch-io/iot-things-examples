@@ -27,7 +27,7 @@
     "prune": "~0.0.2",
     "request-promise-native": "~1.0.7",
     "sha.js": "^2.4.11",
-    "lodash": "~4.17.11"
+    "lodash": "~4.17.15"
   },
   "devDependencies": {
     "@types/jest": "~24.0.15",

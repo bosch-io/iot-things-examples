@@ -49,7 +49,7 @@ Set your credentials in the file "config.json". You can copy "config-template.js
 
 ```
 npm install
-npm run build
+tsc
 npm run start
 ```
 

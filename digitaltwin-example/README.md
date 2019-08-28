@@ -195,7 +195,7 @@ Set your credentials in a file called "config.json". You can copy "config.json-t
 
 ```
 npm install
-npm run build
+tsc
 npm run start
 ```
 

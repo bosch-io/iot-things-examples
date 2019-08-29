@@ -26,7 +26,6 @@
 package com.bosch.iot.things.examples;
 
 import static java.util.Optional.of;
-import static org.eclipse.ditto.model.base.auth.AuthorizationModelFactory.newAuthSubject;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +39,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.ditto.json.JsonObject;
-import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
-import org.eclipse.ditto.model.things.AclEntry;
 import org.eclipse.ditto.model.things.Feature;
-import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
-import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,9 +186,6 @@ public class DeviceIntegration {
             // Create a Thing with a counter Feature and get the FeatureHandle
             final FeatureHandle counter = createThingWithCounter();
 
-            // Update the ACL with your User ID to see your thing in the Demo Web UI
-            // Uncomment this if you use Things-client 3.2 or below which use API1
-//            updateACL();
             // Log full Thing info (as JSON)
             LOGGER.info("Thing looks like this: {}", getThingById(thingId).toJson());
 
@@ -261,30 +253,6 @@ public class DeviceIntegration {
                     }
                 })
                 .get(TIMEOUT, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Update the ACL of a specified Thing. Blocks until ACL has been updated.
-     */
-    public void updateACL() throws InterruptedException, ExecutionException, TimeoutException {
-        twin.forId(thingId) //
-                .retrieve() //
-                .thenCompose(thing -> {
-                    final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(userid), //
-                            Permission.READ, //
-                            Permission.WRITE, //
-                            Permission.ADMINISTRATE);
-
-                    final Thing updated = thing.setAclEntry(aclEntry);
-                    return twin.update(updated);
-                }) //
-                .whenComplete((aVoid, throwable) -> {
-                    if (null == throwable) {
-                        LOGGER.info("Thing with ID '{}' updated ACL entry!", thingId);
-                    } else {
-                        LOGGER.error(throwable.getMessage());
-                    }
-                }).get(TIMEOUT, TimeUnit.SECONDS);
     }
 
     /**

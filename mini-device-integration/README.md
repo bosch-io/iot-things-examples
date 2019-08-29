@@ -23,6 +23,8 @@ mvn clean install
 mvn exec:java
 ```
 
+You will see how a feature with the featureId "counter" will increment his value till 100 is reached. You can track the features grow either in your Terminal or you can use a front-end like described in our ["Octopus bidirectional"](https://github.com/bsinno/iot-things-examples/tree/master/octopus-bidirectional) example.
+
 ## License
 
 See the iot-things-examples top level README.md file for license details.

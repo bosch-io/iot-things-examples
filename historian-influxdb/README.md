@@ -86,7 +86,7 @@ Add a section like the follwing to the policy/policies of your things in order t
 To query/analyse collected Thing history data you could either work on a global level directly on your InfluxDB or you can use the Historian service to manage query execution in the context of individual Things. By using the latter approach the full access control check is applied for these query invocations and only allowed subjects are able to query the data.
 
 The message that describes query invocations is defined based the following Eclipse Vorto functionblock:
-[http://vorto.eclipse.org/#/details/org.eclipse.ditto/Historian/1.0.0]
+[https://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.historian:Historian:1.0.0]
 
 After adding a respective feature (e.g. with id "Historian") to your Things you can invoke the message.
 

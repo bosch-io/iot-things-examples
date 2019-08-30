@@ -1,12 +1,12 @@
-namespace org.eclipse.ditto
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.historian
 version 1.0.0
 displayname "Historian"
-description
-"Function block model for Historian. For Features marked with this Functionblock all history data of properties can be collected and access to the history is provided using defined operations."
-category eclipse
-using org.eclipse.ditto.InfluxDbQuery ; 1.0.0
+description "Function block model for Historian. For Features marked with this Functionblock all history data of properties can be collected and access to the history is provided using defined operations."
+using com.bosch.iot.suite.examples.historian.InfluxDbQuery;1.0.0
 
 functionblock Historian {
+
 	configuration {
 	}
 

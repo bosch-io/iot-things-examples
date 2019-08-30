@@ -1,8 +1,9 @@
-namespace org.eclipse.ditto
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.historian
 version 1.0.0
 displayname "InfluxDbQuery"
 description "Type for InfluxDbQuery; see https://docs.influxdata.com/influxdb/v1.5/query_language/data_exploration/ for description"
-category eclipse	
+
 
 entity InfluxDbQuery {
 	fields as string

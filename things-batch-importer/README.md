@@ -9,43 +9,18 @@ The file(s) should contain one thing per line in JSON format e.g.
 
 ##### Prerequisites:
 
-- Solution information like solutionId and apiToken have to be present.
-- Namespace in which the things should be imported, have to be created.
+- Knowledge of Java
+- Knowledge of Maven
+- [Solution](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-base) information like solutionId and apiToken have to be present.
+- [Namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) in which the things should be imported, have to be created.
 - Import file(s) with one thing per line in JSON format.
-- User of Bosch IoT Permissions or - alternativly - Public Key for authenticating the Things client.
+- [User of Bosch IoT Permissions](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) or - alternativly - [Public Key](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key) for authenticating the Things client.
 - WebsocketEndpoint have to be configured in config.properties.
 
-Example for config.properties file:
-```
-## WebSocket Endpoint
-# Bosch IoT Things on EU-1 (AWS)
-#webSocketEndpoint=wss://things.eu-1.bosch-iot-suite.com/
-# Bosch IoT Things on EU-2 (Bosch IoT Cloud)
-#webSocketEndpoint=wss://things.s-apps.de1.bosch-iot-cloud.com/
+### Preperation
 
-## Solution information
-solutionId=### your solutionId ###
-apiToken=### your apiToken ###
-
-#Either use Bosch IoT Permissions user or Public Key for Authentication
-# Uncomment one of the following sections
-## Permissions User
-#username=tenant\\username
-#password=
-
-## Public Key for Authentication
-#keystoreLocation=ThingsClient.jks
-#keystorePassword=
-#keystoreAlias=things
-#keystoreAliasPassword=
-
-## Optional proxy configuration
-#proxyHost=localhost
-#proxyPort=3128
-#proxyPrincipal=### your http proxy principal (user), if you need one ###
-#proxyPassword=### your http proxy password, if you need one ###
-
-```
+Create at least one [policy](https://docs.bosch-iot-suite.com/asset-communication/Initial-policy.html) which you can assigned to your things.\
+Set your credentials under "/src/main/resources/config.properties". 
 
 ### How to build things batch importer tool
 Build the jar file with following command.
@@ -56,7 +31,8 @@ mvn clean install
 ### How to run things batch importer tool 
 
 ```$bash
-java -Xms2G -Xmx4G -DthingsConfigFile=<absolutePathToConfig> -jar things-batch-importer-0-SNAPSHOT-jar-with-dependencies.jar <absolutePathToUploadDirectory>
+cd target
+java -Xms2G -Xmx4G -DthingsConfigFile="### absolutePathToConfig ###" -jar things-batch-importer-0-SNAPSHOT-jar-with-dependencies.jar "### absolutePathToUploadDirectory ###"
 ```
 
 If the import is interrupted the import tool can just be re-executed. It then continues to import where it previously stopped.

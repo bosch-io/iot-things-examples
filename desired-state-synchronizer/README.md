@@ -4,6 +4,13 @@ This example shows a simple implementation and usage scenario for an integration
 
 This example shows a preliminary implementation that could be refactored towards a core functionally of Bosch IoT Things / Eclipse Ditto. See [ditto#125](https://github.com/eclipse/ditto/issues/125) for the discussion/progress on this functionally/refactoring.
 
+# Prerequisites
+
+The following background knowledge is required for this example
+
+- npm
+- TypeScript
+
 # Chosen approach
 
 Whenever an IoT application has to distinguish between the two perspectives "desired" and "reported" (current) state of an IoT device it should maintain these two perspectives within the same Thing that represents the device.
@@ -31,22 +38,21 @@ The following sequence diagram shows the interaction between device, Bosch IoT T
 
 The example implementation includes 3 components to illustrate the approach in one single runtime application based on Node.js:
 - a Frontend that is a placeholder for an IoT application that set's up a Thing entity, periodically tries to set a desired configuration value and also periodically reads the whole state (reported and desired). The Frontend communicates with Bosch IoT Things / Eclipse Ditto using the HTTP API.
-- a DeviceSimulation that acts as a replacement for a real device. This DeviceSimulation uses a WebSocket channel to integrate with Bosch IoT Things / Eclipse Ditto. This integration is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as Eclipse Hono supports [command&control](https://www.eclipse.org/hono/api/command-and-control-api/) using MQTT the simulation could be switched to it.
-* a Synchronizer that support calculating the different between reported and desired state. The calculation is triggered using a message-based interaction pattern ("determineDesiredPatch").
+- a Synchronizer that support calculating the different between reported and desired state. The calculation is triggered using a message-based interaction pattern ("determineDesiredPatch").
 
 # Prepare
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 ## Prepare user (subject)
 
-In real-world scenarios the 3 components would each run with it's own user context / technical user. For simplicity you can run them with one single user. For evaluation/example scenarios you can setup a evaluation user as described [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser).
+In real-world scenarios the 3 components would each run with it's own user context / technical user. For simplicity you can run them with one single user. For evaluation/example scenarios you can setup a evaluation user as described in [register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your settings
 
-Set your credentials in the file "config.json". You can copy "config.json-template" as template and fill out placeholders.
+Set your credentials in the file "config.json". You can copy "config-template.json" as template and fill out placeholders.
 
 # Build and Run
 

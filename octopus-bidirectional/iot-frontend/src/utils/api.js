@@ -30,97 +30,127 @@
 import Vue from "vue";
 import store from "../store";
 import axios from "axios";
+import qs from "qs";
 
 export default (window.Api = new class {
-  constructor() {
-    this.vue = new Vue({
-      name: "api",
-      store,
-      computed: {
-        connection: {
-          get() {
-            return this.$store.getters.getConnection;
-          }
-        },
-        selected: {
-          get() {
-            return this.$store.getters.getSelected;
-          }
-        }
-      }
-    });
+    constructor() {
+        this.vue = new Vue({
+                               name: "api",
+                               store,
+                               computed: {
+                                   connection: {
+                                       get() {
+                                           return this.$store.getters.getConnection;
+                                       }
+                                   },
+                                   selected: {
+                                       get() {
+                                           return this.$store.getters.getSelected;
+                                       }
+                                   },
+                                   suiteAuthHost: {
+                                       get() {
+                                           return this.$store.getters.getSuiteAuthHost;
+                                       }
+                                   },
+                                   suiteAuthActive: {
+                                       get() {
+                                           return this.$store.getters.getSuiteAuthActive;
+                                       }
+                                   },
+                               }
+                           });
 
-    this.routes = {
-      policies: this.vue.connection.http_endpoint + "/api/2" + "/policies",
-      searchThings:
-        this.vue.connection.http_endpoint +
-        "/api/2" +
-        "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
-      things: this.vue.connection.http_endpoint + "/api/2" + "/things",
-      messages:
-        this.vue.connection.http_endpoint +
-        "/api/2" +
-        "/things/" +
-        this.vue.selected.thingId
-    };
-  }
-
-  createAuthHeader = (username, password) => {
-    return (
-      "Basic " +
-      btoa(
-        encodeURIComponent(username + ":" + password).replace(
-          /%([0-9A-F]{2})/g,
-          function toSolidBytes(match, p1) {
-            return String.fromCharCode("0x" + p1);
-          }
-        )
-      )
-    );
-  };
-
-  getConfig = (additionalHeader = null) => {
-    if (additionalHeader) {
-      return {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: this.createAuthHeader(
-            this.vue.connection.username,
-            this.vue.connection.password
-          ),
-          "x-cr-api-token": this.vue.connection.api_token,
-          "x-correlation-id": additionalHeader
-        }
-      };
+        this.routes = {
+            policies:
+                this.vue.connection.http_endpoint + "/api/2" + "/policies",
+            searchThings:
+                this.vue.connection.http_endpoint + "/api/2" +
+                "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
+            things: this.vue.connection.http_endpoint + "/api/2" + "/things",
+            messages:
+                this.vue.connection.http_endpoint +
+                "/api/2" +
+                "/things/" +
+                this.vue.selected.thingId
+        };
     }
-    return {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: this.createAuthHeader(
-          this.vue.connection.username,
-          this.vue.connection.password
-        ),
-        "x-cr-api-token": this.vue.connection.api_token
-      }
+
+    createAuthHeaderBasic = (username, password) => {
+        return (
+            "Basic " +
+            btoa(
+                encodeURIComponent(username + ":" + password).replace(
+                    /%([0-9A-F]{2})/g,
+                    function toSolidBytes(match, p1) {
+                        return String.fromCharCode("0x" + p1);
+                    }
+                )
+            )
+        );
     };
-  };
 
-  getAllThings = () => {
-    return axios.get(
-      `${
-        this.vue.connection.http_endpoint
-      }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
-      this.getConfig()
-    );
-  };
+    getConfig = (additionalHeader = null) => {
+        if (additionalHeader && !this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: this.createAuthHeaderBasic(
+                        this.vue.connection.username,
+                        this.vue.connection.password
+                    ),
+                    "x-cr-api-token": this.vue.connection.api_token,
+                    "x-correlation-id": additionalHeader
+                }
+            };
+        }
+        if (additionalHeader && this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token,
+                    'x-correlation-id': additionalHeader
+                }
+            };
+        }
+        if (!additionalHeader && !this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: this.createAuthHeaderBasic(
+                        this.vue.connection.username,
+                        this.vue.connection.password
+                    ),
+                    "x-cr-api-token": this.vue.connection.api_token
+                }
+            };
+        }
+        if (!additionalHeader && this.vue.suiteAuthActive) {
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token
+                }
+            }
+        }
+    };
 
-  sendMessage = (message, topic, corrId) => {
-    return axios.post(
-      `${this.vue.connection.http_endpoint}/api/2/things/${
-        this.vue.selected.thingId
-      }/inbox/messages/${topic}`,
-      `${JSON.stringify(message)}`,
-      this.getConfig(corrId)
-    );
-  };
+    getAllThings = () => {
+        return axios.get(
+            `${
+                this.vue.connection.http_endpoint
+                }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+            this.getConfig()
+        );
+    };
+
+    sendMessage = (message, topic, corrId) => {
+        return axios.post(
+            `${this.vue.connection.http_endpoint}/api/2/things/${
+                this.vue.selected.thingId
+                }/inbox/messages/${topic}`,
+            `${JSON.stringify(message)}`,
+            this.getConfig(corrId)
+        );
+    };
 }());

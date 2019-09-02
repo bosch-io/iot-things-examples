@@ -18,6 +18,12 @@
 
 This example shows a simple end-to-end scenario for digital twins based on Bosch IoT Things / Eclipse Ditto with a digital twin that represents an IoT device.
 
+## Prerequisites
+
+The following background knowledge is required for this example:
+- npm
+- TypeScript
+
 # General concept
 
 ## Structure of Digital Twins
@@ -53,13 +59,13 @@ The following diagram shows deployment options for digital twins with Bosch IoT 
 
 This example illustrates the implementation of a digital twin with some typical aspects:
 - **Device**: a feature that represents the state of a connected device. The device regularly measures the temperature and has a configured threshold value to adjust the minimum temperature that should be reported to the digital twin.\
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device/D100/2.1.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device:D100:2.1.0]
 - **Commissioning**: a feature (separate to _Device_) that abstracts the "workflow" to execute all preparation steps for a new device, so that it can be connected afterwards. The workflow interface is included in the digital twin in order to be part of the overall orchestration including access control and to support reflecting status of the commissioning process within the digital twin. In the example, the commissioning implements the registration of the device in Bosch IoT Hub / Eclipse Hono.\
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto/HonoCommissioning/1.0.0]
+The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto:HonoCommissioning:1.0.0]
 - **Accessories**: a custom functionality to determine supported accessory products that can be combined with the device (e.g. batteries, spare parts). In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog/Accessories/2.0.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog:Accessories:2.0.0]
 - **Descriptive**: a small, reusable aspect with general-purpose descriptive information about a thing, defined as "static" state properties.
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.vorto.standard/Descriptive/1.0.0]
+The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.vorto.standard:Descriptive:1.0.0]
 - **ProductInfo**: an unstructured set of properties describing more information about the overall product. There is no contract for this feature.
 
 Adding all of these aspects in the general conceptual model gives the following picture:
@@ -71,7 +77,7 @@ Adding all of these aspects in the general conceptual model gives the following 
 The example implementation includes all the microservices that provide the features of the digital twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated [command&control](see https://www.eclipse.org/hono/api/command-and-control-api/) pattern using MQTT, the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated command&control pattern (see https://www.eclipse.org/hono/docs/latest/concepts/command-and-control/) using MQTT, the simulation could be switched to it for both channels.
 
 Following the deployment model from above this looks like this:
 
@@ -167,19 +173,19 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
 
 ## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
 
-Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT cloud service](https://www.bosch-iot-suite.com/hub/) for details.
+Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT Hub service](https://www.bosch-iot-suite.com/service/hub/) for details.
 
 After you have both instances (Things and Hub) in place, you can setup the integration between the two.
-See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
+See the [Bosch IoT Thing documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
 
 ## Prepare users (subjects) for each microservice
 
-As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/permissions/).
-For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register Evaluation User](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=examples_demo:createuser).
+As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/service/permissions/).
+For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 ## Configure your settings
 
@@ -189,7 +195,7 @@ Set your credentials in a file called "config.json". You can copy "config.json-t
 
 ```
 npm install
-npm run build
+tsc
 npm run start
 ```
 

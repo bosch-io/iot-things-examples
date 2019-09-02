@@ -1,76 +1,74 @@
-## Bosch IoT Things - Example Data Historian
+# Bosch IoT Things - Example Data Historian
 
-This example shows how to collect and use data history of property values.
-It shows how to collect and store the data in a MongoDB, how to make them accessible via REST and how to present them in a time series chart.
+This example shows a simple historian service implementation that pushes modifications of Things, managed with Bosch IoT Things, to a MongoDB and  how to make them accessible via REST.
+
+This example can be used as basis for custom historian implementations and visualizations (e.g. by using a Grafana dashboard) and it could also be included in a Digital Twin approach where history data is directly accessible within the Digital Twin API.
 
 ![Screenshot](screenshot.png)
 
-# How it works?
+## How it works?
 
-## Overview
+### Overview
 
 The following diagram shows how the Example Data Historian could work:
 
 ![Overview](overview.png)
 
-Step by step:
+Overview:
 
 - Your (existing) IoT solution uses Bosch IoT Things to integrate it's devices
-- This Historian application can run separately to your applications
-- For things that it is allowed to it subscribes to all changes on the different Features of the managed Things
+- This Historian application can run separately from your other applications
+- Subscribes to all changes on the different Features of the managed Things
 - All fetched changes are stored as a time series record in a MongoDB database
 - The Historian application can be used by your business solution to access or to display history data of individual Thing properties
+
+
+## Prerequisites
+
+The following background knowledge is required for this example
+- Mongo DB
+- Java
+- Maven
+- Asymmetric cryptography
+- HTTP
 
 ## MongoDB document layout
 
 The time serias data is recorded in a simple document structure in MongoDB.
 
-For each and every single (scalar) property of a Thing exactly one document is managed.
-This document has a unique id consisting of "<thing-id>/<feature-id>/properties/<property-path>".
-The documents have to array fields: a "values" array and a "timestamps" array.
-Both arrays are updated on every property change.
-The new value and timestamp is added to the end of the array
-In addition the array is sliced to not exceed a fixed element count.
+For each single (scalar) property of a Thing exactly one document is managed. This document has an unique id consisting of `<thing-id>/features/<feature-id>/properties/<property-path>`. Each document consists of two array fields: 
+1) "values" array 
+2) "timestamps" array
+
+Both arrays are updated on every property change.\
+The new value and timestamp is added to the end of the array. In addition the array is sliced, to not exceed a fixed element count.
 
 | Document Id | Content |
 | --- | --- |
 | demo:vehicle-53/features/envscanner/properties/velocity | { "_id": ..., "values": [ 60.50, 62.94, 64.12, ... ], "timestamps: [ "2016-04-28T22:19:59.841Z", "2016-04-28T22:20:03.143Z", "2016-04-28T22:20:06.047Z", ... ] } |
 | demo:vehicle-53/features/envscanner/properties/acceleration | { "_id": ..., "values": [ 2.21, 1.95, 1.59, ... ], "timestamps: [ "2016-04-28T22:19:59.841Z", "2016-04-28T22:20:03.143Z", "2016-04-28T22:20:06.047Z", ... ] } |
 
-# How to run it?
+## Prepare
 
-## Create a Solution with a private/public key
+### Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) and [key-pair](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key). Store the things-client.jks file to the folder "src/main/resources".\
+Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
-Create and add a Public Key to your solution and store the things-client.jks file to the folder "src/main/resources".
-
-## Configure your Client Id and other settings
-
-Create file "config.properties" in folder "src/main/resources". _Please change the ids._
-
-```
-thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
-clientId=###your solution id ###\:historian
-apiToken=###your historian solution API token###
-keyAlias=CR
-keyStorePassword=#### your key password ###
-keyAliasPassword=#### your key alias password ###
-http.proxyHost=#### your http proxy host, if you need one ###
-http.proxyPort=#### your http proxy host, if you need one ###
-```
-
-## Install and start a local MongoDB
+### Install and start a local MongoDB
 
 See https://www.mongodb.org/
 
-## Build
+### Configure your settings
+
+Create the config file `src/main/resources/config.properties`. Use `src/main/resources/config.properties-default` as an template. 
+
+
+## Build and Run
 
 ```
 mvn clean install
 ```
-
-## Run it
 
 Use the following command to run the example.
 
@@ -78,28 +76,24 @@ Use the following command to run the example.
 mvn exec:java -Dexec.mainClass=com.bosch.iot.things.example.historian.Application
 ```
 
-## Add ACL for "historian" to your things
-
-Add an ACL for the "historian"-client to any thing you already have. See the inventory-browser and vehicle-simulator examples.
-
-```
-{
-   ...
-   "acl": {
-      ...
-      "###your historian solution id ###": {
-         "READ": true,
-         "WRITE": false,
-         "ADMINISTRATE": false
-      }
-   }
-   ...
-}
-```
-
 ## Usage
 
-Use the following URL to look at the collected data:
+### Add a policy subject for "historian" to your things
+
+Add an entry in your policy (with our [HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v1#/Features/put_things__thingId__features__featureId__properties__propertyPath_)) for the "historian"-client to any thing you already have.\
+If you do not have a device yet, see the [inventory-browser](https://github.com/bsinno/iot-things-examples/tree/master/inventory-browser) example to create a device.
+```
+...
+    "subjects": {
+        "### your solution id ###:historian" {
+          "type": "generated"
+    }
+...
+```
+
+### Look at your Data
+
+Use the following URL to look at the collected data and authenticate with your permissions user:
 
 http://localhost:8080/history/data/###thingId###/features/###featureId###/properties/###propertyPath###
 
@@ -113,7 +107,7 @@ e.g.
 - http://localhost:8080/history/data/demo:vehicle-53/features/[geolocation/properties/geoposition/latitude,enginetemperature/properties/value]
 - http://localhost:8080/history/data/[demo:vehicle-53/features/geolocation/properties/geoposition/latitude,demo:vehicle-99/features/geolocation/properties/geoposition/latitude]
 
-Use the following URL to view at the collected data as a timeseries chart, following the same format above to take into account multiple feature/values.
+Use the following URL to view at the collected data as a timeseries chart, following the same format above to take into account multiple feature/values. Authenticate with your permissions user:
 
 http://localhost:8080/history/view/###thingId###/features/###featureId###/properties/###propertyPath###
 

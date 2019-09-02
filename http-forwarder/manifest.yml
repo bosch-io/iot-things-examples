@@ -1,0 +1,8 @@
+applications:
+- name: http-forwarder
+  command: npm run start
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+  health-check-type: process
+  no-route: true
+  disk_quota: 256M
+  memory: 128M

@@ -28,14 +28,13 @@ package com.bosch.iot.things.examples.changes;
 
 import static org.eclipse.ditto.model.things.ThingsModelFactory.allPermissions;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
 import org.eclipse.ditto.model.things.Thing;
@@ -58,10 +57,6 @@ public final class RegisterForChanges extends ExamplesBase {
 
     private static final String ALL_THINGS = "allThings";
     private static final String MY_THING = "myThing";
-    private static final String ALL_THINGS_ATTRIBUTE_CHANGE = "allThings_attributeChanges";
-    private static final String ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE = "allThings_specificAttributeChanges";
-    private static final String MY_THING_ATTRIBUTE_CHANGE = "myThing_attributeChanges";
-    private static final String MY_THING_SPECIFIC_ATTRIBUTE_CHANGE = "myThing_specificAttributeChanges";
 
     private final CountDownLatch countDownLatch;
     private final String registrationId = UUID.randomUUID().toString();
@@ -86,40 +81,13 @@ public final class RegisterForChanges extends ExamplesBase {
     }
 
     /**
-     * Register for {@code ImmutableThingAttributeChange}s.
-     */
-    public void registerForAttributeChanges() {
-        /* Register for *all* attribute changes of *all* things */
-        client.twin().registerForAttributesChanges(ALL_THINGS_ATTRIBUTE_CHANGE,
-                change -> LOGGER.info("For all things: Change received: {}", change));
-
-        /* Register for *specific* attribute changes of *all* things */
-        client.twin()
-                .registerForAttributeChanges(ALL_THINGS_SPECIFIC_ATTRIBUTE_CHANGE,
-                        JsonFactory.newPointer("address/city"),
-                        change -> LOGGER.info("For all things with specific Attribute: Change received: {}", change));
-
-        /* Register for *all* attribute changes of a *specific* thing */
-        myThing.registerForAttributesChanges(MY_THING_ATTRIBUTE_CHANGE, change -> {
-            final Optional<JsonValue> value = change.getValue()
-                    .map(JsonValue::asObject) // "attributes" is a JsonObject
-                    .flatMap(jsonObj -> jsonObj.getValue(change.getPath()));
-            LOGGER.info("My Thing: Change received: {} - value was: {}", change, value);
-        });
-
-        /* Register for *specific* attribute changes of a *specific* thing */
-        myThing.registerForAttributeChanges(MY_THING_SPECIFIC_ATTRIBUTE_CHANGE, JsonFactory.newPointer("address/city"),
-                change -> LOGGER.info("My Thing with specific Attribute: attributeChange received: {}", change));
-    }
-
-    /**
      * Register for {@code ThingChange}s and deregister after the created-event has been retrieved.
      */
     public void registerForThingChangesWithDeregistration() {
         final ThingHandle thingHandle = client.twin().forId(thingId);
 
         /* Register for *all* change events of a *specific* thing */
-        LOGGER.info("Register handler with id: {}", registrationId);
+        LOGGER.info("RegistrationId: {}", registrationId);
         thingHandle.registerForThingChanges(registrationId, change -> {
             LOGGER.info("{}: ThingChange received: {}", thingId, change);
             /* Deregister when the created-event has been retrieved */
@@ -133,11 +101,17 @@ public final class RegisterForChanges extends ExamplesBase {
 
     public void createThing() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Create thing {} and set required permissions.", thingId);
-        client2.twin().create(thingId)
+        final Thing thing = Thing.newBuilder()
+                .setId(thingId)
+                .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId), allPermissions())
+                .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherClientId), allPermissions())
+                .setPermissions(AuthorizationModelFactory.newAuthSubject(userId), allPermissions())
+                .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherUserId), allPermissions())
+                .build();
+        client2.twin().create(thing)
                 .thenCompose(createdThing -> {
                     final Thing updatedThing = createdThing.toBuilder()
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId), allPermissions())
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherClientId), allPermissions())
+                            .setAttribute(JsonPointer.of("foo"), JsonValue.of("bar"))
                             .build();
                     return client2.twin().update(updatedThing);
                 }).get(10, TimeUnit.SECONDS);
@@ -152,7 +126,6 @@ public final class RegisterForChanges extends ExamplesBase {
     public static void main(final String... args) throws Exception {
         final RegisterForChanges registerForChanges = new RegisterForChanges();
         try {
-            registerForChanges.registerForAttributeChanges();
             registerForChanges.registerForThingChanges();
             registerForChanges.registerForThingChangesWithDeregistration();
 

@@ -1,11 +1,18 @@
 # Bosch IoT Things - Device integration with Bosch IoT Hub
 
-This example shows how integrate device telemetry data into things of Bosch IoT Things using the device connectivity of Bosch IoT Hub.
-It shows how to register things/devices at Things/Hub and how to send data using either HTTP or MQTT.
+This example shows how integrate device telemetry data into things, of Bosch IoT Things, using the device connectivity of Bosch IoT Hub.
+It shows how to register things/devices at Things/Hub and how to send data using either HTTP or MQTT.\
+For a similar example, which uses our swagger API, you can look [here](https://docs.bosch-iot-suite.com/asset-communication/Telemetry-example.html).
+
+## Prerequisites
+
+The following background knowledge is required for this example
+- npm
+- TypeScript
 
 ## Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace).
 
 ## Use an existing or request a new Bosch IoT Hub tenant
 
@@ -14,7 +21,7 @@ Request your own tenant for the Bosch IoT Hub: see [Bosch IoT Hub cloud service]
 ## Configure the integration of these two instances
 
 After you have both instances (Things and Hub) in place, you can setup the integration between the two.
-See the [Bosch IoT Thing documentation](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
+See the [Bosch IoT Thing documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
 
 ## Configure your settings
 

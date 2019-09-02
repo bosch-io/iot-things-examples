@@ -1,0 +1,17 @@
+[
+  {
+    "websocketBaseUrl": "### solution endpoint_ws ###",
+    "httpHeaders": {
+      "x-cr-api-token": "### your things api token ###"
+    },
+    "things": {
+      "username": "### Permission-TenantName\\Permission-username ###",
+      "password": "### password ###"
+    },
+    "forwarder": {
+      "url": "### http://localhost:8086/process ###",
+      "username": "### username ###",
+      "password": "### password ###"
+    }
+  }
+]

@@ -51,7 +51,12 @@ void Octopus::connectToWifi(char* ssid, const char* password) {
 
   WiFi.mode(WIFI_STA);
   this->showColor(0, 0, 0, 0, 0x80); // white
-  Printer::printMsg("Octopus::WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
+
+  Printer::printMsg("WiFi", "Device MAC address: ");
+  Serial.println(WiFi.macAddress());
+   
+  Printer::printMsg("WiFi", String("Connecting to WiFi with SSID: '") + String(ssid) + String("' and password '") + String(password) + String("'"));
+  
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");

@@ -46,6 +46,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,13 +79,17 @@ public abstract class ExamplesBase {
     protected final String apiToken;
     protected final String namespace;
 
+    protected final String endpoint_ws;
+
     protected final String clientId;
     protected final String anotherClientId;
 
     protected final String username;
+    protected final String userId;
     protected final String password;
 
     protected final String anotherUsername;
+    protected final String anotherUserId;
     protected final String anotherPassword;
 
     protected final String proxyHost;
@@ -108,11 +113,14 @@ public abstract class ExamplesBase {
      */
     protected ExamplesBase() {
 
+        //Read config.properties
         final Properties props = loadConfigurationFromFile();
 
         solutionId = props.getProperty("solutionId");
         apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
+
+        endpoint_ws = props.getProperty("endpointWs");
 
         clientId = solutionId + ":example";
         anotherClientId = solutionId + ":example2";
@@ -129,8 +137,10 @@ public abstract class ExamplesBase {
         keystoreAliasPassword = props.getProperty("keystoreAliasPassword");
 
         username = props.getProperty("username");
+        userId = props.getProperty("userId");
         password = props.getProperty("password");
         anotherUsername = props.getProperty("anotherUsername");
+        anotherUserId = props.getProperty("anotherUserId");
         anotherPassword = props.getProperty("anotherPassword");
 
         proxyHost = props.getProperty("proxyHost");
@@ -187,15 +197,24 @@ public abstract class ExamplesBase {
                         .password(password)
                         .build();
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+
+        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
+                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
                 .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .build();
+                .authenticationConfiguration(credentialsAuthenticationConfiguration);
+
+        if (endpoint_ws != null) {
+            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
+        }
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
+                thingsWsMessagingProviderConfigurationBuilder.build();
 
         final CommonConfiguration.OptionalConfigurationStep configuration =
                 ThingsClientFactory.configurationBuilder()
                         .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration);
+                        .providerConfiguration(thingsWsMessagingProviderConfiguration)
+                        .schemaVersion(JsonSchemaVersion.V_1);
 
         proxyConfiguration().ifPresent(configuration::proxyConfiguration);
 
@@ -214,10 +233,17 @@ public abstract class ExamplesBase {
                         .aliasPassword(keystoreAliasPassword)
                         .build();
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
+        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
+                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
                 .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
-                .build();
+                .authenticationConfiguration(publicKeyAuthenticationConfiguration);
+
+        if (endpoint_ws != null) {
+            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
+        }
+
+        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
+                thingsWsMessagingProviderConfigurationBuilder.build();
 
         final MessageSerializerConfiguration serializerConfiguration = MessageSerializerConfiguration.newInstance();
         setupCustomMessageSerializer(serializerConfiguration);
@@ -226,6 +252,7 @@ public abstract class ExamplesBase {
                 ThingsClientFactory.configurationBuilder()
                         .apiToken(apiToken)
                         .providerConfiguration(thingsWsMessagingProviderConfiguration)
+                        .schemaVersion(JsonSchemaVersion.V_1)
                         .serializerConfiguration(serializerConfiguration);
 
         proxyConfiguration().ifPresent(configuration::proxyConfiguration);

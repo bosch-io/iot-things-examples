@@ -66,13 +66,15 @@
               type="button"
               class="btn btn-secondary"
               v-show="connectionStatus && !gettingTelemetry"
-            >Receive push updates</button>
+            >Receive push updates
+            </button>
             <button
               @click="stopSSE"
               type="button"
               class="btn btn-outline-secondary"
               v-show="gettingTelemetry"
-            >Stop push updates</button>
+            >Stop push updates
+            </button>
           </div>
         </div>
       </div>
@@ -80,64 +82,70 @@
   </div>
 </template>
 
+
 <script>
-import UserDataForm from "./UserDataForm.vue";
+    import UserDataForm from "./UserDataForm.vue";
 
-export default {
-  name: "UserDataView",
+    export default {
+        name: "UserDataView",
 
-  components: {
-    UserDataForm
-  },
+        components: {
+            UserDataForm
+        },
 
-  data() {
-    return {
-      gettingTelemetry: false,
-      collapsed: true
+        data() {
+            return {
+                gettingTelemetry: false
+            };
+        },
+        computed: {
+            connectionStatus: {
+                get() {
+                    return this.$store.getters.getConnectionStatus;
+                }
+            },
+            telemetryCount: {
+                get() {
+                    return this.$store.getters.getTelemetryCount;
+                }
+            },
+            collapsed: {
+                get() {
+                    return this.$store.getters.getUserDataFormCollapsed;
+                }
+            }
+        },
+        watch: {
+            connectionStatus: function (val) {
+                if (val === true) {
+                    // Connect to server sent events
+                    this.initSSE();
+                    this.showData();
+                } else {
+                    this.stopSSE();
+                }
+            }
+        },
+        methods: {
+            initSSE() {
+                this.gettingTelemetry = true;
+                Event.fire("initSSE");
+            },
+            stopSSE() {
+                this.gettingTelemetry = false;
+                Event.fire("connectionError");
+            },
+            showData() {
+                this.$store.dispatch("collapseUserDataView", !this.collapsed);
+            }
+
+        }
     };
-  },
-  computed: {
-    connectionStatus: {
-      get() {
-        return this.$store.getters.getConnectionStatus;
-      }
-    },
-    telemetryCount: {
-      get() {
-        return this.$store.getters.getTelemetryCount;
-      }
-    }
-  },
-  watch: {
-    connectionStatus: function(val) {
-      if (val === true) {
-        // Connect to server sent events
-        this.initSSE();
-        this.showData();
-      } else {
-        this.stopSSE();
-      }
-    }
-  },
-  methods: {
-    initSSE() {
-      this.gettingTelemetry = true;
-      Event.fire("initSSE");
-    },
-    stopSSE() {
-      this.gettingTelemetry = false;
-      Event.fire("connectionError");
-    },
-    showData() {
-      this.collapsed = !this.collapsed;
-    }
-  }
-};
 </script>
 
 <style>
-.center-content {
-  display: flex;
-  align-items: center;
-}
+  .center-content {
+    display: flex;
+    align-items: center;
+  }
 </style>

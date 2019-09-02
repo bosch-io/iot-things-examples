@@ -37,132 +37,214 @@ const AWS = "https://things.eu-1.bosch-iot-suite.com";
 const BIC = "https://things.s-apps.de1.bosch-iot-cloud.com";
 
 const store = new Vuex.Store({
-  state: {
-    connection: {
-      http_endpoint: "",
-      api_token: "",
-      username: "",
-      password: ""
-    },
-    items: {},
-    selected: "No thing selected",
-    connectionStatus: false,
-    telemetryCount: 0
-  },
+                                 state: {
+                                     suiteAuthActive: true,
+                                     connection: {
+                                         http_endpoint: AWS,
+                                         api_token: "",
+                                         username: "",
+                                         password: "",
+                                         oAuth2_Token: "",
+                                     },
+                                     items: {},
+                                     selected: "No thing selected",
+                                     connectionStatus: false,
+                                     telemetryCount: 0,
+                                     suiteAuthHost: "https://access.bosch-iot-suite.com/token",
+                                     accessToken: '',
+                                     userDataFormCollapsed: true,
+                                     httpErrorRequestAlert: {
+                                         alertId: "",
+                                         isSuccess: false,
+                                         isError: false,
+                                         successMessage: "",
+                                         errorMessage: ""
+                                     }
+                                 },
 
-  getters: {
-    getConnection: state => {
-      return state.connection;
-    },
-    getSelected: state => {
-      return state.selected;
-    },
-    getItems: state => {
-      return state.items;
-    },
-    getConnectionStatus: state => {
-      return state.connectionStatus;
-    },
-    getTelemetryCount: state => {
-      return state.telemetryCount;
-    }
-  },
+                                 getters: {
+                                     getConnection: state => {
+                                         return state.connection;
+                                     },
+                                     getSelected: state => {
+                                         return state.selected;
+                                     },
+                                     getItems: state => {
+                                         return state.items;
+                                     },
+                                     getConnectionStatus: state => {
+                                         return state.connectionStatus;
+                                     },
+                                     getTelemetryCount: state => {
+                                         return state.telemetryCount;
+                                     },
+                                     getSuiteAuthActive: state => {
+                                         return state.suiteAuthActive;
+                                     },
+                                     getSuiteAuthHost:
+                                         state => {
+                                             return state.suiteAuthHost;
+                                         },
+                                     getUserDataFormCollapsed:
+                                         state => {
+                                             return state.userDataFormCollapsed;
+                                         },
+                                     getHTTPErrorRequestAlert: state => {
+                                         return state.httpErrorRequestAlert;
+                                     }
 
-  mutations: {
-    setSelected(state, thing) {
-      state.selected = thing;
-    },
-    setItems(state, items) {
-      state.items = items;
-    },
-    setItem(state, item) {
-      let thing = JSON.parse(item);
-      state.items[thing.thingId] = deepmerge(state.items[thing.thingId], thing);
-    },
-    setConnectionData(state, value) {
-      state.connection = Object.assign({}, state.connection, value);
-    },
-    setConnectionStatus(state, status) {
-      state.connectionStatus = status;
-    },
-    incrementTelemetryCount(state) {
-      state.telemetryCount += 1;
-    },
-    setDisconnected(state) {
-      state.connectionStatus = false;
-      state.selected = "No thing selected.";
-      state.items = {};
-    },
-    updatePlatform(state, value) {
-      state.connection.http_endpoint = value;
-    }
-  },
+                                 },
 
-  actions: {
-    /*
-     * API action calls
-     */
-    getAllThings({ commit }) {
-      return new Promise((resolve, reject) => {
-        Api.getAllThings()
-          .then(res => {
-            this.commit(
-              "setItems",
-              res.data.items.reduce(function(map, item) {
-                map[item.thingId] = item;
-                return map;
-              }, {})
-            );
-            this.commit("setConnectionStatus", true);
-            resolve(res);
-          })
-          .catch(err => resolve(err));
-      });
-    },
-    saveChanges({ state }, thing) {
-      return new Promise((resolve, reject) => {
-        Api.saveChanges(thing)
-          .then(res => resolve(res))
-          .catch(err => reject(err));
-      });
-    },
-    sendMessage({ state }, payload) {
-      return new Promise((resolve, reject) => {
-        Api.sendMessage(payload.message, payload.topic, payload.corrId)
-          .then(res => resolve(res))
-          .catch(err => reject(err));
-      });
-    },
+                                 mutations: {
+                                     setSelected(state, thing) {
+                                         state.selected = thing;
+                                     },
+                                     setItems(state, items) {
+                                         state.items = items;
+                                     },
+                                     setItem(state, item) {
+                                         let thing = JSON.parse(item);
+                                         state.items[thing.thingId] = deepmerge(state.items[thing.thingId], thing);
+                                     },
+                                     setConnectionData(state, value) {
+                                         state.connection = Object.assign({}, state.connection, value);
 
-    /*
-     * Internal state mutation actions
-     */
-    handleSelected({ commit }, thing) {
-      return new Promise((resolve, reject) => {
-        if (thing.thingId === undefined) reject({ err: "ThingId undefined!" });
-        this.commit("setSelected", thing);
-        resolve({ status: 200 });
-      });
-    },
-    disconnect({ commit }) {
-      this.commit("setDisconnected");
-    },
-    telemetryUpdate({ commit }, thing) {
-      this.commit("setItem", thing);
-    },
-    setPlatform({ commit }, platformIndex) {
-      switch (platformIndex) {
-        case "1":
-          this.commit("updatePlatform", AWS);
-          break;
-        case "2":
-          this.commit("updatePlatform", BIC);
-          break;
-        default:
-          break;
-      }
-    }
-  }
-});
+                                     },
+                                     setConnectionStatus(state, status) {
+                                         state.connectionStatus = status;
+                                     },
+                                     incrementTelemetryCount(state) {
+                                         state.telemetryCount += 1;
+                                     },
+                                     setDisconnected(state) {
+                                         state.connectionStatus = false;
+                                         state.selected = "No thing selected.";
+                                         state.items = {};
+                                     },
+                                     updatePlatform(state, value) {
+                                         state.connection.http_endpoint = value;
+                                     },
+                                     setSuiteAuthActive(state, value) {
+                                         state.suiteAuthActive = value;
+                                     },
+                                     setUserDataFormCollapsed(state, value) {
+                                         state.userDataFormCollapsed = value;
+                                     },
+                                     setHTTPErrorRequestMessage(state, value) {
+                                         state.httpErrorRequestAlert.alertId = "httpError";
+                                         state.httpErrorRequestAlert.isError = true;
+                                         if (value.toString().includes('401')) {
+                                             state.httpErrorRequestAlert.errorMessage =
+                                                 value + ' - token expired.';
+                                         } else {
+                                             state.httpErrorRequestAlert.errorMessage = value;
+                                         }
+                                     },
+                                     resetHTTPErrorAlert(state) {
+                                         state.httpErrorRequestAlert.alertId = "";
+                                         state.httpErrorRequestAlert.isError = false;
+                                         state.httpErrorRequestAlert.errorMessage = "";
+                                     }
+                                 },
+
+                                 actions: {
+                                     /*
+                                      * API action calls
+                                      */
+
+                                     setSuiteAuthActive({commit}, authenticationIndex) {
+                                         switch (authenticationIndex) {
+                                             case "1":
+                                                 this.commit("setSuiteAuthActive", true);
+                                                 break;
+                                             case "2":
+                                                 this.commit("setSuiteAuthActive", false);
+                                                 break;
+                                             default:
+                                                 break;
+                                         }
+                                     },
+                                     getAllThings({commit}) {
+                                         return new Promise((resolve, reject) => {
+                                             Api.getAllThings()
+                                                 .then(res => {
+                                                     this.commit("setItems",
+                                                                 res.data.items.reduce(function (map, item) {
+                                                                     map[item.thingId] = item;
+                                                                     return map;
+                                                                 }, {})
+                                                     );
+                                                     this.commit("setConnectionStatus", true);
+                                                     if (this.state.httpErrorRequestAlert.alertId !== "") {
+                                                         this.commit("resetHTTPErrorAlert");
+                                                     }
+                                                     resolve(res);
+                                                 }).catch(err => resolve(err)
+                                             );
+                                         });
+                                     },
+
+                                     saveChanges({state}, thing) {
+                                         return new Promise((resolve, reject) => {
+                                             Api.saveChanges(thing)
+                                                 .then(res => resolve(res))
+                                                 .catch(err => reject(err));
+                                         });
+                                     },
+
+                                     collapseUserDataView({state}, value) {
+                                         this.commit("setUserDataFormCollapsed", value);
+                                     },
+
+                                     sendMessage({state}, payload) {
+                                         return new Promise((resolve, reject) => {
+                                             Api.sendMessage(payload.message, payload.topic, payload.corrId)
+                                                 .then(res => {
+                                                     if (res.status === 401) {
+                                                         this.commit("setHTTPErrorRequestMessage", res);
+                                                     }
+                                                     resolve(res)
+                                                 })
+                                                 .catch(err => {
+                                                     this.commit("setDisconnected");
+                                                     this.commit("setUserDataFormCollapsed", true);
+                                                     this.commit("setHTTPErrorRequestMessage", err);
+                                                     reject(err)
+                                                 });
+                                         });
+                                     },
+
+                                     /*
+                                      * Internal state mutation actions
+                                      */
+                                     handleSelected({commit}, thing) {
+                                         return new Promise((resolve, reject) => {
+                                             if (thing.thingId === undefined) {
+                                                 reject({err: "ThingId undefined!"});
+                                             }
+                                             this.commit("setSelected", thing);
+                                             resolve({status: 200});
+                                         });
+                                     },
+                                     disconnect({commit}) {
+                                         this.commit("setDisconnected");
+                                     },
+                                     telemetryUpdate({commit}, thing) {
+                                         this.commit("setItem", thing);
+                                     },
+                                     setPlatform({commit}, platformIndex) {
+                                         switch (platformIndex) {
+                                             case "1":
+                                                 this.commit("updatePlatform", AWS);
+                                                 break;
+                                             case "2":
+                                                 this.commit("updatePlatform", BIC);
+                                                 break;
+                                             default:
+                                                 break;
+                                         }
+                                     },
+                                 }
+                             });
 
 export default store;

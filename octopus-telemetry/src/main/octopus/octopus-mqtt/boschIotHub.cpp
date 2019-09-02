@@ -27,22 +27,26 @@
 #include "boschIotHub.h"
 #include "printer.h"
 
-BoschIotHub::BoschIotHub(const char* mqttBroker_, const int mqttPort_, const unsigned char* mqttServerCA_, const unsigned int mqttServerCALen_)
-  : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerCA(mqttServerCA_), mqttServerCALen(mqttServerCALen_) {
+BoschIotHub::BoschIotHub(const char *mqttBroker_, const int mqttPort_, const unsigned char *mqttServerCA_, const unsigned int mqttServerCALen_)
+    : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerCA(mqttServerCA_), mqttServerCALen(mqttServerCALen_)
+{
 }
+
+
 
 bool BoschIotHub::connect() {
   mqttClient.setServer(mqttBroker, mqttPort);
+  
+  if(!wiFiClient.setCACert(mqttServerCA, mqttServerCALen)){
+    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
+    return false;
+  }
+  
   if (!wiFiClient.connect(mqttBroker, mqttPort)) {
     Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");
     return false;
   } else {
     Printer::printlnMsg("Bosch IoT Hub", "Secure connection established"); 
-  }
-
-  if(!wiFiClient.setCACert(mqttServerCA, mqttServerCALen)){
-    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
-    return false;
   }
 
   int rc = wiFiClient.verifyCertChain(mqttBroker);

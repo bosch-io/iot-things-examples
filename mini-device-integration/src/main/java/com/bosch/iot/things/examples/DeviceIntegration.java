@@ -39,10 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.ditto.json.JsonObject;
-import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
-import org.eclipse.ditto.model.things.AclEntry;
 import org.eclipse.ditto.model.things.Feature;
-import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +65,7 @@ public class DeviceIntegration {
     private static final String COUNTER = "counter";
     private static final String COUNTER_VALUE = "value";
 
+    private final String endpoint_ws;
     private final String solutionId;
     private final String apiToken;
     private final String namespace;
@@ -101,6 +99,7 @@ public class DeviceIntegration {
 
         final Properties props = loadConfigurationFromFile();
 
+        endpoint_ws = props.getProperty("endpoint_ws");
         solutionId = props.getProperty("solutionId");
         apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
@@ -112,7 +111,8 @@ public class DeviceIntegration {
             this.keystoreLocation = new File(keystoreLocationProperty).toURI().toURL();
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " + e.getMessage());
+                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " +
+                            e.getMessage());
         }
         keystorePassword = props.getProperty("keystorePassword");
         keystoreAlias = props.getProperty("keystoreAlias");
@@ -162,6 +162,7 @@ public class DeviceIntegration {
         final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
                 .thingsWebsocketProviderBuilder()
                 .authenticationConfiguration(credentialsAuthenticationConfiguration /* or publicKeyAuthenticationConfiguration */)
+                .endpoint(endpoint_ws)
                 .build();
 
 
@@ -184,9 +185,6 @@ public class DeviceIntegration {
         try {
             // Create a Thing with a counter Feature and get the FeatureHandle
             final FeatureHandle counter = createThingWithCounter();
-
-            // Update the ACL with your User ID to see your thing in the Demo Web UI
-            updateACL();
 
             // Log full Thing info (as JSON)
             LOGGER.info("Thing looks like this: {}", getThingById(thingId).toJson());
@@ -246,39 +244,15 @@ public class DeviceIntegration {
      * Delete a Thing.
      */
     public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        twin.delete(thingId) //
+        twin.delete(thingId)
                 .whenComplete((aVoid, throwable) -> {
                     if (null == throwable) {
                         LOGGER.info("Thing with ID deleted: {}", thingId);
                     } else {
                         LOGGER.error(throwable.getMessage());
                     }
-                }) //
+                })
                 .get(TIMEOUT, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Update the ACL of a specified Thing. Blocks until ACL has been updated.
-     */
-    public void updateACL() throws InterruptedException, ExecutionException, TimeoutException {
-        twin.forId(thingId) //
-                .retrieve() //
-                .thenCompose(thing -> {
-                    final AclEntry aclEntry = AclEntry.newInstance(AuthorizationSubject.newInstance(userid), //
-                            Permission.READ, //
-                            Permission.WRITE, //
-                            Permission.ADMINISTRATE);
-
-                    final Thing updated = thing.setAclEntry(aclEntry);
-                    return twin.update(updated);
-                }) //
-                .whenComplete((aVoid, throwable) -> {
-                    if (null == throwable) {
-                        LOGGER.info("Thing with ID '{}' updated ACL entry!", thingId);
-                    } else {
-                        LOGGER.error(throwable.getMessage());
-                    }
-                }).get(TIMEOUT, TimeUnit.SECONDS);
     }
 
     /**

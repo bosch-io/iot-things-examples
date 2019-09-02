@@ -26,7 +26,6 @@
 #include <Arduino.h>
 #include "boschIotHub.h"
 #include "printer.h"
-
 #define MSG_LENGTH 4096
 
 StaticJsonBuffer<MSG_LENGTH> jsonBuffer;
@@ -83,6 +82,13 @@ bool BoschIotHub::connect()
 {
   mqttClient.setServer(mqttBroker, mqttPort);
   mqttClient.setCallback(hubCommandReceived);
+
+  if (!wiFiClient.setCACert(mqttServerCA, mqttServerCALen))
+  {
+    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
+    return false;
+  }
+
   if (!wiFiClient.connect(mqttBroker, mqttPort))
   {
     Printer::printlnMsg("Bosch IoT Hub", "Connect failed.");
@@ -91,12 +97,6 @@ bool BoschIotHub::connect()
   else
   {
     Printer::printlnMsg("Bosch IoT Hub", "Secure connection established");
-  }
-
-  if (!wiFiClient.setCACert(mqttServerCA, mqttServerCALen))
-  {
-    Printer::printlnMsg("Bosch IoT Hub", "Cannot load root certificate");
-    return false;
   }
 
   int rc = wiFiClient.verifyCertChain(mqttBroker);
@@ -142,9 +142,9 @@ void BoschIotHub::connectDevice(const char *deviceId, const char *authId, const 
 
 void BoschIotHub::publish(const char *topic, String payload)
 {
-  // Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
-  // Serial.println(topic);
-  // Printer::printlnMsg("Bosch IoT Hub", payload);
+  Printer::printMsg("Bosch IoT Hub", "Publishing on topic: ");
+  Serial.println(topic);
+  Printer::printlnMsg("Bosch IoT Hub", payload);
 
   const size_t requiredLength = 5 + 2 + strlen(topic) + payload.length();
 

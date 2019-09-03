@@ -4,3 +4,4 @@ target/
 .project
 .settings
 *.cer
+\src\main\resources\config.properties

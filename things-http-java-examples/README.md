@@ -19,7 +19,7 @@ Book the Bosch IoT Things cloud service as described in our [documentation](http
 
 ## Configure
 
-Create or adjust file `src/main/resources/config.properties`
+Create or adjust file `src/main/resources/config.properties`. You can use `src/main/resources/config-template.properties` as a template.
 
 ## Build and run
 

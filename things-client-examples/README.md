@@ -19,7 +19,7 @@ Book the Bosch IoT Permission cloud service and register two users as described 
 
 ## Configure
 
-Create or adjust the file `src/main/resources/config.properties`. 
+Create or adjust the file `src/main/resources/config.properties`. You can use `src/main/resources/config-template.properties` as a template.
 
 
 ## Build and run
@@ -28,7 +28,6 @@ Build and run an Example (e.g. `RegisterForChanges`) with the following command:
 ```
 mvn compile exec:java -Dexec.mainClass="com.bosch.iot.things.examples.changes.RegisterForChanges"
 ```
-
 
 ## License
 

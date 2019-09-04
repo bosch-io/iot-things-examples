@@ -61,7 +61,7 @@ See https://www.mongodb.org/
 
 ### Configure your settings
 
-Create the config file `src/main/resources/config.properties`. Use `src/main/resources/config.properties-default` as an template. 
+Create the config file `src/main/resources/config.properties`. Use `src/main/resources/config-template.properties` as an template. 
 
 
 ## Build and Run

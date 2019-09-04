@@ -238,7 +238,7 @@ The Arduino Sketch we have prepared publishes the sensor information via the Bos
 
 Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `iot-device/octopus-hub/settings.h`. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
+All properties relevant for the connection to our cloud services have to be set in `iot-device/octopus-hub/settings.h`. You can use `iot-device/octopus-hub/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
 
 ```cpp
 #ifndef SETTINGS_H

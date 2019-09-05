@@ -2,9 +2,9 @@
 
 **Table of contents**
 
-- [Foreword](#foreword)
+- [About Things](#about-things)
 - [Examples](#examples)
-    - [End2End](#end2end)
+    - [End-to-endd](#end-to-end)
         - [digitaltwin-example](#digitaltwin-example)
         - [desired-state-synchronizer](#desired-state-synchronizer)
         - [octopus-bidirectional](#octopus-bidirectional)
@@ -21,46 +21,51 @@
         - [hub-device-integration](#hub-device-integration)
         - [mini-device-integration](#mini-device-integration)
         - [device-simulator](#device-simulator)
-- [Preparation for the Bosch IoT Things - Things Client](#Preparation-for-the-Bosch-IoT-Things-\--Things-Client)
+- [Setup your workspace to work with the things-client](#Setup-your-workspace-to-work-with-the-things\-client)
     - [Maven Repository](#Maven-Repository)
     - [Maven Dependency](#Maven-Dependency)
 - [License](#License)
 
-## Foreword
+## About Things
 
 This repository contains examples for using the Bosch IoT Things service in the cloud.
 
-Bosch IoT Things is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by Bosch Software Innovations, as part of the Bosch Group.
-Further background information regarding the platform is also available at the [Bosch Software Innovations](https://www.bosch-si.com/corporate/home/homepage.html) site.
+Bosch IoT Things is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch Software Innovations](https://www.bosch-si.com/corporate/home/homepage.html).
 
-The example code provided here shows a selection of the Bosch IoT Things service functionality. However, the examples do not cover the complete service offering. If you need more information, please visit the links above or contact us.
+The Things service is *based on* and *powered by* the open source project Eclise Ditto https://www.eclipse.org/ditto/.
 
-The examples are thematically according to the following topics:
-- End2End
+The example code provided here shows a *selection* of the Bosch IoT Things service functionality. Thus, the examples do not cover the complete service offering. 
+
+If you need more information, please visit the links above or contact us.
+
+The examples are structured in following groups:
+- End-to-end
 - Application related
 - Device related
 
 ## Examples
 
-### End2End
+### End-to-end
 
 #### [digitaltwin-example](digitaltwin-example/)
 
-This example shows a simple Node.js based end-to-end scenario for Digital Twins based on Bosch IoT Things / Eclipse Ditto.
+This example shows a simple Node.js based end-to-end scenario for digital twins based on Bosch IoT Things / Eclipse Ditto.
 
 #### [desired-state-synchronizer](desired-state-synchronizer/)
 
-This example shows a simple Node.js based implementation and usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto that is based on distinguishing between the current reported state of device information and a desired, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably.
+This example shows a simple Node.js based implementation and usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto. It is focused on distinguishing between the _current_ reported state of device information and a _desired_, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably.
 
 #### [octopus-bidirectional](octopus-bidirectional/)
 
-This example shows how to connect an ESP8266 based IoT board via Bosch IoT Hub to Bosch IoT Things in order to 
+This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_.
+
+It shows how to 
 * update a digital twin via "telemetry" data sent from the device
-* send command&control messages via Bosch IoT Things' HTTP API via Bosch IoT Hub to the device
+* send command-and-control messages via the HTTP API of _Bosch IoT Things_ to _Bosch IoT Hub_ to the physical device - and back
 
 #### [octopus-telemetry](octopus-telemetry/)
 
-This example shows how to connect an ESP8266 based IoT board via Bosch IoT Hub to Bosch IoT Things in order to update 
+This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_ in order to update 
 a digital twin via "telemetry" data sent from the device.
 
 
@@ -68,7 +73,7 @@ a digital twin via "telemetry" data sent from the device.
 
 #### [inventory-browser](inventory-browser/)
 
-This example shows how to create a simple HTML/JavaScript user interface to list things and their details. Additionally, the inventory browser can show the things on a map, given that the thing provides “geolocation” information.
+This example shows how to create a simple UI (with HTML/JavaScript) to list things and their details. Additionally, the inventory browser can show the things on a map, given that the thing provides “geolocation” information.
 
 The inventory browser integrates the "device-simulator" and "historian" features.
 
@@ -76,20 +81,22 @@ Find the deployed version in our demo section: https://demos.s-apps.de1.bosch-io
 
 #### [historian](historian/)
 
-This Java-based example shows how to collect and use historic data. While the Bosch IoT Things service keeps track of the latest property values of your things, this add-on helps to store old values in a MongoDB.
-Further, is shows, how to make your historic data accessible for REST-like requests, and how to display such data in a time series chart.
+This Java-based example shows how to collect and use historic data. 
+
+While the Bosch IoT Things service keeps track of the _latest_ property values of your things, this add-on helps to _store old values_ in a MongoDB.
+Further, is shows, how to make your historic data accessible for HTTP requests, and how to display such data in a time series chart.
 
 #### [historian-influxdb](historian-influxdb/)
 
-This Node.js based example shows how to collect historic data in a InfluxDB time series database and how to provide an query functionality integrated in the API of your Things.
+This Node.js based example shows how to collect historic data in an InfluxDB time series database, and how to provide query functionality integrated in the API of your things.
 
 #### [things-batch-importer](things-batch-importer/)
 
-With this tool it is possible to upload multiple things stored in a file. This example is using the things client for uploading the things.
+With this tool, you can upload a large number things into your cloud service instance at once. The example uses the things-client for uploading the things from a local file.
 
 #### [things-client-examples](things-client-examples/)
 
-This example shows how to use the Things Client for Java.
+Bosch IoT Things provides a Java based client, which you can use within your applications. This example shows how to use the things-client.
 
 #### [things-http-java-examples](things-http-java-examples/)
 
@@ -97,28 +104,28 @@ This example shows how to use the HTTP API within Java using the Signature Authe
 
 #### [http-forwarder](http-forwarder/)
 
-This example shows a simple HTTP forwarder service implementation that pushes modifications of Things - managed with Bosch IoT Things - to an extern HTTP endpoint.
+This example shows a simple implementation of an HTTP forwarder service. It pushes modifications of things - managed with your service instance - to an external HTTP endpoint.
 
 ### Device related
 
 #### [hub-device-integration](hub-device-integration/)
 
-This example shows how integrate device telemetry data into things, of Bosch IoT Things, using the device connectivity of Bosch IoT Hub.
+This example shows how to integrate device telemetry data into things. Bosch IoT Things uses the device connectivity functionality provided by Bosch IoT Hub - another cloud service of the Bosch IoT Suite.
 
 #### [mini-device-integration](mini-device-integration/)
 
-This example shows how to create a minimal Java-based device integration application with our Things Client for Java.
+This example shows how to create a minimal device integration application in Java. It uses our things-client.
 
 #### [device-simulator](device-simulator/)
 
-This example implements a simple HTML/JavaScript web application which simulates a simple device. It mimics a mobile phone/tablet to send data to the Things cloud service.
+This example implements a simple Web application which simulates a device. It mimics a mobile phone/tablet to send data to the Things service.
 
 
-## Preparation for the Bosch IoT Things - Things Client
+## Setup your workspace to work with the things-client
 
 ### Maven Repository
 
-Some examples uses the [Bosch IoT Things - Things Client](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start). In order to be able to run the examples you should add following Maven-Repository to your Maven `settings.xml`.
+Some examples use the [Bosch IoT Things - Things Client](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start). In order to be able to run the examples you will need to add our repository to your Maven `settings.xml`.
 
 ```
    ..

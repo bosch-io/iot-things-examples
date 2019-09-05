@@ -198,6 +198,9 @@ Upon success, you have created a subject in your policy with _read_ access for y
 
 The Arduino Sketch we have prepared publishes the sensor information via the Bosch IoT Hub to Bosch IoT Things.
 
+**Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
+https://vorto.eclipse.org/#/details/com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.0.0
+
 Open `src/main/octopus/octopus-mqtt/octopus-mqtt.ino` in your Arduino IDE.
 
 All properties relevant for the connection to our cloud services have to be set in `src/main/octopus/octopus-mqtt/settings.h`. You can use `src/main/octopus/octopus-mqtt/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.

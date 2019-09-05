@@ -4,7 +4,7 @@
 
 - [About Things](#about-things)
 - [Examples](#examples)
-    - [End-to-endd](#end-to-end)
+    - [End-to-end](#end-to-end)
         - [digitaltwin-example](#digitaltwin-example)
         - [desired-state-synchronizer](#desired-state-synchronizer)
         - [octopus-bidirectional](#octopus-bidirectional)
@@ -32,7 +32,7 @@ This repository contains examples for using the Bosch IoT Things service in the 
 
 Bosch IoT Things is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch Software Innovations](https://www.bosch-si.com/corporate/home/homepage.html).
 
-The Things service is *based on* and *powered by* the open source project Eclise Ditto https://www.eclipse.org/ditto/.
+The Things service is *based on* and *powered by* the open source project Eclipse Ditto https://www.eclipse.org/ditto/.
 
 The example code provided here shows a *selection* of the Bosch IoT Things service functionality. Thus, the examples do not cover the complete service offering. 
 

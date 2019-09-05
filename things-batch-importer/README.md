@@ -20,7 +20,7 @@ The file(s) should contain one thing per line in JSON format e.g.
 ### Preperation
 
 Create at least one [policy](https://docs.bosch-iot-suite.com/asset-communication/Initial-policy.html) which you can assigned to your things.\
-Set your credentials under "/src/main/resources/config.properties". 
+Set your credentials under `/src/main/resources/config.properties`. You can use `src/main/resources/config-template.properties` as a template.
 
 ### How to build things batch importer tool
 Build the jar file with following command.

@@ -18,7 +18,7 @@ Book the Bosch IoT Permission cloud service and register one user as described [
 
 # Configure your API Token and other settings
 
-Create or adjust file "src/main/resources/config.properties"
+Create or adjust file `src/main/resources/config.properties`
 
 ```
 thingsServiceEndpointUrl=### Your Things Solution endpoint_http ###

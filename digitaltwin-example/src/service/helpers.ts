@@ -195,7 +195,7 @@ export namespace Helpers {
 
   /** Sequentielly invokes and array of functions, waiting for each execution. Errors are just logged, but execution continues. */
   export async function processAll(a: Array<() => void>, errorLogPrefix) {
-    for await (const [i, f] of a.entries()) {
+    for await (const f of a) {
       try {
         await f()
       } catch (e) {

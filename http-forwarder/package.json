@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "set-value": ">=2.0.1",
     "@types/node": "~9.3.0",
     "@types/request-promise-native": "~1.0.15",
     "@types/ws": "~3.2.1",

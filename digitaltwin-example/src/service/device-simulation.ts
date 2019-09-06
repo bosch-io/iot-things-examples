@@ -40,17 +40,18 @@ const WEBSOCKET_OPTIONS = {
   agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
   headers: {
     ...CONFIG.httpHeaders,
-    'Authorization': 'Basic ' + new Buffer(CONFIG.deviceSimulation.username + ':' + CONFIG.deviceSimulation.password).toString('base64')
+    'Authorization': 'Basic ' + Buffer.from(CONFIG.deviceSimulation.username + ':' + CONFIG.deviceSimulation.password).toString('base64')
+
   }
 }
 const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
 const THING_ID: string = CONFIG.frontend.thingId
 const THING_ID_PATH = THING_ID.replace(':', '/')
-const HUB_TENANT = CONFIG.deviceCommissioning.hubTenant
-const HUB_DEVICE_ID = THING_ID.substr(THING_ID.indexOf(':') + 1)
-const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID
-const HUB_DEVICE_PASSWORD = CONFIG.frontend.hubDevicePassword
+const HUB_TENANT = CONFIG.provisioning.hubServiceInstanceId
+const HUB_DEVICE_ID = THING_ID
+const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID.replace(':', '_')
+const HUB_DEVICE_PASSWORD = CONFIG.provisioning.hubDevicePassword
 
 /** Simple device simulation that simulates device activity in absence of a real phyiscal device.
  *
@@ -135,7 +136,13 @@ export class DeviceSimulation {
       }
     }
 
-    console.log('[DeviceSimulation] unprocessed data: ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
+    if (m.channel === 'twin' && m.criterion === 'events'
+      && m.path.startsWith('/features/Device/properties/status')) {
+      // ignore twin status modfied events for Device status
+      return
+    }
+
+    console.log('[DeviceSimulation] unprocessed data: ' + m.channel + ',' + m.criterion + ': ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
   private async updateStatus() {
@@ -153,7 +160,7 @@ export class DeviceSimulation {
 
       // publish update to Hub via HTTP
       const options = {
-        url: 'https://rest.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
+        url: 'https://http.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
         auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
         method: 'PUT',
         json: true,

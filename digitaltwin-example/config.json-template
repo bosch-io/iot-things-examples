@@ -9,13 +9,18 @@
     "username": "### your-iot-permissions-tenant-name ###\\### your-accessories-username ###",
     "password": "### your-accessories-password ###"
   },
-  "deviceCommissioning": {
-    "subject": "iot-permissions:### your-deviceCommissioning-permissions-userid ###",
-    "username": "### your-iot-permissions-tenant-name ###\\### your-deviceCommissioning-username ###",
-    "password": "### your-deviceCommissioning-password ###",
-    "hubTenant": "### your-hub-tenant_id ###",
-    "hubRegistryUsername": "### your-hub-device-registry-username ###",
-    "hubRegistryPassword": "### your-hub-device-registry-password ###"
+  "provisioning": {
+    "oauthTokenEndpoint": "https://access.bosch-iot-suite.com/token",
+    "oauthClientId": "### your Suite authorization client-id ###",
+    "oauthClientSecret": "### your Suite authorization client-secret ###",
+    "suiteProvisioningHttpBaseUrl": "https://deviceprovisioning.eu-1.bosch-iot-suite.com",
+    "serviceInstanceId": "### your Suite for Asset Communication service instance id ###",
+    "thingsServiceInstanceId": "### your Things service instance of of your Suite for Asset Communication subscription ###",
+    "hubServiceInstanceId": "### your Hub service instance of of your Suite for Asset Communication subscription ###",
+    "hubDevicePassword": "### your-favored-hub-device-password ###",
+    "cleanup": {
+      "hubDeviceRegistryHttpBaseUrl": "https://manage.bosch-iot-hub.com"
+    }
   },
   "deviceSimulation": {
     "subject": "iot-permissions:### your-deviceSimulation-permissions-userid ###",
@@ -23,12 +28,9 @@
     "password": "### your-deviceSimulation-password ###"
   },
   "frontend": {
+    "subject": "iot-permissions:### your-frontend-permissions-userid ###",
     "username": "### your-iot-permissions-tenant-name ###\\### your-frontend-username ###",
     "password": "### your-frontend-password ###",
-    "apitoken": "### your-things-service-api-token ###",
-    "thingId": "### your-thingid ###",
-    "policyId": "### your-policyid ###",
-    "hubDevicePassword": "### your-favored-hub-device-password ###",
-    "integrationSubject": "### your-hub-things-integration-subject ###"
+    "thingId": "### your-thingid ###"
   }
 }

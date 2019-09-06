@@ -28,7 +28,6 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import { Frontend } from './service/frontend'
-import { DeviceCommissioning } from './service/device-commissioning'
 import { DeviceSimulation } from './service/device-simulation'
 import { Accessories } from './service/accessories'
 
@@ -41,10 +40,6 @@ async function start(args: string[]) {
   if (startAll || args.indexOf('accessories') >= 0) {
     if (!startAll) args.splice(args.indexOf('accessories'), 1)
     services.push(new Accessories().start())
-  }
-  if (startAll || args.indexOf('commissioning') >= 0) {
-    if (!startAll) args.splice(args.indexOf('commissioning'), 1)
-    services.push(new DeviceCommissioning().start())
   }
   if (startAll || args.indexOf('simulation') >= 0) {
     if (!startAll) args.splice(args.indexOf('simulation'), 1)
@@ -61,7 +56,7 @@ async function start(args: string[]) {
   }
 
   if (args.length > 0) {
-    console.log(`Unknown options: ${args}. Supported options: [accessories|commissioning|simulation|frontend]*`)
+    console.log(`Unknown options: ${args}. Supported options: [accessories|simulation|frontend]*`)
     process.exit(1)
   }
 

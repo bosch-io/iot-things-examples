@@ -183,7 +183,7 @@ export namespace Helpers {
         'correlation-id': request.headers['correlation-id'],
         'content-type': 'application/json',
         direction: 'FROM',
-        // include also (redundant) thing-id and subject as specificed in Ditto protocol; may be obsolte after CR-5200
+        // include also (redundant) thing-id and subject as specificed in Ditto protocol; may be obsolete after CR-5200
         'thing-id': request.thingId,
         subject: request.action
       },
@@ -195,14 +195,14 @@ export namespace Helpers {
 
   /** Sequentielly invokes and array of functions, waiting for each execution. Errors are just logged, but execution continues. */
   export async function processAll(a: Array<() => void>, errorLogPrefix) {
-    a.forEach(async (f, i, a) => {
+    for await (const [i, f] of a.entries()) {
       try {
         await f()
       } catch (e) {
-        console.log(`${errorLogPrefix}: ${JSON.stringify(e.error || e)}`)
+        console.log(`${errorLogPrefix}: ${JSON.stringify(e.error || e.message || e)}`)
       }
-      a.splice(i, 1)
-    })
+    }
+    a.length = 0
   }
 
   export async function sleep(milliseconds): Promise<void> {

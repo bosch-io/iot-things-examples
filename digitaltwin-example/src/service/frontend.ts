@@ -2,7 +2,7 @@
  *                                            Bosch SI Example Code License
  *                                              Version 1.0, January 2016
  *
- * Copyright 2017 Bosch Software Innovations GmbH ("Bosch SI"). All rights reserved.
+ * Copyright 2017 Bosch Software Innovations GmbH ('Bosch SI'). All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  * following conditions are met:
@@ -13,7 +13,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
  * following disclaimer in the documentation and/or other materials provided with the distribution.
  *
- * BOSCH SI PROVIDES THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ * BOSCH SI PROVIDES THE PROGRAM 'AS IS' WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
  * THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
  * ALL NECESSARY SERVICING, REPAIR OR CORRECTION. THIS SHALL NOT APPLY TO MATERIAL DEFECTS AND DEFECTS OF TITLE WHICH
@@ -29,14 +29,13 @@
 
 import * as fs from 'fs'
 import * as requestPromise from 'request-promise-native'
-import * as shajs from 'sha.js'
 import * as Ajv from 'ajv'
 import { Helpers } from './helpers'
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
-const THING_ID = CONFIG.frontend.thingId
-const POLICY_ID = CONFIG.frontend.policyId
+const THING_ID: string = CONFIG.frontend.thingId
+const POLICY_ID = THING_ID
 
 const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
   json: true,
@@ -47,14 +46,13 @@ const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
 const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
   .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
 
-const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/com.acme.catalog_Accessories_2.0.0/operations/retrieveSupportedAccessories-response.schema.json', 'utf8')))
-const COMMISSION_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/org.eclipse.ditto_HonoCommissioning_1.0.0/operations/commissionDevice-response.schema.json', 'utf8')))
+const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse(fs.readFileSync('models/json-schema/com.bosch.iot.suite.examples.digitaltwin_Accessories_2.0.0/operations/retrieveSupportedAccessories-response.schema.json', 'utf8')))
 
 /** Example frontend of an IoT application using Digital Twins.
  *
  * The implementation shows the following examplinary topics:
  *  - set up a Thing entity with its Policy to define the digital twin
- *  - trigger a commissioning to setup- the device connectivity
+ *  - setup the device connectivity
  *  - periodically sets a configuration value (that should be used by the device)
  *  - periodically retrieves supported accessories (as orchestratet business logic usable in the context of this digital twin)
  *  - periodically reads the whole state of the digital twin.
@@ -67,7 +65,6 @@ export class Frontend {
     console.log('[Frontend] start')
 
     await this.recreateEntities()
-    await this.commission()
 
     setInterval(await this.retrieveDeviceTwinState, 3000)
 
@@ -79,13 +76,12 @@ export class Frontend {
   private async recreateEntities() {
 
     const thing = {
-      policyId: POLICY_ID,
       attributes: {
         commissioningDate: new Date()
       },
       features: {
         Device: {
-          definition: ['com.acme.device:D100:2.1.0'],
+          definition: ['com.bosch.iot.suite.examples.digitaltwin:D100:2.1.0'],
           properties: {
             config: {
               threshold: 11
@@ -94,11 +90,8 @@ export class Frontend {
             }
           }
         },
-        Commissioning: {
-          definition: ['org.eclipse.ditto:HonoCommissioning:1.0.0']
-        },
         Description: {
-          definition: ['org.eclipse.vorto.standard:Descriptive:1.0.0'],
+          definition: ['com.bosch.iot.suite.standard:Descriptive:1.0.0'],
           properties: {
             config: {
               displayName: 'My D100A device'
@@ -114,170 +107,162 @@ export class Frontend {
           }
         },
         Accessories: {
-          definition: ['com.acme.catalog:Accessories:2.0.0']
-        }
-      }
-    }
-
-    const policy = {
-      entries: {
-        owner: {
-          subjects: {
-            '${request.subjectId}': { type: 'any' }
-          },
-          resources: {
-            'thing:/': {
-              grant: ['READ', 'WRITE'],
-              revoke: []
-            },
-            'message:/': {
-              grant: ['READ', 'WRITE'],
-              revoke: []
-            },
-            'policy:/': {
-              grant: ['READ', 'WRITE'],
-              revoke: []
-            }
-          }
-        },
-        device: {
-          subjects: {
-            [CONFIG.frontend.integrationSubject]: { type: 'any' },
-            [CONFIG.deviceSimulation.subject]: { type: 'any' }
-          },
-          resources: {
-            'thing:/features/Device/properties/status': {
-              grant: ['WRITE'],
-              revoke: []
-            },
-            'thing:/features/Device/properties/config': {
-              grant: ['READ'],
-              revoke: []
-            }
-          }
-        },
-        accessories: {
-          subjects: {
-            [CONFIG.accessories.subject]: { type: 'any' }
-          },
-          resources: {
-            'message:/features/Accessories/inbox/messages': {
-              grant: ['READ', 'WRITE'],
-              revoke: []
-            },
-            'thing:/features/Productinfo': {
-              grant: ['READ'],
-              revoke: []
-            }
-          }
-        },
-        commissioning: {
-          subjects: {
-            [CONFIG.deviceCommissioning.subject]: { type: 'any' }
-          },
-          resources: {
-            'message:/features/Commissioning/inbox': {
-              grant: ['READ'],
-              revoke: []
-            },
-            'thing:/features/Commissioning': {
-              grant: ['READ', 'WRITE'],
-              revoke: []
-            }
-          }
+          definition: ['com.bosch.iot.suite.examples.digitaltwin:Accessories:2.0.0']
         }
       }
     }
 
     let cleanup: Array<() => void> = []
 
-    // delete old Thing / Policy
+    // get oauth token
 
+    console.log('[Frontend] get oauth token')
+    let r = await requestPromise({
+      url: CONFIG.provisioning.oauthTokenEndpoint,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      method: 'POST',
+      form: {
+        grant_type: 'client_credentials',
+        client_id: CONFIG.provisioning.oauthClientId,
+        client_secret: CONFIG.provisioning.oauthClientSecret,
+        scope: `service:iot-hub-prod:${CONFIG.provisioning.hubServiceInstanceId}/full-access service:iot-things-eu-1:${CONFIG.provisioning.thingsServiceInstanceId}/full-access`
+      }
+    })
+    const accessToken = JSON.parse(r).access_token
+    // console.log(`[Frontend] oauth accessToken:\n${accessToken}\n`)
+
+    // delete old Thing / Policy
+    // TODO switch to DELETE of Suite Device Provisioning
+
+    cleanup.push(async () => {
+      try {
+        await requestPromise({
+          auth: { bearer: accessToken },
+          url: CONFIG.httpBaseUrl + '/api/2/policies/' + encodeURIComponent(THING_ID),
+          headers: { 'if-none-match': '*' },
+          json: true,
+          body: {
+            entries: {
+              DEFAULT: {
+                subjects: { '{{ request:subjectId }}': { type: 'any' } },
+                resources: {
+                  'policy:/': { grant: ['READ', 'WRITE'], revoke: [] },
+                  'thing:/': { grant: ['READ', 'WRITE'], revoke: [] },
+                  'message:/': { grant: ['READ', 'WRITE'], revoke: [] }
+                }
+              }
+            }
+          },
+          method: 'PUT'
+        })
+      } catch (e) {
+        // ignore completely
+      }
+      // await Helpers.sleep(2000)
+    })
     cleanup.push(() => requestPromise({
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID,
+      auth: { bearer: accessToken },
+      url: CONFIG.httpBaseUrl + '/api/2/things/' + encodeURIComponent(THING_ID),
       method: 'DELETE'
     }))
     cleanup.push(() => requestPromise({
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
+      auth: { bearer: accessToken },
+      url: CONFIG.httpBaseUrl + '/api/2/policies/' + encodeURIComponent(POLICY_ID),
+      method: 'DELETE'
+    }))
+    cleanup.push(() => requestPromise({
+      auth: { bearer: accessToken },
+      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/registration/${encodeURIComponent(CONFIG.provisioning.hubServiceInstanceId)}/${encodeURIComponent(THING_ID)}`,
+      method: 'DELETE'
+    }))
+    const hubAuthId = THING_ID.replace(':', '_')
+    cleanup.push(() => requestPromise({
+      auth: { bearer: accessToken },
+      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/credentials/${encodeURIComponent(CONFIG.provisioning.hubServiceInstanceId)}?auth-id=${encodeURIComponent(hubAuthId)}&type=hashed-password`,
       method: 'DELETE'
     }))
 
     console.log('[Frontend] cleanup')
     await Helpers.processAll(cleanup, '[Frontend] ignore failed cleanup')
+
     // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
     await Helpers.sleep(2000)
 
-    // create Policy
+    // provision thing+device (incl. policy+credentials)
 
-    console.log('[Frontend] create/update policy')
+    console.log('\n[Frontend] provision thing+device')
+
+    const provisioningRequest = {
+      id: THING_ID,
+      hub: {
+        device: { enabled: true },
+        credentials: {
+          type: 'hashed-password',
+          secrets: [
+            {
+              password: CONFIG.provisioning.hubDevicePassword
+            }
+          ]
+        }
+      },
+      things: {
+        thing: thing
+      }
+    }
+
+    // console.log('<-- ' + JSON.stringify(provisioningRequest))
+
     await requestPromise({
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
-      method: 'PUT',
-      body: policy
+      json: true,
+      auth: { bearer: accessToken },
+      url: CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices`,
+      method: 'POST',
+      body: provisioningRequest
     })
 
-    cleanup.push(() => requestPromise({
-      ...DEFAULT_OPTIONS,
+    // extend policy
+
+    console.log('[Frontend] read policy')
+    let policy = await requestPromise({
+      auth: { bearer: accessToken },
       url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
-      method: 'DELETE'
-    }))
+      method: 'GET',
+      json: true
+    })
 
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(1000)
-
-    // create Thing
-
-    try {
-      console.log('[Frontend] create/update thing')
-      await requestPromise({
-        ...DEFAULT_OPTIONS,
-        url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID,
-        method: 'PUT',
-        body: thing
-      })
-    } catch (e) {
-      await Helpers.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
-      throw e
-    }
-
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(1000)
-  }
-
-  private async commission() {
-    console.log('[Frontend] trigger commission')
-
-    // request body is pwdHash as literal; should be object with pwdHash property if more parameters are added
-    const body = shajs('sha512').update(CONFIG.frontend.hubDevicePassword).digest('base64')
-
-    const options = {
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Commissioning/inbox/messages/commissionDevice',
-      method: 'POST',
-      json: true,
-      headers: {
-        ...DEFAULT_OPTIONS.headers,
-        'content-type': 'application/json'
+    policy.entries.DEFAULT.subjects[CONFIG.frontend.subject] = { type: 'iot-permissions-user' }
+    policy.entries.DEVICE.subjects[CONFIG.deviceSimulation.subject] = { type: 'iot-permissions-user' }
+    delete policy.entries.DEVICE.resources['message:/']
+    policy.entries.ACCESSORIES = {
+      subjects: {
+        [CONFIG.accessories.subject]: { type: 'iot-permissions-user' }
       },
-      body: body
-    }
-
-    try {
-      const response = await requestPromise(options)
-      console.log(`[Frontend] commissioning response: ${JSON.stringify(response)}`)
-
-      if (COMMISSION_RESPONSE_VALIDATION(response)) {
-        console.log(`[Frontend] commissioning response valid`)
-        return response
-      } else {
-        console.log(`[Frontend] commissioning response validation faild: ${JSON.stringify(COMMISSION_RESPONSE_VALIDATION.errors)}`)
+      resources: {
+        'message:/features/Accessories/inbox/messages': {
+          grant: ['READ', 'WRITE'],
+          revoke: []
+        },
+        'thing:/features/Productinfo': {
+          grant: ['READ'],
+          revoke: []
+        }
       }
-    } catch (e) {
-      console.log(`[Frontend] commissioning failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
     }
+
+    console.log('[Frontend] write extended policy')
+    await requestPromise({
+      auth: { bearer: accessToken },
+      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
+      body: policy,
+      json: true,
+      method: 'PUT'
+    })
+
+    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
+    await Helpers.sleep(1000)
+
   }
 
   private async configureThreshold() {

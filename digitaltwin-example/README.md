@@ -59,13 +59,11 @@ The following diagram shows deployment options for digital twins with Bosch IoT 
 
 This example illustrates the implementation of a digital twin with some typical aspects:
 - **Device**: a feature that represents the state of a connected device. The device regularly measures the temperature and has a configured threshold value to adjust the minimum temperature that should be reported to the digital twin.\
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.device:D100:2.1.0]
-- **Commissioning**: a feature (separate to _Device_) that abstracts the "workflow" to execute all preparation steps for a new device, so that it can be connected afterwards. The workflow interface is included in the digital twin in order to be part of the overall orchestration including access control and to support reflecting status of the commissioning process within the digital twin. In the example, the commissioning implements the registration of the device in Bosch IoT Hub / Eclipse Hono.\
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.ditto:HonoCommissioning:1.0.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.digitaltwin:D100:2.1.0]
 - **Accessories**: a custom functionality to determine supported accessory products that can be combined with the device (e.g. batteries, spare parts). In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.acme.catalog:Accessories:2.0.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.digitaltwin:Accessories:2.0.0]
 - **Descriptive**: a small, reusable aspect with general-purpose descriptive information about a thing, defined as "static" state properties.
-The contract is defined in: [http://vorto.eclipse.org/#/details/org.eclipse.vorto.standard:Descriptive:1.0.0]
+The contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.standard:Descriptive:1.0.0]
 - **ProductInfo**: an unstructured set of properties describing more information about the overall product. There is no contract for this feature.
 
 Adding all of these aspects in the general conceptual model gives the following picture:
@@ -77,7 +75,7 @@ Adding all of these aspects in the general conceptual model gives the following 
 The example implementation includes all the microservices that provide the features of the digital twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
 In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
 
-INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel. As soon as both Bosch IoT Hub / Eclipse Hono and Bosch IoT Things / Eclipse Ditto support an integrated command&control pattern (see https://www.eclipse.org/hono/docs/latest/concepts/command-and-control/) using MQTT, the simulation could be switched to it for both channels.
+INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel like MQTT via Bosch IoT Hub.
 
 Following the deployment model from above this looks like this:
 
@@ -89,7 +87,6 @@ You will need users for following roles:
 - **integration**: this is a "virtual" user/subject that is used to define access rights used in the integration with Bosch IoT Hub / Eclipse Hono. This subject is allowed to write status properties and read configuration properties. As it is "virtual", no real (technical) user entity is required, but any unique, arbitrary subject ID can be used for that.
 - **simulation**: used by the device simulation microservice to act as replacement for a real physical device. It will be configured with the same access rights as the _Integration_ subject.
 - **accessories**: as the example accessories microservice uses a message-based interaction pattern ("retrieveSupportedAccessories") this subject requires receive permissions on these messages. The retrieval is based on product information and so this subject requires access on the respective _ProductInfo_ feature also.
-- **commissioning**: the commissioning workflow is also integrated using message-based interaction patterns (e.g. "commissionDevice"). Access rights to receive these messages are defined and also access rights to manage the state of the _Commissioning_ feature in order to write result information.
 
 The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy document, that defined all the access rights of the various roles for one or more digital twin instances. As described this also defines the orchestration of these roles within the digital twin:
 
@@ -97,7 +94,7 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
 {
   "policyId": "com.example.foo.bar:policy-100",
   "entries": {
-    "owner": {
+    "DEFAULT": {
       "subjects": {
         "iot-permissions:0e08a311-xxxx-xxxx-xxxx-6209bbf7ad7a": { "type": "iot-permissions-userid" }
       },
@@ -116,7 +113,7 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
         }
       }
     },
-    "device": {
+    "DEVICE": {
       "subjects": {
         "integration:b55b6221-xxxx-xxxx-xxxx-d7cd9cbf454a:hub-abc": { "type": "iot-things-integration" },
         "iot-permissions:cae7eaa0-xxxx-xxxx-xxxx-f2da514201bb": {
@@ -135,7 +132,7 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
         }
       }
     },
-    "accessories": {
+    "ACCESSORIES": {
       "subjects": {
         "iot-permissions1799eeb9-xxxx-xxxx-xxxx-0f2308640b9d": { "type": "iot-permissions-userid" }
       },
@@ -149,21 +146,6 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
           "revoke": []
         }
       }
-    },
-    "commissioning": {
-      "subjects": {
-        "iot-permissions:96603fc5-xxxx-xxxx-xxxx-3ca286a30bbe": { "type": "iot-permissions-userid" }
-      },
-      "resources": {
-        "thing:/features/Commissioning": {
-          "grant": [ "READ", "WRITE" ],
-          "revoke": []
-        },
-        "message:/features/Commissioning/inbox/messages": {
-          "grant": [ "READ" ],
-          "revoke": []
-        }
-      }
     }
   }
 }
@@ -171,16 +153,9 @@ The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy docum
 
 # Prepare
 
-## Use an existing or request a new Bosch IoT Things service instance
+## Use an existing or request a new Bosch IoT Suite for Asset Comunication service subscription
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
-
-## Only required for device integration/simulation: Use an existing or request a new Bosch IoT Hub tenant
-
-Request your own tenant for the Bosch IoT Hub (based on Eclipse Hono): see [Bosch IoT Hub service](https://www.bosch-iot-suite.com/service/hub/) for details.
-
-After you have both instances (Things and Hub) in place, you can setup the integration between the two.
-See the [Bosch IoT Thing documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-y-connection) for details.
+Book the Bosch IoT Suite for Asset Communication (including Bosch Iot Things and Bosch IoT Hub) as described in our [documentation](https://docs.bosch-iot-suite.com/asset-communication/Subscribe-a-package-instance.html).
 
 ## Prepare users (subjects) for each microservice
 

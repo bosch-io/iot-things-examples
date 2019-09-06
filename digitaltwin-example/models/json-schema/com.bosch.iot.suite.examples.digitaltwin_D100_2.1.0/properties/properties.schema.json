@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Properties validation of definition <com.acme.device:D100:2.1.0>",
+	"title": "Properties validation of definition <com.bosch.iot.suite.examples.digitaltwin:D100:2.1.0>",
 	"type": "object",
 	"properties": {
 		"configuration": {

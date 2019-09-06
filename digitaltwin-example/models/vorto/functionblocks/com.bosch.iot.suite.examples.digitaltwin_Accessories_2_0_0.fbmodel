@@ -1,0 +1,21 @@
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.digitaltwin
+version 2.0.0
+displayname "Accessories"
+description "Functionblock for working with accessories associated to assets"
+using com.bosch.iot.suite.examples.digitaltwin.Accessory; 2.0.0
+
+functionblock Accessories {
+
+	configuration {}
+
+	status {}
+
+	events {
+	  newSupportedAccessory { name as string }
+	}
+
+	operations {
+		retrieveSupportedAccessories() returns multiple Accessory
+	}
+}

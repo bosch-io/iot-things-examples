@@ -1,11 +1,11 @@
-namespace com.acme.catalog
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.digitaltwin
 version 2.0.0
 displayname "Accessory"
 description "Type for Accessory"
-category example
 
 entity Accessory {
 	mandatory name as string
 	mandatory manufacturer as string
-	mandatory gtin as string <REGEX '[0-9]{8,14}'>   
+	mandatory gtin as string <REGEX '[0-9]{8,14}'>
 }

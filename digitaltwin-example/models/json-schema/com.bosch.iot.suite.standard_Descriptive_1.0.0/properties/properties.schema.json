@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Properties validation of definition <org.eclipse.vorto.standard:Descriptive:1.0.0>",
+	"title": "Properties validation of definition <com.bosch.iot.suite.standard:Descriptive:1.0.0>",
 	"type": "object",
 	"properties": {
 		"configuration": {

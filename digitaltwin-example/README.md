@@ -59,7 +59,7 @@ The following diagram shows deployment options for digital twins with Bosch IoT 
 
 This example illustrates the implementation of a digital twin with some typical aspects:
 - **Device**: a feature that represents the state of a connected device. The device regularly measures the temperature and has a configured threshold value to adjust the minimum temperature that should be reported to the digital twin.\
-The example contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.digitaltwin:D100:2.1.0]
+The example contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.digitaltwin:D100:1.0.0]
 - **Accessories**: a custom functionality to determine supported accessory products that can be combined with the device (e.g. batteries, spare parts). In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
 The example contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.suite.examples.digitaltwin:Accessories:2.0.0]
 - **Descriptive**: a small, reusable aspect with general-purpose descriptive information about a thing, defined as "static" state properties.

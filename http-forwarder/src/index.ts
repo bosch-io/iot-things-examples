@@ -39,7 +39,7 @@ async function start(_args: string[]) {
   }
 
   // start one historian instance for each configuration
-  configs.forEach(c => new Forwarder(c).start().catch(console.log))
+  configs.forEach(c => { if (!(c.active === false)) new Forwarder(c).start().catch(console.log) })
 }
 
 start(process.argv.slice(2)).catch(e => console.log(`Start failed: ${e}`))

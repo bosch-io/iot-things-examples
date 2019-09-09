@@ -1,0 +1,17 @@
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.digitaltwin
+version 1.0.0
+displayname "DigitaltwinExample"
+description "Information Model for DigitaltwinExample"
+using com.bosch.iot.suite.examples.digitaltwin.D100;1.0.0
+using com.bosch.iot.suite.examples.digitaltwin.Accessories;2.0.0
+using com.bosch.iot.suite.standard.Descriptive;1.0.0
+
+infomodel DigitaltwinExample {
+
+	functionblocks {
+		Device as D100
+		Description as Descriptive
+		Accessories as Accessories
+	}
+}

@@ -4,16 +4,24 @@ This example shows how to create a simple user interface to list things and thei
 
 ![Screenshot](screenshot.png)
 
+# Prerequisites
+
+The following background knowledge is required for this example
+- Maven
+- Java
+- JavaScript
+
 # Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service: as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace).\
+Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
 
 # Configure your API Token and other settings
 
-Create or adjust file "src/main/resources/config.properties"
+Create or adjust file `src/main/resources/config.properties`
 
 ```
-thingsServiceEndpointUrl=https://things.s-apps.de1.bosch-iot-cloud.com
+thingsServiceEndpointUrl=### Your Things Solution endpoint_http ###
 apiToken=### your Bosch IoT Things Solution API Token ###
 http.proxyHost=### your http proxy host, if you need one ###
 http.proxyPort=### your http proxy port, if you need one ###
@@ -35,52 +43,17 @@ java -jar target/inventory-browser.jar
 
 # Usage
 
-## Show Dashboard
-
-Browse to the Bosch IoT Things Dashboard: <https://things.s-apps.de1.bosch-iot-cloud.com/>
-
-## Create Demo User
-
-Create a demo user as described in [Register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
-
 ## Show Inventory Browser
 
-Browse to the example web app: <http://localhost:8080/inventory-browser/>
-
-## Create Empty Thing
-
-In REST Documentation (Swagger): <https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v1>
-use "Things - POST /things"
-
-thing:
-```
-{}
-```
-
-Look in the response for the created Thing. Within this you will find your user's unique id which can be used in the next steps.
+Browse to the example web app: <http://localhost:8080/inventory-browser/> and register with your permissions user. (Note that username = Permission-TenantName\Username)
 
 ## Create Thing for Herbie
 
-Use "Things - PUT /things"
-thingId: demo:vehicle-53
+Use our [http API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Things/put_things__thingId_) to create a thing, which you can track. Authenticate with the same permissions user as in your Inventory Browser.
 
-thing:
-
-_Change the ids before executing this call._
+Use this in the request body to set the attributes and features:
 ```
 {
-   "acl":{
-      "### id of your user ###":{
-         "READ":true,
-         "WRITE":true,
-         "ADMINISTRATE":true
-      },
-      "### id of your solution ###:gateway":{
-         "READ":true,
-         "WRITE":true,
-         "ADMINISTRATE":false
-      }
-   },
    "attributes":{
       "name":"Herbie 53",
       "manufacturer":"VW",
@@ -88,7 +61,7 @@ _Change the ids before executing this call._
    },
    "features":{
       "geolocation":{
-         "definition": [ "org.eclipse.vorto.Geolocation:1.0.0" ],
+         "definition": [ "org.eclipse.vorto:Geolocation:1.0.0" ],
          "properties":{
             "geoposition":{
                "latitude":47.68,
@@ -108,13 +81,10 @@ _Change the ids before executing this call._
 }
 ```
 
-# Refresh Things in Inventory Browser
-
 # Update Position of Herbie
 
-Use "Features - PUT /things/{thingId}/features/{featureId}/properties/{propertyPath}"
-
-thingId: demo:vehicle-53
+Use our [http API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Features/put_things__thingId__features__featureId__properties__propertyPath_) to update your thing.\
+You can update one entry of the geoposition or both.
 
 featureId: geolocation
 
@@ -131,7 +101,7 @@ propertyPath: features/geolocation/properties/geoposition
 }
 ```
 
-# Refresh Things in Inventory Browser
+After you updated your thing, refresh your Inventory Browser and look how the arrow moved.
 
 # More example Things
 

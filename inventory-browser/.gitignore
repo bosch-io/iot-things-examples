@@ -7,3 +7,4 @@ config*.properties
 .classpath
 .project
 .settings
+/src/main/resources/config.properties

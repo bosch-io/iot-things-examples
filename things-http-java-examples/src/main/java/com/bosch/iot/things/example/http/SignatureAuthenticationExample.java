@@ -74,10 +74,10 @@ public class SignatureAuthenticationExample {
         r.close();
 
         thingsServiceEndpointUrl =
-                props.getProperty("thingsServiceEndpointUrl");
+                props.getProperty("endpoint_http");
 
-        final String clientId = props.getProperty("clientId");
-        final String apiToken = props.getProperty("apiToken");
+        final String clientId = props.getProperty("solution_id");
+        final String apiToken = props.getProperty("api_token");
         final String namespace = props.getProperty("namespace");
 
         final URI keystoreUri = new File(props.getProperty("keystoreLocation")).toURI();
@@ -119,11 +119,11 @@ public class SignatureAuthenticationExample {
      */
     public void putThingWithCRS() throws ExecutionException, InterruptedException {
         final String thingJsonString = "{}";
-        final String path = "/api/1/things/" + thingId;
+        final String path = "/api/2/things/" + thingId;
 
-        final ListenableFuture<Response> future = asyncHttpClient.preparePut(thingsServiceEndpointUrl + path) //
-                .addHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON) //
-                .setBody(thingJsonString) //
+        final ListenableFuture<Response> future = asyncHttpClient.preparePut(thingsServiceEndpointUrl + path)
+                .addHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON)
+                .setBody(thingJsonString)
                 .execute();
 
         final Response response = future.get();
@@ -134,9 +134,9 @@ public class SignatureAuthenticationExample {
      * Delete a Thing with CRS Authentication.
      */
     public void deleteThingWithCRS() throws ExecutionException, InterruptedException {
-        final String path = "/api/1/things/" + thingId;
+        final String path = "/api/2/things/" + thingId;
 
-        final ListenableFuture<Response> future = asyncHttpClient.prepareDelete(thingsServiceEndpointUrl + path) //
+        final ListenableFuture<Response> future = asyncHttpClient.prepareDelete(thingsServiceEndpointUrl + path)
                 .execute();
 
         final Response response = future.get();

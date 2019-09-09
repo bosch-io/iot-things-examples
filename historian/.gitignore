@@ -2,7 +2,7 @@ target/
 .extract/
 .idea
 *.iml
-**/config*.properties
+/src/main/resources/config.properties*
 **/*.jks
 db/
 mvnw*

@@ -1,34 +1,36 @@
 {
-  "websocketBaseUrl": "wss://things.s-apps.de1.bosch-iot-cloud.com",
-  "httpBaseUrl": "https://things.s-apps.de1.bosch-iot-cloud.com",
+  "websocketBaseUrl": "### your-things-service-endpoint_ws",
+  "httpBaseUrl": "### your-things-service-endpoint_http ###",
   "httpHeaders": {
-    "x-cr-api-token": "<<<your-api-token>>>"
+    "x-cr-api-token": "### your-things-service-api_token ###"
   },
   "accessories": {
-    "subject": "iot-permissions:<<<your-accessories-userid>>>",
-    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-accessories-username>>>",
-    "password": "<<<your-accessories-password>>>"
+    "subject": "iot-permissions:### your-accessories-permissions-userid ###",
+    "username": "### your-iot-permissions-tenant-name ###\\### your-accessories-username ###",
+    "password": "### your-accessories-password ###"
   },
-  "deviceCommissioning": {
-    "subject": "iot-permissions:<<<your-deviceCommissioning-userid>>>",
-    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-deviceCommissioning-username>>>",
-    "password": "<<<your-deviceCommissioning-password>>>",
-    "hubTenant": "<<<your-hub-tenant>>>",
-    "hubRegistryUsername": "<<<your-hub-device-registry-username>>>",
-    "hubRegistryPassword": "<<<your-hub-device-registry-username>>>"
+  "provisioning": {
+    "oauthTokenEndpoint": "https://access.bosch-iot-suite.com/token",
+    "oauthClientId": "### your Suite authorization client-id ###",
+    "oauthClientSecret": "### your Suite authorization client-secret ###",
+    "suiteProvisioningHttpBaseUrl": "https://deviceprovisioning.eu-1.bosch-iot-suite.com",
+    "serviceInstanceId": "### your Suite for Asset Communication service instance id ###",
+    "thingsServiceInstanceId": "### your Things service instance of of your Suite for Asset Communication subscription ###",
+    "hubServiceInstanceId": "### your Hub service instance of of your Suite for Asset Communication subscription ###",
+    "hubDevicePassword": "### your-favored-hub-device-password ###",
+    "cleanup": {
+      "hubDeviceRegistryHttpBaseUrl": "https://manage.bosch-iot-hub.com"
+    }
   },
   "deviceSimulation": {
-    "subject": "iot-permissions:<<<your-deviceSimulation-userid>>>",
-    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-deviceSimulation-username>>>",
-    "password": "<<<your-deviceSimulation-password>>>"
+    "subject": "iot-permissions:### your-deviceSimulation-permissions-userid ###",
+    "username": "### your-iot-permissions-tenant-name ###\\### your-deviceSimulation-username ###",
+    "password": "### your-deviceSimulation-password ###"
   },
   "frontend": {
-    "username": "<<<your-iot-permissions-tenant-name>>>\\<<<your-frontend-username>>>",
-    "password": "<<<your-frontend-password>>>",
-    "apitoken": "<<<your-api-token>>>",
-    "thingId": "<<<your-thingid>>>",
-    "policyId": "<<<your-policyid>>>",
-    "hubDevicePassword": "<<<your-favored-hub-device-password>>>",
-    "integrationSubject": "<<<your-hub-things-integration-subject>>>"
+    "subject": "iot-permissions:### your-frontend-permissions-userid ###",
+    "username": "### your-iot-permissions-tenant-name ###\\### your-frontend-username ###",
+    "password": "### your-frontend-password ###",
+    "thingId": "### your-thingid ###"
   }
 }

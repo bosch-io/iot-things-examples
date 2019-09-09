@@ -8,7 +8,9 @@
     },
     "features": {
       "geolocation": {
-        "definition": [ "org.eclipse.vorto.Geolocation:1.0.0" ],
+        "definition": [
+          "org.eclipse.vorto:Geolocation:1.0.0"
+        ],
         "properties": {
           "geoposition": {
             "latitude": 47.66603,
@@ -28,7 +30,9 @@
     },
     "features": {
       "geolocation": {
-        "definition": [ "org.eclipse.vorto.Geolocation:1.0.0" ],
+        "definition": [
+          "org.eclipse.vorto:Geolocation:1.0.0"
+        ],
         "properties": {
           "geoposition": {
             "latitude": 47.682085,
@@ -48,7 +52,9 @@
     },
     "features": {
       "geolocation": {
-        "definition": [ "org.eclipse.vorto.Geolocation:1.0.0" ],
+        "definition": [
+          "org.eclipse.vorto:Geolocation:1.0.0"
+        ],
         "properties": {
           "geoposition": {
             "latitude": 47.68,

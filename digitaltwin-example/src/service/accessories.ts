@@ -39,7 +39,7 @@ const WEBSOCKET_OPTIONS = {
   agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
   headers: {
     ...CONFIG.httpHeaders,
-    'Authorization': 'Basic ' + new Buffer(CONFIG.accessories.username + ':' + CONFIG.accessories.password).toString('base64')
+    'Authorization': 'Basic ' + Buffer.from(CONFIG.accessories.username + ':' + CONFIG.accessories.password).toString('base64')
   }
 }
 const WEBSOCKET_REOPEN_TIMEOUT = 1000

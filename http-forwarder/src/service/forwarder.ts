@@ -33,7 +33,7 @@ import * as requestPromise from 'request-promise-native'
 import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { Config } from './config'
 
-const WEBSOCKET_REOPEN_TIMEOUT = 5000
+const WEBSOCKET_REOPEN_TIMEOUT = 15000
 
 /**
  * Forwarder service that listens to thing signals via WebSocket and pushes them as normalized JSON documents to an extern HTTP endpoint.
@@ -43,8 +43,9 @@ export class Forwarder {
 
   private config: Config
   private ws?: NodeWebSocket
-
   private websocketOptions
+  private countForwards: number = 0
+  private countForwardsNamespaces = {}
 
   constructor(config: Config) {
     this.config = config
@@ -59,7 +60,7 @@ export class Forwarder {
 
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
-      console.log(`start for user ${this.config.things.username}`)
+      this.log(`starting...`)
 
       // WARNING: use the following only for testing - if your target http endpoint uses a self-signed certificate
       // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -82,19 +83,19 @@ export class Forwarder {
               if (i > -1) {
                 pendingAcks.splice(i, 1)
                 if (pendingAcks.length === 0) {
-                  console.log(`started for user ${this.config.things.username}`)
+                  this.log(`started`)
                   resolve()
                 }
               } else {
-                console.log('excessive ACK ignored: ' + data)
+                this.log(`excessive ACK ignored: ${data}`)
               }
             } else {
-              console.log('unprocessed non-json data: ' + data)
+              this.log(`unprocessed non-json data: ${data}`)
             }
           })
 
-          this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`websocket send error ${err}`) })
-          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`websocket send error ${err}`) })
+          this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) this.log(`websocket send error ${err}`) })
+          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) this.log(`websocket send error ${err}`) })
         })
     })
   }
@@ -103,20 +104,28 @@ export class Forwarder {
 
     if (m.channel === 'twin' && m.criterion === 'events' && m.action === 'modified') {
 
-      this.forward(m.thingId, m.path, m.value)
+      this.forward(m)
       return
     }
 
-    // console.log('unprocessed data: ' + m.topic + ' ' + m.thingId)
+    // this.log(`unprocessed data: ${m.topic} ${m.thingId}`)
   }
 
   /** Pushes modifications to external http endpoint. */
-  private async forward(thingId: string, path: string, value: any) {
+  private async forward(m: ThingMessage) {
 
-    const partialThing = Helpers.partial(path, value)
+    const partialThing = Helpers.partial(m.path, m.value)
+    partialThing.thingId = m.thingId
     partialThing._modified = new Date()
+    partialThing._context = {
+      topic: m.topic,
+      path: m.path,
+      headers: m.headers,
+      fields: m.fields,
+      status: m.status
+    }
 
-    // console.log(`thing ${thingId} modified: ${JSON.stringify(partialThing)}`)
+    // this.log(`thing ${m.thingId} modified: ${JSON.stringify(partialThing)}`)
 
     let r = requestPromise({
       url: this.config.forwarder.url,
@@ -124,13 +133,27 @@ export class Forwarder {
       auth: { sendImmediately: true, user: this.config.forwarder.username, pass: this.config.forwarder.password },
       json: true,
       resolveWithFullResponse: true,
-      body: JSON.stringify(partialThing)
+      body: partialThing,
+      headers: {
+        'X-Metadata': `thingId\=${m.thingId}`
+      }
     } as requestPromise.Options)
     try {
       await r
     } catch (e) {
-      console.log(`write error ${e.toString()} ${JSON.stringify(r)}`)
+      this.log(`write error ${e.toString()} ${JSON.stringify(r)}`)
     }
+
+    this.countForwardsNamespaces[m.namespace] = (this.countForwardsNamespaces[m.namespace] + 1) || 1
+    this.countForwards++
+    if (this.countForwards === 1 || this.countForwards % 100 === 0) {
+      this.log(`forwarded ${this.countForwards} thing modifications in total; latest namespaces: ${JSON.stringify(this.countForwardsNamespaces)}`)
+      this.countForwardsNamespaces = {}
+    }
+  }
+
+  private log(m): void {
+    console.log(`${new Date().toISOString()} ${this.config.things.username}: ${m}`)
   }
 
 }

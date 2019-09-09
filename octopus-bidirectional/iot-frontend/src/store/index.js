@@ -44,11 +44,6 @@ const store = new Vuex.Store({
                                          api_token: "",
                                          username: "",
                                          password: "",
-                                         //client_id: "c5124c68-d88d-4774-8e54-836e881268c8",
-                                         //client_secret: "2286494DCB39EE17C8651A7DC03E22F2",
-                                         //scope:
-                                         // "service:iot-hub-prod:tf02ef68db31348fba60684c43e2eeb68_hub/full-access
-                                         // service:iot-things-eu-1:f02ef68d-b313-48fb-a606-84c43e2eeb68_things/full-access",
                                          oAuth2_Token: "",
                                      },
                                      items: {},

@@ -1,0 +1,20 @@
+vortolang 1.0
+namespace com.bosch.iot.suite.examples.digitaltwin
+version 1.0.0
+displayname "D100"
+description "Functionblock for example device type D100"
+
+functionblock D100 {
+
+	configuration {
+			mandatory threshold as double "Lower bound threshold for reporting new temperature values"
+	}
+
+	status {
+		optional temperature as double <MIN -273.15> "Current temperature in Celsius"
+	}
+
+	events {}
+
+	operations {}
+}

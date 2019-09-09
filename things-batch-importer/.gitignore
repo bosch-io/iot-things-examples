@@ -4,3 +4,4 @@ completedFiles.txt
 errorFile.txt
 retryFile.txt
 *-tmpFile.txt
+/src/main/resources/config.properties

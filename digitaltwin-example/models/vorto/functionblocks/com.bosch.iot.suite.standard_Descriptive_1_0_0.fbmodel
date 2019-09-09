@@ -1,0 +1,19 @@
+vortolang 1.0
+namespace com.bosch.iot.suite.standard
+version 1.0.0
+displayname "Descriptive"
+description "General purpose descriptive information about device objects"
+
+functionblock Descriptive {
+
+	configuration {
+  	mandatory displayName as string
+	}
+
+	status {
+
+	}
+
+	events {}
+	operations {}
+}

@@ -1,30 +1,25 @@
 # Bosch IoT Things - REST examples
 
 This example shows how to connect to Bosch IoT Things with the Signature Authentication (CRS).
-The CRS Authentication allows (technical) clients to connect with a signature instead of BASIC auth.
-You can find more information on the different authentication processes at our [Wiki](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=dev_guide:http_api:0_authenticate_as_a_client).
-Instructions how to generate the required keystore are available in our [Getting started](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-public-key) guide.
+The CRS Authentication allows (technical) clients to connect with a signature instead of BASIC Authentication. 
+More information could be found [here](https://things.s-apps.de1.bosch-iot-cloud.com/dokuwiki/doku.php?id=dev_guide:http_api:0_authenticate_as_a_client). 
+General information on the various authentication processes are also contained in our [Wiki](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=3_basic_concepts:auth).\
+To get familiar with our HTTP API you can take a look at our [REST documentation (Swagger)](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/).
+
+## Knowledge prerequisites
+
+To understand this example, knowledge of following is required:
+- HTTP 
+- Public-key cryptography 
+- Java
+
+## Preperation
+
+Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) and [key-pair](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key).
 
 ## Configure
 
-Create or adjust file "config.properties"
-
-```
-thingsServiceEndpointUrl=https\://things.s-apps.de1.bosch-iot-cloud.com
-clientId=### user solution id ###\:restcli
-apiToken=### user solution API Token ###
-namespace=### user solution namespace ###
-keystoreLocation=ThingsClient.jks
-keyAlias=Things
-keyStorePassword=### your key password ###
-keyAliasPassword=### your key alias password ###
-#http.proxyHost=### your http proxy host, if you need one ###
-#http.proxyPort=### your http proxy host, if you need one ###
-#http.proxyPrincipal=### your http proxy principal (user), if you need one ###
-#http.proxyPassword=### your http proxy password, if you need one ###
-```
-
-The `keystoreLocation` is a path relative to the path the example is run from.
+Create or adjust file `src/main/resources/config.properties`. You can use `src/main/resources/config-template.properties` as a template.
 
 ## Build and run
 

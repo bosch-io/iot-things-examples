@@ -23,7 +23,7 @@ Create or adjust file `src/main/resources/config.properties`. You can use `src/m
 
 ## Build and run
 
-Build and run the Example with the following command:
+Build and run the example with the following command:
 ```
 mvn compile exec:java
 ```

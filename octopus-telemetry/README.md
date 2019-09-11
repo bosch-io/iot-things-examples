@@ -94,57 +94,57 @@ Your request body should contain the following information:
       "features": {
         "acceleration": {
           "definition": [
-            "com.ipso.smartobjects:Accelerometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Accelerometer:1.1.0"
           ]
         },
         "ambient_temperature": {
           "definition": [
-            "com.ipso.smartobjects:Temperature:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Temperature:1.1.0"
           ]
         },
         "orientation": {
           "definition": [
-            "com.ipso.smartobjects:Multiple_Axis_Joystick:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:MultipleAxisJoystick:1.1.0"
           ]
         },
         "linear_acceleration": {
           "definition": [
-            "com.ipso.smartobjects:Accelerometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Accelerometer:1.1.0"
           ]
         },
         "magnetometer": {
           "definition": [
-            "com.ipso.smartobjects:Magnetometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Magnetometer:1.1.0"
           ]
         },
         "gravity": {
           "definition": [
-            "com.ipso.smartobjects:Accelerometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Accelerometer:1.1.0"
           ]
         },
         "temperature": {
           "definition": [
-            "com.ipso.smartobjects:Temperature:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Temperature:1.1.0"
           ]
         },
         "humidity": {
           "definition": [
-            "com.ipso.smartobjects:Humidity:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Humidity:1.1.0"
           ]
         },
         "pressure": {
           "definition": [
-            "com.ipso.smartobjects:Barometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Barometer:1.1.0"
           ]
         },
         "angular_velocity": {
           "definition": [
-            "com.ipso.smartobjects:Gyrometer:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Gyrometer:1.1.0"
           ]
         },
         "voltage": {
           "definition": [
-            "com.ipso.smartobjects:Voltage:1.1.0"
+            "com.bosch.iot.suite.example.octopussuiteedition:Voltage:1.1.0"
           ]
         }
       }

@@ -61,7 +61,7 @@ Use this in the request body to set the attributes and features:
    },
    "features":{
       "geolocation":{
-         "definition": [ "org.eclipse.vorto:Geolocation:1.0.0" ],
+         "definition": [ "com.bosch.iot.suite.examples.geolocation:Geolocation:1.0.0" ],
          "properties":{
             "geoposition":{
                "latitude":47.68,

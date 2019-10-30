@@ -50,7 +50,10 @@ Set your credentials in the file "config.json". You can copy "config.json-templa
 
 ## Setup development tools
 
-Install Node.js (version 10+, incl. npm) and TypeScript (version 3.5+)
+Setup:
+* NodeJs (tested with version 10.15.3)
+* npm (tested with version 6.4.1)
+* tsc (tested with version 3.5.2). Be careful! There is an issue with versions of typescript 3.6.x. See issue (https://github.com/bsinno/iot-things-examples/issues/33).
 
 # Build and Run
 

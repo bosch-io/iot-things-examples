@@ -59,14 +59,21 @@ void setup()
   Serial.println();
 }
 
+void sendLedUpdate(const String value) {
+  hub.publish(modifyFeaturePropertiesMsg("led", value));
+}
+
 void customMessageHandler(JsonObject &root, String command, String replyTopic)
 {
   const char *dittoTopic = root["topic"];
   JsonObject &headers = root["headers"];
+  const char* path = root["path"];
+
+  String switchLedPath = "/features/led/inbox/messages/setColor";
 
   Serial.println(command);
 
-  if (command.equals("switch_led"))
+  if (command.equals("setColor") && switchLedPath.equals(path))
   {
     JsonObject &value = root["value"];
     const char red = value["r"];
@@ -78,6 +85,11 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
 
     root["value"] = "\"Command '" + command + "' executed\"";
     root["status"] = 200;
+
+    String output;
+    value.printTo(output);
+
+    sendLedUpdate(output);
   }
   else if (command.equals("change_update_rate"))
   {

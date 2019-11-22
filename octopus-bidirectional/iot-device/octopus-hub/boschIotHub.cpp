@@ -48,8 +48,8 @@ void hubCommandReceived(char *topic, byte *payload, unsigned int length)
   Serial.println(topic);
 
   String topicStr = String(topic);
-  topicStr.replace("control///req/", "");
-  String replyTopic = "control///res/" + topicStr.substring(0, topicStr.lastIndexOf("/")) + "/";
+  topicStr.replace("command///req/", "");
+  String replyTopic = "command///res/" + topicStr.substring(0, topicStr.indexOf("/")) + "/";
   String command = topicStr.substring(topicStr.lastIndexOf("/") + 1, topicStr.length());
 
   // Allocate the correct amount of memory for the payload copy

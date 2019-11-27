@@ -1,0 +1,15 @@
+hub:
+  client:
+    host:
+    port:
+    username:
+    password:
+tenant:
+  id:
+local:
+  client:
+    host:
+    port:
+logging:
+  level:
+    com.bosch.iot.things.example.message.processor: INFO

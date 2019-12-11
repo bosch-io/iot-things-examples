@@ -88,6 +88,7 @@ Your request body should contain the following information:
   },
   "things": {
     "thing": {
+      "definition": "com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.1.0",
       "attributes": {
         "manufacturer": "<my-awesome-company>"
       },

@@ -76,6 +76,7 @@ export class Frontend {
   private async recreateEntities() {
 
     const thing = {
+      definition: "com.bosch.iot.suite.examples.digitaltwin:DigitaltwinExample:1.0.0",
       attributes: {
         commissioningDate: new Date()
       },

@@ -160,7 +160,7 @@ Book the Bosch IoT Suite for Asset Communication (including Bosch Iot Things and
 ## Prepare users (subjects) for each microservice
 
 As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/service/permissions/).
-For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register a user](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
+For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register a user](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/).
 
 ## Configure your settings
 
@@ -178,7 +178,7 @@ If you need to access the Internet using a proxy configuration, please make sure
 
 # Extensions / Further reading
 
-A lot of usage scenarios of digital twins require the integration of **history data** of properties of one or more Features of a digital twin. Therefore we provide an example implementation of a general-purpose historian service that can be easily plugged into any digital twin to provide a managed way for collecting and accessing history data. See this example for details: [https://github.com/bsinno/iot-things-examples/tree/dev/historian-influxdb]
+A lot of usage scenarios of digital twins require the integration of **history data** of properties of one or more Features of a digital twin. Therefore we provide an example implementation of a general-purpose historian service that can be easily plugged into any digital twin to provide a managed way for collecting and accessing history data. See this example for details: [https://github.com/bosch-io/iot-things-examples/tree/dev/historian-influxdb]
 
 # License
 See the iot-things-examples top level README.md file for license details.

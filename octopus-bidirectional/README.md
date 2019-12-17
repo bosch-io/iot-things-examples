@@ -334,7 +334,7 @@ We assume you work with the version hosted at our demo
 
 You can use your _SuiteAuth_ authentication by choosing from the dropdown input and logging in with a valid Token. Request a new token and paste it in the dedicated input field. **Your Token will be valid for 5 minutes**.
 
-The second way to authenticate at this UI is the _BasicAuth_ - with an API token, username and password. Find details at [Register Evaluation User](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) and make sure the user is empowered in the [policy](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_tutorial:hello-world:start#elearn_to_read_the_policy_notation) of your octopus.
+The second way to authenticate at this UI is the _BasicAuth_ - with an API token, username and password. Find details at [Register Evaluation User](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/) and make sure the user is empowered in the [policy](https://docs.bosch-iot-suite.com/things/tutorials/hello-world/#e-learn-to-read-the-policy-notation) of your octopus.
 
 After you have added your credentials and pressed _connect_, you should see a list with your things (at least the octopus).
 

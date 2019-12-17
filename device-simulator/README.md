@@ -13,9 +13,9 @@ The following background knowledge is required for this example
 
 ## Preperation
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your namespace and key-pair.\
-Book the Bosch IoT Permission cloud service and a user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).\
-This example is designed to run in Cloud Foundry. Therefore a Cloud Foundry instance must already exist. Also it build on top of the [inventory-browser example](https://github.com/bsinno/iot-things-examples/tree/master/inventory-browser). So an instance of it should already be deployed in Cloud Foundry.\
+Book the Bosch IoT Things cloud service as described in our [documentation](https://docs.bosch-iot-suite.com/things/getting-started/booking/). Follow the guide to manage your namespace and key-pair.\
+Book the Bosch IoT Permission cloud service and a user as described [in our demo](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/).\
+This example is designed to run in Cloud Foundry. Therefore a Cloud Foundry instance must already exist. Also it build on top of the [inventory-browser example](https://github.com/bosch-io/iot-things-examples/tree/master/inventory-browser). So an instance of it should already be deployed in Cloud Foundry.\
 To connect to your Cloud Foundry instance download and install the [Cloud Foundry Command Line Interface (cf CLI)](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 
 ## Configuration
@@ -24,7 +24,7 @@ You have to prepare the following information:
 
 API-Token: Your Things solution API Token to execute API Calls. You can find it in your things service credentials\
 Technical-User: a permissions user (e.g. registered in the Things dashboard). Use a BASE64 encoder (like http://www.tuxgraphics.org/toolbox/base64-javascript.html) to create a snippet. Your input should follow this format: tenand\username:password\
-In main.js of your [inventory-browser example](https://github.com/bsinno/iot-things-examples/tree/master/inventory-browser) you can change the route-URL for this example
+In main.js of your [inventory-browser example](https://github.com/bosch-io/iot-things-examples/tree/master/inventory-browser) you can change the route-URL for this example
 
 ## Deployment
 

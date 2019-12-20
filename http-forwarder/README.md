@@ -17,8 +17,8 @@ To understand this example, knowledge of following is required:
 
 ## Use existing or request new Bosch IoT service instances
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your namespace.
-Book the Bosch IoT Permission cloud service and register one users as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://docs-staging.bosch-iot-suite.com/things/getting-started/booking/). Follow the guide to manage your namespace.
+Book the Bosch IoT Permission cloud service and register one users as described [in our demo](https://docs-staging.bosch-iot-suite.com/things/examples-demo/createuser/).
 
 ## Create a Thing
 
@@ -53,7 +53,7 @@ Set your credentials in the file "config.json". You can copy "config.json-templa
 Setup:
 * NodeJs (tested with version 10.15.3)
 * npm (tested with version 6.4.1)
-* tsc (tested with version 3.5.2). Be careful! There is an issue with versions of typescript 3.6.x. See issue (https://github.com/bsinno/iot-things-examples/issues/33).
+* tsc (tested with version 3.5.2). Be careful! There is an issue with versions of typescript 3.6.x. See issue (https://github.com/bosch-io/iot-things-examples/issues/33).
 
 # Build and Run
 

@@ -12,7 +12,7 @@ This Historian example addresses two topics:
 - **Collecting** all (streamed) Thing modifications in an InfluxDB time series database.\
 The collection is _scoped_ to the defined read access rights according to policies, i.e. only explicitly marked Things or marked fine-grained properties within Things are written to this database.
 - **Execution of queries** to retrieve/analyse the collected data is provided in the _context_ of an individual Thing.\
-This query execution can be integrated into the Thing API by using the messaging functionality of Bosch IoT Things. This way the query execution is usable as any other functionality of a Thing by using the Thing API, e.g. as sketched in this [Digital Twin example](https://github.com/bsinno/iot-things-examples/tree/dev/digitaltwin-example).\
+This query execution can be integrated into the Thing API by using the messaging functionality of Bosch IoT Things. This way the query execution is usable as any other functionality of a Thing by using the Thing API, e.g. as sketched in this [Digital Twin example](https://github.com/bosch-io/iot-things-examples/tree/dev/digitaltwin-example).\
 This context-based query execution can be used in addition or as replacement to the execution of queries directly on the time series database on a _global context_ that would not respect individual access rights on individual things but only general access rights to the database.
 
 ## Prerequisites
@@ -28,8 +28,8 @@ The following background knowledge is required for this example
 
 ### Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace).\
-Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://docs.bosch-iot-suite.com/things/getting-started/booking/). Follow the guide to manage your [namespace](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-namespace/).\
+Book the Bosch IoT Permission cloud service and register one user as described [in our demo](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/).
 
 ### Use or setup an InfluxDB instance
 

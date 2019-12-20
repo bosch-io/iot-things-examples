@@ -52,8 +52,8 @@ The new value and timestamp is added to the end of the array. In addition the ar
 
 ### Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) and [key-pair](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key). Store the things-client.jks file to the folder "src/main/resources".\
-Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://docs.bosch-iot-suite.com/things/getting-started/booking/). Follow the guide to manage your [namespace](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-namespace/) and [key-pair](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-key/). Store the things-client.jks file to the folder "src/main/resources".\
+Book the Bosch IoT Permission cloud service and [register a user](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/).
 
 ### Install and start a local MongoDB
 
@@ -81,7 +81,7 @@ mvn exec:java -Dexec.mainClass=com.bosch.iot.things.example.historian.Applicatio
 ### Add a policy subject for "historian" to your things
 
 Add an entry in your policy (with our [HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v1#/Features/put_things__thingId__features__featureId__properties__propertyPath_)) for the "historian"-client to any thing you already have.\
-If you do not have a device yet, see the [inventory-browser](https://github.com/bsinno/iot-things-examples/tree/master/inventory-browser) example to create a device.
+If you do not have a device yet, see the [inventory-browser](https://github.com/bosch-io/iot-things-examples/tree/master/inventory-browser) example to create a device.
 ```
 ...
     "subjects": {

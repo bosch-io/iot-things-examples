@@ -13,8 +13,8 @@ The following background knowledge is required for this example
 
 # Use an existing or request a new Bosch IoT Things service instance
 
-Book the Bosch IoT Things cloud service as described in our [documentation](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:start). Follow the guide to manage your [namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace).\
-Book the Bosch IoT Permission cloud service and register one user as described [here](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser).
+Book the Bosch IoT Things cloud service as described in our [documentation](https://docs.bosch-iot-suite.com/things/getting-started/booking/). Follow the guide to manage your [namespace](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-namespace/).\
+Book the Bosch IoT Permission cloud service and register one user as described [in our demo](https://docs-staging.bosch-iot-suite.com/things/examples-demo/createuser/).
 
 # Configure your API Token and other settings
 

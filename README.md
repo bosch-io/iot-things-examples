@@ -125,7 +125,7 @@ This example implements a simple Web application which simulates a device. It mi
 
 ### Maven Repository
 
-Some examples use the [Bosch IoT Things - Things Client](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start). In order to be able to run the examples you will need to add our repository to your Maven `settings.xml`.
+Some examples use the [Bosch IoT Things - Things Client](https://docs.bosch-iot-suite.com/things/dev-guide/java-api/). In order to be able to run the examples you will need to add our repository to your Maven `settings.xml`.
 
 ```
    ..
@@ -149,7 +149,7 @@ Some examples use the [Bosch IoT Things - Things Client](https://things.eu-1.bos
 
 ### Maven Dependency
 
-After adding the public repository as described above, you can simply use the [Bosch IoT Things - Things Client](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=dev_guide:java_api:start) dependency to your `pom.xml`:
+After adding the public repository as described above, you can simply use the [Bosch IoT Things - Things Client](https://docs.bosch-iot-suite.com/things/dev-guide/java-api/) dependency to your `pom.xml`:
 
 ```
 <dependency>

@@ -11,13 +11,13 @@ The file(s) should contain one thing per line in JSON format e.g.
 
 - Knowledge of Java
 - Knowledge of Maven
-- [Solution](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-base) information like solutionId and apiToken have to be present.
-- [Namespace](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-solution-namespace) in which the things should be imported, have to be created.
+- [Solution](https://docs.bosch-iot-suite.com/things/getting-started/booking/basic-data/) information like solutionId and apiToken have to be present.
+- [Namespace](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-namespace/) in which the things should be imported, have to be created.
 - Import file(s) with one thing per line in JSON format.
-- [User of Bosch IoT Permissions](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=examples_demo:createuser) or - alternatively - [Public Key](https://things.eu-1.bosch-iot-suite.com/dokuwiki/doku.php?id=2_getting_started:booking:manage-key) for authenticating the Things client.
+- [User of Bosch IoT Permissions](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/) or - alternatively - [Public Key](https://docs.bosch-iot-suite.com/things/getting-started/booking/manage-key/) for authenticating the Things client.
 - Websocket endpoint has to be configured in config.properties.
 
-### Preperation
+### Preparation
 
 Create at least one [policy](https://docs.bosch-iot-suite.com/asset-communication/Initial-policy.html) which you can assigned to your things.\
 Set your credentials under `/src/main/resources/config.properties`. You can use `src/main/resources/config-template.properties` as a template.

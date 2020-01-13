@@ -24,7 +24,7 @@
     "@types/jest": "~24.0.15",
     "@types/supertest": "~2.0.5",
     "concurrently": "~3.5.1",
-    "jest": "~24.8.0",
+    "jest": "^24.9.0",
     "nodemon": "~1.14.12",
     "supertest": "~3.0.0",
     "tslint": "~5.9.1",

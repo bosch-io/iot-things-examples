@@ -26,27 +26,25 @@
  */
 package com.bosch.iot.things.examples.live;
 
-import static org.eclipse.ditto.model.things.ThingsModelFactory.allPermissions;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.DittoClient;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.json.JsonValue;
-import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
-import org.eclipse.ditto.model.things.Permission;
+import org.eclipse.ditto.model.base.entity.id.EntityId;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.ThingsClient;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows how the {@link com.bosch.iot.things.clientapi.live.Live} client can be used to register for and
- * emit live changes.
+ * This example shows how the {@link org.eclipse.ditto.client.DittoClient}client can be used to register for and
+ * emit {@link org.eclipse.ditto.client.live.Live} changes.
  */
 public class RegisterForAndEmitLiveEvents extends ExamplesBase {
 
@@ -54,8 +52,8 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
     private static final String FEATURE_ID = "lamp";
 
     private final String thingId;
-    private final ThingsClient backendClient;
-    private final ThingsClient clientAtDevice;
+    private final DittoClient backendClient;
+    private final DittoClient clientAtDevice;
     private final CountDownLatch latch;
 
     public RegisterForAndEmitLiveEvents() {
@@ -65,14 +63,21 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
         latch = new CountDownLatch(2);
     }
 
+    public static void main(final String... args) throws Exception {
+        RegisterForAndEmitLiveEvents registerForAndEmitLiveEvents = new RegisterForAndEmitLiveEvents();
+        try {
+            registerForAndEmitLiveEvents.registerForAndEmitLiveEvents();
+        } finally {
+            registerForAndEmitLiveEvents.terminate();
+        }
+    }
+
     public void registerForAndEmitLiveEvents() throws InterruptedException, TimeoutException, ExecutionException {
 
         LOGGER.info("[AT BACKEND] Creating thing {}..", thingId);
-        backendClient.twin().create(thingId).thenCompose(created -> {
+        backendClient.twin().create(ThingId.of(thingId)).thenCompose(created -> {
             final Thing updated =
                     created.toBuilder()
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId), allPermissions())
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherClientId), Permission.READ)
                             .build();
             return backendClient.twin().update(updated);
         }).get(2, TimeUnit.SECONDS);
@@ -80,15 +85,15 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
         LOGGER.info("[AT BACKEND] register for LIVE attribute changes of attribute 'location'..");
         backendClient.live()
                 .registerForAttributeChanges("locationHandler", "location", change -> {
-                    final String thingId = change.getThingId();
+                    final EntityId entityId = change.getEntityId();
                     LOGGER.info("[AT BACKEND] Received change of attribute 'location' {} for thing {}.",
-                            change.getValue().orElse(null), thingId);
+                            change.getValue().orElse(null), entityId);
                     latch.countDown();
                 });
 
         LOGGER.info("[AT BACKEND] register for LIVE feature property changes of feature '{}'..", FEATURE_ID);
         backendClient.live()
-                .forFeature(thingId, FEATURE_ID)
+                .forFeature(ThingId.of(thingId), FEATURE_ID)
                 .registerForPropertyChanges("lampPropertiesHandler", change -> {
                     LOGGER.info("[AT BACKEND] Received change of Feature '{}' property '{}': {}", FEATURE_ID,
                             change.getPath(), change.getValue().orElse(null));
@@ -98,12 +103,12 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
         try {
             backendClient.live().startConsumption().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new IllegalStateException("Error creating Things Client.", e);
+            throw new IllegalStateException("Error creating Ditto Client.", e);
         }
 
         LOGGER.info("[AT DEVICE] Emitting LIVE event AttributeModified for attribute 'location'..");
         clientAtDevice.live()
-                .forId(thingId)
+                .forId(ThingId.of(thingId))
                 .emitEvent(thingEventFactory ->
                         thingEventFactory.attributeModified("location",
                                 JsonObject.newBuilder()
@@ -116,7 +121,7 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
         LOGGER.info("[AT DEVICE] Emitting LIVE event 'FeaturePropertyModified' for feature '{}', property 'on'..",
                 FEATURE_ID);
         clientAtDevice.live()
-                .forId(thingId)
+                .forId(ThingId.of(thingId))
                 .forFeature(FEATURE_ID)
                 .emitEvent(featureEventFactory ->
                         featureEventFactory.featurePropertyModified("on",
@@ -128,15 +133,6 @@ public class RegisterForAndEmitLiveEvents extends ExamplesBase {
             LOGGER.info("Received all expected events!");
         } else {
             LOGGER.info("Did not receive all expected events!");
-        }
-    }
-
-    public static void main(final String... args) throws Exception {
-        RegisterForAndEmitLiveEvents registerForAndEmitLiveEvents = new RegisterForAndEmitLiveEvents();
-        try {
-            registerForAndEmitLiveEvents.registerForAndEmitLiveEvents();
-        } finally {
-            registerForAndEmitLiveEvents.terminate();
         }
     }
 }

@@ -33,25 +33,26 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.management.FeatureHandle;
+import org.eclipse.ditto.client.management.ThingHandle;
+import org.eclipse.ditto.client.twin.Twin;
+import org.eclipse.ditto.client.twin.TwinFeatureHandle;
+import org.eclipse.ditto.client.twin.TwinThingHandle;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.things.FeatureProperties;
 import org.eclipse.ditto.model.things.Features;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.things.FeatureHandle;
-import com.bosch.iot.things.clientapi.things.ThingHandle;
-import com.bosch.iot.things.clientapi.twin.Twin;
-import com.bosch.iot.things.clientapi.twin.TwinFeatureHandle;
-import com.bosch.iot.things.clientapi.twin.TwinThingHandle;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows how a {@link ThingHandle} and {@link FeatureHandle} can be used to perform CRUD (Create, Read,
+ * This example shows how a {@link org.eclipse.ditto.client.DittoClient}can be used to perform CRUD (Create, Read,
  * Update, and Delete) operations on {@link Features} and {@link FeatureProperties}.
  */
 public class ManageFeatures extends ExamplesBase {
@@ -64,6 +65,18 @@ public class ManageFeatures extends ExamplesBase {
     private static final String FEATURE_ID2 = "elevator";
     private static final JsonPointer PROPERTY_JSON_POINTER = JsonFactory.newPointer("density");
     private static final JsonValue PROPERTY_JSON_VALUE = JsonFactory.newValue(0.7);
+
+    public static void main(final String... args) throws Exception {
+        final ManageFeatures manageFeatures = new ManageFeatures();
+        try {
+            manageFeatures.crudFeature();
+            manageFeatures.crudFeatureProperty();
+            manageFeatures.crudFeatureProperties();
+            manageFeatures.deleteFeatures();
+        } finally {
+            manageFeatures.terminate();
+        }
+    }
 
     public void crudFeature() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Create, read, update and delete a Feature of a Thing.");
@@ -86,7 +99,7 @@ public class ManageFeatures extends ExamplesBase {
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final ThingHandle<TwinFeatureHandle> thingHandle = client.twin().forId(thingId);
+        final ThingHandle<TwinFeatureHandle> thingHandle = client.twin().forId(ThingId.of(thingId));
 
         thingHandle.registerForFeatureChanges(UUID.randomUUID().toString(),
                 featureChange -> LOGGER.info("{} Feature '{}'", featureChange.getAction(), featureChange.getFeature()));
@@ -112,7 +125,7 @@ public class ManageFeatures extends ExamplesBase {
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final FeatureHandle featureHandle = client.twin().forFeature(thingId, FEATURE_ID);
+        final FeatureHandle featureHandle = client.twin().forFeature(ThingId.of(thingId), FEATURE_ID);
 
         client.twin().registerForFeaturePropertyChanges(UUID.randomUUID().toString(), FEATURE_ID,
                 featurePropertyChange -> LOGGER
@@ -153,7 +166,7 @@ public class ManageFeatures extends ExamplesBase {
 
         client.twin().create(thing).get(TIMEOUT, SECONDS);
 
-        final FeatureHandle featureHandle = client.twin().forFeature(thingId, FEATURE_ID);
+        final FeatureHandle featureHandle = client.twin().forFeature(ThingId.of(thingId), FEATURE_ID);
 
         featureHandle.registerForPropertyChanges(UUID.randomUUID().toString(), featurePropertyChange -> LOGGER
                 .info("{} Properties '{}:{}'", featurePropertyChange.getAction(), featurePropertyChange.getPath(),
@@ -187,7 +200,7 @@ public class ManageFeatures extends ExamplesBase {
 
         twin.create(thing).get(TIMEOUT, SECONDS);
 
-        final TwinThingHandle thingHandle = twin.forId(thingId);
+        final TwinThingHandle thingHandle = twin.forId(ThingId.of(thingId));
 
         thingHandle.registerForFeaturesChanges(UUID.randomUUID().toString(),
                 featuresChange -> LOGGER.info("{} Features '{}:{}'", featuresChange.getAction(),
@@ -196,17 +209,5 @@ public class ManageFeatures extends ExamplesBase {
         thingHandle.deleteFeatures().thenCompose(aVoid -> thingHandle.retrieve())
                 .thenAccept(thing1 -> LOGGER.info("Features have been deleted: {}", thing1.toJsonString()))
                 .get(TIMEOUT, SECONDS);
-    }
-
-    public static void main(final String... args) throws Exception {
-        final ManageFeatures manageFeatures = new ManageFeatures();
-        try {
-            manageFeatures.crudFeature();
-            manageFeatures.crudFeatureProperty();
-            manageFeatures.crudFeatureProperties();
-            manageFeatures.deleteFeatures();
-        } finally {
-            manageFeatures.terminate();
-        }
     }
 }

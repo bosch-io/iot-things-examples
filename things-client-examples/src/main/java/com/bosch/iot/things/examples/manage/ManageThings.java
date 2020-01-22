@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.twin.TwinThingHandle;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonFieldSelector;
 import org.eclipse.ditto.json.JsonPointer;
@@ -42,6 +43,7 @@ import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.things.Feature;
 import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,18 @@ public class ManageThings extends ExamplesBase {
         complexThingId = generateRandomThingId("complexThing_");
     }
 
+    public static void main(final String... args) throws Exception {
+        final ManageThings manageThings = new ManageThings();
+        try {
+            manageThings.createReadUpdateDelete();
+            manageThings.createAComplexThing();
+            manageThings.retrieveThings();
+            manageThings.updateThing();
+        } finally {
+            manageThings.terminate();
+        }
+    }
+
     /**
      * Creates a new {@code Thing} object, updates the thing by adding a new attribute to the thing, retrieves the
      * modified thing, and finally deletes it.
@@ -75,12 +89,13 @@ public class ManageThings extends ExamplesBase {
      */
     public void createReadUpdateDelete() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Starting: createReadUpdateDelete()");
-        client.twin().create(myThingId)
-                .thenCompose(createdThing -> myThing.putAttribute(JsonFactory.newPointer("address/city"), "Berlin"))
-                .thenCompose(changedSuccessfully -> myThing.retrieve())
+        final TwinThingHandle thingHandle = client.twin().forId(ThingId.of(myThingId));
+        client.twin().create(ThingId.of(myThingId))
+                .thenCompose(createdThing -> thingHandle.putAttribute(JsonFactory.newPointer("address/city"), "Berlin"))
+                .thenCompose(changedSuccessfully -> thingHandle.retrieve())
                 .thenCompose(retrievedThing -> {
                     LOGGER.info("My thing as persisted: {}", retrievedThing);
-                    return myThing.delete();
+                    return thingHandle.delete();
                 }).get(10, TimeUnit.SECONDS);
     }
 
@@ -97,7 +112,7 @@ public class ManageThings extends ExamplesBase {
     public void createAComplexThing() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Starting: createAComplexThing()");
         /* Create a new thing with acls, features, attributes and define handlers for success and failure */
-        client.twin().create(complexThingId).thenCompose(created -> {
+        client.twin().create(ThingId.of(complexThingId)).thenCompose(created -> {
             final Thing updated =
                     created.toBuilder()
                             .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId),
@@ -131,11 +146,14 @@ public class ManageThings extends ExamplesBase {
     public void retrieveThings() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Starting: retrieveThings()");
         /* Retrieve a Single Thing*/
-        client.twin().forId(complexThingId).retrieve().thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
+        client.twin()
+                .forId(ThingId.of(complexThingId))
+                .retrieve()
+                .thenAccept(thing -> LOGGER.info("Retrieved thing: {}", thing))
                 .get(1, TimeUnit.SECONDS);
 
         /* Retrieve a List of Things */
-        client.twin().retrieve(myThingId, complexThingId).thenAccept(things -> {
+        client.twin().retrieve(ThingId.of(myThingId), ThingId.of(complexThingId)).thenAccept(things -> {
             if (things.isEmpty()) {
                 LOGGER.info(
                         "The requested things were not found, or you don't have sufficient permission to read them.");
@@ -145,7 +163,8 @@ public class ManageThings extends ExamplesBase {
         }).get(1, TimeUnit.SECONDS);
 
         /* Retrieve a List of Things with field selectors */
-        client.twin().retrieve(JsonFieldSelector.newInstance("attributes"), myThingId, complexThingId)
+        client.twin().retrieve(JsonFieldSelector.newInstance("attributes"), ThingId.of(myThingId),
+                ThingId.of(complexThingId))
                 .thenAccept(things -> {
                     if (things.isEmpty()) {
                         LOGGER.info(
@@ -169,7 +188,7 @@ public class ManageThings extends ExamplesBase {
                 .build();
 
         LOGGER.info("Registering for changes of thing {}", thingId);
-        client.twin().forId(thingId).registerForThingChanges(UUID.randomUUID().toString(), change -> {
+        client.twin().forId(ThingId.of(thingId)).registerForThingChanges(UUID.randomUUID().toString(), change -> {
             LOGGER.info("Received Event: {} -> {}", change.getAction(), change.getValue());
             countDownLatch.countDown();
         });
@@ -197,18 +216,6 @@ public class ManageThings extends ExamplesBase {
 
         boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
         LOGGER.info("All events received: {}", allMessagesReceived);
-    }
-
-    public static void main(final String... args) throws Exception {
-        final ManageThings manageThings = new ManageThings();
-        try {
-            manageThings.createReadUpdateDelete();
-            manageThings.createAComplexThing();
-            manageThings.retrieveThings();
-            manageThings.updateThing();
-        } finally {
-            manageThings.terminate();
-        }
     }
 
 }

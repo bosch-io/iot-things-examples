@@ -1,7 +1,7 @@
 package com.bosch.iot.things.example.message.processor.upstream;
 
 import com.bosch.iot.things.example.message.processor.Constants;
-import com.bosch.iot.things.example.message.processor.processing.MessageProcessingService;
+import com.bosch.iot.things.example.message.processor.processing.MessageProcessor;
 import com.bosch.iot.things.example.message.processor.transport.AmqpClient;
 import io.vertx.proton.*;
 import org.apache.qpid.proton.message.Message;
@@ -27,7 +27,7 @@ public class HubToThingsFlow {
     private AmqpClient amqpClient;
 
     @Autowired
-    private MessageProcessingService messageProcessingService;
+    private MessageProcessor messageProcessingService;
 
     @Value(value = "${tenant.id}")
     private String tenantId;
@@ -46,7 +46,7 @@ public class HubToThingsFlow {
     private void receiveFromHubSendToThings(ProtonConnection hubConnection) {
         createHubReceiver(Constants.TELEMETRY_ENDPOINT + tenantId, hubConnection);
         createHubReceiver(Constants.EVENT_ENDPOINT + tenantId, hubConnection);
-        createHubReceiver(Constants.CONTROL_ENDPOINT + tenantId  + Constants.CONTROL_REPLY_ENDPOINT, hubConnection);
+        createHubReceiver(Constants.COMMAND_RESPONSE + tenantId  + Constants.REPLIES, hubConnection);
     }
 
     private void createHubReceiver(String address, ProtonConnection hubConnection) {
@@ -64,7 +64,7 @@ public class HubToThingsFlow {
         hubReceiver.handler((delivery, msg) -> {
             String address = hubReceiver.getRemoteSource().getAddress();
             log.debug("Received message from HUB service with content: " + msg.getBody().toString());
-            Message processedMessage = this.messageProcessingService.getProcessedMessage(msg);
+            Message processedMessage = this.messageProcessingService.encrypt(msg);
             forwardToThings(processedMessage, address);
         }).open();
     }

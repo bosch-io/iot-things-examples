@@ -19,6 +19,9 @@
         <!-- Dependency versions -->
         <stack.version>3.8.2</stack.version>
         <proton.version>0.33.2</proton.version>
+        <rx.version>2.1.0</rx.version>
+        <rs.version>1.0.3</rs.version>
+        <junit.version>4.12</junit.version>
         <!-- Test properties -->
         <proton.trace.frames>false</proton.trace.frames>
         <spring.version>2.2.0.RELEASE</spring.version>
@@ -71,12 +74,12 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-proton</artifactId>
-            <version>3.8.2</version>
+            <version>${stack.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,13 +90,13 @@
         <dependency>
             <groupId>org.reactivestreams</groupId>
             <artifactId>reactive-streams-tck</artifactId>
-            <version>1.0.3</version>
+            <version>${rs.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.reactivex.rxjava2</groupId>
             <artifactId>rxjava</artifactId>
-            <version>2.1.0</version>
+            <version>${rx.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- codegen -->

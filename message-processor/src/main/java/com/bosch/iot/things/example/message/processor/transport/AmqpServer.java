@@ -14,8 +14,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bosch.iot.things.example.message.processor.Constants.CONTROL_ENDPOINT;
-import static com.bosch.iot.things.example.message.processor.Constants.CONTROL_REPLY_ENDPOINT;
+import static com.bosch.iot.things.example.message.processor.Constants.*;
 
 public class AmqpServer {
 
@@ -99,28 +98,10 @@ public class AmqpServer {
     }
 
     private void sendMessage(Message msg, String address) {
-        if (address.startsWith(CONTROL_ENDPOINT) && !address.endsWith(CONTROL_REPLY_ENDPOINT)) {
-            forwardToHubService(msg, CONTROL_ENDPOINT + tenantId);
-        } else {
-            forwardToThingsService(msg, address);
-        }
-    }
-
-    private void forwardToHubService(Message msg, String address) {
         ProtonSender sender = senders.get(address);
-        log.debug("Sending message to HUB service");
         log.debug("payload: " + msg.getBody().toString());
         sender.send(msg, delivery -> {
-            log.info(String.format("The message was received by the local client : remote state=%s, remotely settled=%s message format=%d",
-                    delivery.getRemoteState(), delivery.remotelySettled(), delivery.getMessageFormat()));
-        });
-    }
-    private void forwardToThingsService(Message msg, String address) {
-        ProtonSender sender = senders.get(address);
-        log.debug("Sending message to THINGS service");
-        log.debug("payload: " + msg.getBody().toString());
-        sender.send(msg, delivery -> {
-            log.info(String.format("The message was received by THINGS service : remote state=%s, remotely settled=%s message format=%d",
+            log.info(String.format("The message was received : remote state=%s, remotely settled=%s message format=%d",
                     delivery.getRemoteState(), delivery.remotelySettled(), delivery.getMessageFormat()));
         });
     }

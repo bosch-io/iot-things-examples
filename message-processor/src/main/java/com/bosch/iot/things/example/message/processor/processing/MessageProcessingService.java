@@ -8,7 +8,13 @@ import org.apache.qpid.proton.message.Message;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MessageProcessingService {
+public class MessageProcessingService implements MessageProcessor{
+
+    @Override
+    public Message encrypt(Message message) { return getProcessedMessage(message); }
+
+    @Override
+    public Message decrypt(Message message) { return getProcessedMessage(message); }
 
     public Message getProcessedMessage(Message message) {
         Section body = message.getBody();

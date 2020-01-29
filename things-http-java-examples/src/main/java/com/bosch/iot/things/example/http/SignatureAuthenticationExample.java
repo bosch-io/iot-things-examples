@@ -46,7 +46,12 @@ import org.asynchttpclient.proxy.ProxyServer;
 /**
  * Example to show Signature Authentication for authenticating technical clients at the HTTP interface of the Bosch IoT
  * Things service.
+ *
+ * @deprecated: public/ private key authentication is deprecated. Please use OAuth authentication described at the
+ * <a href= https://docs-staging.bosch-iot-suite.com/things/dev-guide/http-api/authenticate_as_a_client#oauth-authentication/>
+ * things documentation </a>
  */
+@Deprecated
 public class SignatureAuthenticationExample {
 
     private static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";

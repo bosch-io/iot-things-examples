@@ -35,7 +35,12 @@ import org.asynchttpclient.SignatureCalculator;
 /**
  * Implementation of {@link SignatureCalculator} which calculates the asymmetrical signature for authenticating
  * technical clients at the HTTP interface of the Bosch IoT Things service.
+ *
+ * @deprecated: public/ private key authentication is deprecated. Please use OAuth authentication described at the
+ * <a href= https://docs-staging.bosch-iot-suite.com/things/dev-guide/http-api/authenticate_as_a_client#oauth-authentication/>
+ * things documentation </a>
  */
+@Deprecated
 public class AsymmetricalSignatureCalculator implements SignatureCalculator {
 
     private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";

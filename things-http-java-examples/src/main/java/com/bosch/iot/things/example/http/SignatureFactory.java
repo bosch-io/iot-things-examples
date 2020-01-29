@@ -48,7 +48,12 @@ import java.util.Base64;
 
 /**
  * A factory for signing arbitrary data with the {@value #SIGNATURE_ALGORITHM} algorithm.
+ *
+ * @deprecated: public/ private key authentication is deprecated. Please use OAuth authentication described at the
+ * <a href= https://docs-staging.bosch-iot-suite.com/things/dev-guide/http-api/authenticate_as_a_client#oauth-authentication/>
+ * things documentation </a>
  */
+@Deprecated
 public final class SignatureFactory {
 
     /**

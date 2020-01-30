@@ -59,10 +59,6 @@ void setup()
   Serial.println();
 }
 
-void sendLedUpdate(const String value) {
-  hub.publish(modifyFeaturePropertiesMsg("led", value));
-}
-
 void customMessageHandler(JsonObject &root, String command, String replyTopic)
 {
   const char *dittoTopic = root["topic"];
@@ -85,14 +81,6 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
 
     root["value"] = "\"Command '" + command + "' executed\"";
     root["status"] = 200;
-
-    if(command.equals("setColor") && switchLedPath.equals(path))
-    {
-      String output;
-      value.printTo(output);
-
-      sendLedUpdate(output);
-    }
   }
   else if (command.equals("change_update_rate"))
   {
@@ -129,8 +117,10 @@ void loop()
     lastSensorUpdateMillis = millis();
     static Bme680Values bme680Values;
     static Bno055Values bno055Values;
+    static LedValues ledValues;
     memset(&bme680Values, 0, sizeof(bme680Values));
     memset(&bno055Values, 0, sizeof(bno055Values));
+    memset(&ledValues, 0, sizeof(ledValues));
     octopus.readBno055(bno055Values);
 #ifdef BME280
     octopus.readBme280(bme680Values);
@@ -139,8 +129,9 @@ void loop()
 #endif
     float vcc = octopus.getVcc();
 
-    //printSensorData(vcc, bme680Values, bno055Values);
-    publishSensorData(vcc, bme680Values, bno055Values);
+    octopus.readLed(ledValues);
+
+    publishSensorData(vcc, bme680Values, bno055Values, ledValues);
   }
   hub.loop();
   delay(LOOP_DELAY);

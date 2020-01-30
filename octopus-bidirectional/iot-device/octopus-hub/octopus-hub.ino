@@ -73,7 +73,7 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
 
   Serial.println(command);
 
-  if (command.equals("setColor") && switchLedPath.equals(path))
+  if (command.equals("switch_led") || (command.equals("setColor") && switchLedPath.equals(path)))
   {
     JsonObject &value = root["value"];
     const char red = value["r"];
@@ -86,10 +86,13 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
     root["value"] = "\"Command '" + command + "' executed\"";
     root["status"] = 200;
 
-    String output;
-    value.printTo(output);
+    if(command.equals("setColor") && switchLedPath.equals(path))
+    {
+      String output;
+      value.printTo(output);
 
-    sendLedUpdate(output);
+      sendLedUpdate(output);
+    }
   }
   else if (command.equals("change_update_rate"))
   {

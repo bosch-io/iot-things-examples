@@ -14,10 +14,10 @@ public class ApplicationConfiguration {
     public Vertx vertx() { return Vertx.vertx(); }
 
     @Bean
+    @DependsOn("client")
     public AmqpServer server(){ return new AmqpServer(); }
 
     @Bean
-    @DependsOn("server")
     public AmqpClient client(){ return new AmqpClient(); }
 
 }

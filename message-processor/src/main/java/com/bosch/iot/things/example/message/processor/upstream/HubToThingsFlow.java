@@ -1,22 +1,17 @@
 package com.bosch.iot.things.example.message.processor.upstream;
 
-import com.bosch.iot.things.example.message.processor.Constants;
 import com.bosch.iot.things.example.message.processor.processing.MessageProcessor;
 import com.bosch.iot.things.example.message.processor.transport.AmqpClient;
-import io.vertx.proton.*;
+import com.bosch.iot.things.example.message.processor.utils.Utils;
+import io.vertx.proton.ProtonReceiver;
+import io.vertx.proton.ProtonSender;
 import org.apache.qpid.proton.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import static com.bosch.iot.things.example.message.processor.Constants.TIME_OUT;
 
 @Component
 public class HubToThingsFlow {
@@ -27,58 +22,40 @@ public class HubToThingsFlow {
     private AmqpClient amqpClient;
 
     @Autowired
+    private Utils utils;
+
+    @Autowired
     private MessageProcessor messageProcessingService;
 
-    @Value(value = "${tenant.id}")
-    private String tenantId;
-
-    private Map<String, ProtonSender> hubToLocalServerSenders = new HashMap<>();
-
-    @PostConstruct
-    public void start() {
-        if (amqpClient.isConnected(TIME_OUT)) {
-            receiveFromHubSendToThings(amqpClient.getHubConnection());
-        } else {
-            log.error("Either connection to local server or connection to hub server not initialized");
-        }
+    public void init(Map<String, ProtonSender> thingsSenders) {
+        thingsSenders.entrySet().stream().forEach(entry -> forwardToThings(entry.getKey(), entry.getValue()));
     }
 
-    private void receiveFromHubSendToThings(ProtonConnection hubConnection) {
-        createHubReceiver(Constants.TELEMETRY_ENDPOINT + tenantId, hubConnection);
-        createHubReceiver(Constants.EVENT_ENDPOINT + tenantId, hubConnection);
-        createHubReceiver(Constants.COMMAND_RESPONSE + tenantId  + Constants.REPLIES, hubConnection);
+    public void forwardToThings(String address, ProtonSender thingsSender) {
+        ProtonReceiver hubReceiver = createHubReceiver(address);
+        log.info("Hub receiver created for:" + address);
+        sendToThingsService(hubReceiver, thingsSender);
     }
 
-    private void createHubReceiver(String address, ProtonConnection hubConnection) {
-        ProtonReceiver hubReceiver = hubConnection.createReceiver(address);
-        createHubToThingsSender(address);
-        sendToThingsService(hubReceiver);
+    private ProtonReceiver createHubReceiver(String address) {
+        return amqpClient.getHubConnection().createReceiver(address);
     }
 
-    private void createHubToThingsSender(String address) {
-        ProtonSender hubToThingsSender = amqpClient.getLocalConnection().createSender(address);
-        hubToLocalServerSenders.put(address, hubToThingsSender);
-    }
-
-    private void sendToThingsService(ProtonReceiver hubReceiver) {
+    private void sendToThingsService(ProtonReceiver hubReceiver, ProtonSender thingsSender) {
         hubReceiver.handler((delivery, msg) -> {
-            String address = hubReceiver.getRemoteSource().getAddress();
             log.debug("Received message from HUB service with content: " + msg.getBody().toString());
             Message processedMessage = this.messageProcessingService.encrypt(msg);
-            forwardToThings(processedMessage, address);
+            send(processedMessage, thingsSender);
         }).open();
     }
 
-    private void forwardToThings(Message message, String address) {
-        ProtonSender sender = hubToLocalServerSenders.get(address);
-        if (Objects.nonNull(sender)) {
-            sender.open();
-            log.debug("Sending message to local server");
-            sender.send(message, delivery -> {
-                log.info(String.format("The message was received by the local server: remote state=%s, remotely settled=%s", delivery.getRemoteState(), delivery.remotelySettled()));
-            });
-        } else {
-            log.error(String.format("Can't forward message to local server over address: %s", address));
-        }
+    private void send(Message message, ProtonSender sender) {
+        log.debug("Sending message to THINGS service");
+        String address = sender.getRemoteSource().getAddress();
+        utils.logMessageInfo(message, address);
+        sender.send(message, delivery -> {
+            log.info(String.format("The message was received by the THINGS service: remote state=%s, remotely settled=%s",
+                    delivery.getRemoteState(), delivery.remotelySettled()));
+        });
     }
 }

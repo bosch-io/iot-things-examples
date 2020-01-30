@@ -1,15 +1,12 @@
 hub:
-  client:
-    host:
-    port:
-    username:
-    password:
-tenant:
-  id:
+  host:
+  port:
+  username:
+  password:
 local:
-  client:
-    host:
+  server:
     port:
 logging:
   level:
     com.bosch.iot.things.example.message.processor: INFO
+spring.main.web-application-type: none

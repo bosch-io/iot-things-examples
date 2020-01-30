@@ -1,5 +1,7 @@
 package com.bosch.iot.things.example.message.processor.transport;
 
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.proton.ProtonClient;
 import io.vertx.proton.ProtonClientOptions;
@@ -12,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.PostConstruct;
 import java.util.Objects;
 
-import static java.lang.Thread.sleep;
-
 public class AmqpClient {
 
     private static final Logger log = LoggerFactory.getLogger(AmqpClient.class);
@@ -21,90 +21,55 @@ public class AmqpClient {
     @Autowired
     private Vertx vertx;
 
-    @Value(value = "${hub.client.host}")
+    @Value(value = "${hub.host}")
     private String hubHost;
 
-    @Value(value = "${hub.client.port}")
+    @Value(value = "${hub.port}")
     private Integer hubPort;
 
-    @Value(value = "${hub.client.username}")
+    @Value(value = "${hub.username}")
     private String hubUsername;
 
-    @Value(value = "${hub.client.password}")
+    @Value(value = "${hub.password}")
     private String hubPassword;
 
-    @Value(value = "${local.client.host}")
-    private String localHost;
-
-    @Value(value = "${local.client.port}")
-    private Integer localPort;
-
-    private ProtonClient localClient;
-    private ProtonConnection localConnection;
     private ProtonClient hubClient;
     private ProtonConnection hubConnection;
 
-
     @PostConstruct
     private void start() {
-        setLocalClient(ProtonClient.create(vertx));
         setHubClient(ProtonClient.create(vertx));
-        connectLocalClient(localClient);
-        connectHubClient(hubClient);
     }
 
-    private void connectLocalClient(ProtonClient localClient) {
-        localClient.connect(localHost, localPort, res -> {
-            if (res.succeeded()) {
-                log.info("We're connected to local AMQP server! " + res.result().getHostname());
-                setLocalConnection(res.result());
-                localConnection.open();
-            } else {
-                log.error("Error connecting to local AMQP server!");
-                res.cause().printStackTrace();
-            }
-        });
-    }
-
-    private void connectHubClient(ProtonClient hubClient) {
+    private Future<ProtonConnection> connectHubClient() {
+        Promise<ProtonConnection> promise = Promise.promise();
         hubClient.connect(new ProtonClientOptions().setSsl(Boolean.TRUE), hubHost, hubPort, hubUsername, hubPassword, res -> {
             if (res.succeeded()) {
-                log.info("We're connected to Hub server!");
+                log.info("Connected to Hub server!");
                 setHubConnection(res.result());
                 hubConnection.open();
+                promise.complete();
             } else {
-                log.error("Error connecting to Hub server!");
-                res.cause().printStackTrace();
+                log.error(String.format("Error connecting to Hub server! Cause - %s", res.cause().getMessage()));
+                promise.fail(res.cause());
             }
         });
+        return promise.future();
     }
 
-    public boolean isConnected(int timeout) {
-        try {
-            while (timeout > 0 && (Objects.isNull(this.getLocalConnection()) || Objects.isNull(this.getHubConnection()))) {
-                sleep(100);
-                timeout -= 100;
-            }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+    public Future<ProtonConnection> requestHubConnection() {
+        if (Objects.isNull(this.getHubConnection())) {
+            return this.connectHubClient();
         }
-        return Objects.nonNull(this.getLocalConnection()) && Objects.nonNull(this.getHubConnection());
+        return Future.succeededFuture();
     }
 
-    public ProtonClient getLocalClient() {
-        return localClient;
-    }
-
-    private void setLocalClient(ProtonClient localClient) {
-        this.localClient = localClient;
-    }
-
-    public ProtonConnection getLocalConnection() {
-        return localConnection;
-    }
-
-    private void setLocalConnection(ProtonConnection localConnection) {
-        this.localConnection = localConnection;
+    public void disconnectFromHub() {
+        if (Objects.nonNull(this.getHubConnection()) && !this.getHubConnection().isDisconnected()) {
+            getHubConnection().close().disconnect();
+            setHubConnection(null);
+            log.info("Disconnected from Hub server!");
+        }
     }
 
     public ProtonClient getHubClient() {

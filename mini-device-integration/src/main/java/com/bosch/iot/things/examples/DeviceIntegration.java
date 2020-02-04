@@ -104,7 +104,7 @@ public class DeviceIntegration {
         proxyPrincipal = props.getProperty("proxyPrincipal");
         proxyPassword = props.getProperty("proxyPassword");
 
-        LOGGER.info("Creating Things Client ...");
+        LOGGER.info("Creating Ditto Client ...");
         // Create a new Ditto Client instance to start interacting with Bosch IoT Things service
         dittoClient = initializeDittoClient();
 
@@ -144,7 +144,6 @@ public class DeviceIntegration {
                         .clientId(clientId)
                         .clientSecret(clientSecret)
                         .scopes(getScopesAsList(scopes))
-                        //.withAdditionalHeader("\"x-im-client-access-token\"", "\"" + clientId + ":" + clientSecret + "\"")
                         .tokenEndpoint(tokenEndpoint);
 
 

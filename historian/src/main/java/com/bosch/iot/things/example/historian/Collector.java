@@ -30,9 +30,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,12 +40,20 @@ import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.ditto.client.DittoClient;
+import org.eclipse.ditto.client.DittoClients;
+import org.eclipse.ditto.client.changes.ChangeAction;
+import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationConfiguration;
+import org.eclipse.ditto.client.configuration.MessagingConfiguration;
+import org.eclipse.ditto.client.configuration.ProxyConfiguration;
+import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
+import org.eclipse.ditto.client.messaging.AuthenticationProviders;
+import org.eclipse.ditto.client.messaging.MessagingProvider;
+import org.eclipse.ditto.client.messaging.MessagingProviders;
 import org.eclipse.ditto.json.JsonArray;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
-import org.eclipse.ditto.model.things.Thing;
-import org.eclipse.ditto.model.things.ThingBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -60,14 +65,6 @@ import org.springframework.stereotype.Component;
 
 import com.mongodb.BasicDBObject;
 
-import com.bosch.iot.things.client.ThingsClientFactory;
-import com.bosch.iot.things.client.configuration.CommonConfiguration;
-import com.bosch.iot.things.client.configuration.ProviderConfiguration;
-import com.bosch.iot.things.client.configuration.ProxyConfiguration;
-import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.iot.things.client.messaging.internal.thingsws.ThingsWsMessagingProviderConfigurationImpl;
-import com.bosch.iot.things.clientapi.ThingsClient;
-import com.bosch.iot.things.clientapi.things.ChangeAction;
 
 /**
  * Example implemenetation of a history collector. It registers as a consumer for all changes of features of Things and
@@ -78,94 +75,13 @@ public class Collector implements Runnable {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Collector.class);
 
-    /** Backlog of change values for each property */
+    /**
+     * Backlog of change values for each property
+     */
     private static final int HISTORY_SIZE = 1000;
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    private static class History {
-
-        private final String thingId;
-        private final String featureId;
-        private final JsonPointer path;
-        private final JsonValue value;
-        private final LocalDateTime timestamp;
-
-        public History(String thingId, String featureId, JsonPointer path, JsonValue value, LocalDateTime timestamp) {
-            this.thingId = thingId;
-            this.featureId = featureId;
-            this.path = path;
-            this.value = value;
-            this.timestamp = timestamp;
-        }
-
-        @Override
-        public String toString() {
-            return "History{" + "thingId=" + thingId + ", featureId=" + featureId + ", path=" + path + ", value=" +
-                    value + ", timestamp=" + timestamp + '}';
-        }
-
-    }
-
-    @PostConstruct
-    public void start() {
-        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-
-        if (!mongoTemplate.collectionExists("history")) {
-            mongoTemplate.createCollection("history");
-        }
-
-        Thread thread = new Thread(this);
-        thread.start();
-
-        LOGGER.info("Historian collector started");
-    }
-
-    @Override
-    public void run() {
-        ThingsClient client = setupClient();
-
-        client.twin().registerForFeatureChanges("changes", change -> {
-            final ChangeAction action = change.getAction();
-            if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
-                LOGGER.debug("Change: {}", change);
-
-                // collect list of individual property changes
-                List<History> target = new LinkedList<>();
-                collectChanges(target, change.getThingId(), change.getFeature().getId(),
-                        JsonPointer.empty(), change.getValue().get());
-
-                // write them all the the MongoDB
-                target.stream().forEachOrdered(h -> storeHistory(h));
-            }
-        });
-
-        // start consuming changes
-        client.twin().startConsumption();
-    }
-
-    /**
-     * Write history to the the MongoDB
-     */
-    private void storeHistory(History h) {
-        LOGGER.trace("Store history (max {}): {}", h);
-
-        // do combined update query: add newest value+timestamp to the array property and slice array if too long
-        String id = h.thingId + "/features/" + h.featureId + h.path;
-        Update update = new Update()
-                .push("values",
-                        new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
-                                .append("$slice", -HISTORY_SIZE))
-                .push("timestamps",
-                        new BasicDBObject("$each", Arrays.asList(h.timestamp))
-                                .append("$slice", -HISTORY_SIZE));
-
-        // update or create document for this specific property in this thing/feature
-        mongoTemplate.upsert(
-                Query.query(Criteria.where("_id").is(id)),
-                update, String.class, "history");
-    }
 
     /**
      * Collect list of individual property changes
@@ -220,7 +136,7 @@ public class Collector implements Runnable {
         }
     }
 
-    private static ThingsClient setupClient() throws RuntimeException, NumberFormatException {
+    private static DittoClient setupClient() throws RuntimeException {
         Properties props = new Properties(System.getProperties());
         try {
             if (new File("config.properties").exists()) {
@@ -237,51 +153,120 @@ public class Collector implements Runnable {
 
         String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
         String clientId = props.getProperty("clientId");
-        String apiToken = props.getProperty("apiToken");
-        URI keystoreUri;
-        try {
-            keystoreUri = Collector.class.getResource("/things-client.jks").toURI();
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
+        String tokenEndpoint = props.getProperty("tokenEndpoint");
+        String clientSecret = props.getProperty("clientSecret");
 
-        String keystorePassword = props.getProperty("keyStorePassword");
-        String keyAlias = props.getProperty("keyAlias");
-        String keyAliasPassword = props.getProperty("keyAliasPassword");
         String proxyHost = props.getProperty("http.proxyHost");
         String proxyPort = props.getProperty("http.proxyPort");
 
-        PublicKeyAuthenticationConfiguration authenticationConfiguration;
-        try {
-            authenticationConfiguration = PublicKeyAuthenticationConfiguration.newBuilder()
-                    .clientId(clientId)
-                    .keyStoreLocation(keystoreUri.toURL())
-                    .keyStorePassword(keystorePassword)
-                    .alias(keyAlias)
-                    .aliasPassword(keyAliasPassword)
-                    .build();
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        ProviderConfiguration providerConfig = ThingsWsMessagingProviderConfigurationImpl.newBuilder()
-                .endpoint(thingsMessagingEndpointUrl)
-                .authenticationConfiguration(authenticationConfiguration)
+        ClientCredentialsAuthenticationConfiguration authenticationConfiguration;
+        authenticationConfiguration = ClientCredentialsAuthenticationConfiguration.newBuilder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .tokenEndpoint(tokenEndpoint)
                 .build();
 
-        CommonConfiguration.OptionalConfigurationStep configSettable = CommonConfiguration.newBuilder()
-                .apiToken(apiToken)
-                .providerConfiguration(providerConfig);
+        MessagingConfiguration.Builder providerConfig = WebSocketMessagingConfiguration.newBuilder()
+                .endpoint(thingsMessagingEndpointUrl);
 
+
+        MessagingConfiguration provider;
         if (proxyHost != null && proxyPort != null) {
-            configSettable = configSettable.proxyConfiguration(
-                    ProxyConfiguration.newBuilder()
-                            .proxyHost(proxyHost)
-                            .proxyPort(Integer.parseInt(proxyPort))
-                            .build());
+            provider = providerConfig.proxyConfiguration(ProxyConfiguration.newBuilder().proxyHost(proxyHost).proxyPort(
+                    Integer.parseInt(proxyPort)).build()).build();
+        } else {
+            provider = providerConfig.build();
         }
 
-        return ThingsClientFactory.newInstance(configSettable.build());
+        MessagingProvider messagingProvider =
+                MessagingProviders.webSocket(provider,
+                        AuthenticationProviders.clientCredentials(
+                                authenticationConfiguration));
+
+        return DittoClients.newInstance(messagingProvider);
+    }
+
+    @PostConstruct
+    public void start() {
+        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+
+        if (!mongoTemplate.collectionExists("history")) {
+            mongoTemplate.createCollection("history");
+        }
+
+        Thread thread = new Thread(this);
+        thread.start();
+
+        LOGGER.info("Historian collector started");
+    }
+
+    @Override
+    public void run() {
+        DittoClient client = setupClient();
+
+        client.twin().registerForFeatureChanges("changes", change -> {
+            final ChangeAction action = change.getAction();
+            if (action == ChangeAction.CREATED || action == ChangeAction.UPDATED) {
+                LOGGER.debug("Change: {}", change);
+
+                // collect list of individual property changes
+                List<History> target = new LinkedList<>();
+                collectChanges(target, change.getEntityId().toString(), change.getFeature().getId(),
+                        JsonPointer.empty(), change.getValue().get());
+
+                // write them all the the MongoDB
+                target.stream().forEachOrdered(h -> storeHistory(h));
+            }
+        });
+
+        // start consuming changes
+        client.twin().startConsumption();
+    }
+
+    /**
+     * Write history to the the MongoDB
+     */
+    private void storeHistory(History h) {
+        LOGGER.trace("Store history (max {}): {}", h);
+
+        // do combined update query: add newest value+timestamp to the array property and slice array if too long
+        String id = h.thingId + "/features/" + h.featureId + h.path;
+        Update update = new Update()
+                .push("values",
+                        new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
+                                .append("$slice", -HISTORY_SIZE))
+                .push("timestamps",
+                        new BasicDBObject("$each", Arrays.asList(h.timestamp))
+                                .append("$slice", -HISTORY_SIZE));
+
+        // update or create document for this specific property in this thing/feature
+        mongoTemplate.upsert(
+                Query.query(Criteria.where("_id").is(id)),
+                update, String.class, "history");
+    }
+
+    private static class History {
+
+        private final String thingId;
+        private final String featureId;
+        private final JsonPointer path;
+        private final JsonValue value;
+        private final LocalDateTime timestamp;
+
+        public History(String thingId, String featureId, JsonPointer path, JsonValue value, LocalDateTime timestamp) {
+            this.thingId = thingId;
+            this.featureId = featureId;
+            this.path = path;
+            this.value = value;
+            this.timestamp = timestamp;
+        }
+
+        @Override
+        public String toString() {
+            return "History{" + "thingId=" + thingId + ", featureId=" + featureId + ", path=" + path + ", value=" +
+                    value + ", timestamp=" + timestamp + '}';
+        }
+
     }
 
 }

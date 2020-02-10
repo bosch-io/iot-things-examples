@@ -75,6 +75,13 @@ struct Bme680Values {
   float altitude;
 };
 
+struct LedValues {
+  short r;
+  short g;
+  short b;
+  short w;
+};
+
 class Octopus {
   
   #ifdef BME280
@@ -100,6 +107,7 @@ class Octopus {
     void begin();
     void connectToWifi(char* ssid, const char* password);
     void showColor(char led, char red, char green, char blue, char white);
+    bool readLed(LedValues &values);
     float getVcc ();
     bool readBno055(Bno055Values &values);
 

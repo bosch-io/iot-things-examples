@@ -85,7 +85,22 @@ String sensor3dValue(float xValue, float yValue, float zValue, const String& uni
   return output;
 }
 
-void publishSensorData(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
+String ledValue(short r, short g, short b, short w) {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& properties = jsonBuffer.createObject();
+  JsonObject& statusProps = properties.createNestedObject("status");
+  statusProps["r"] = r;
+  statusProps["g"] = g;
+  statusProps["b"] = b;
+  statusProps["w"] = w;
+  
+  String output;
+  properties.printTo(output);
+  jsonBuffer.clear();
+  return output;
+}
+
+void publishSensorData(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values, const LedValues& ledValues) {
 
   updateMinMax(power, bme680Values, bno055Values);
 
@@ -116,6 +131,18 @@ void publishSensorData(float power, const Bme680Values& bme680Values, const Bno0
     modifyFeaturePropertiesMsg("linear_acceleration", sensor3dValue(bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2")));
   hub.publish(
     modifyFeaturePropertiesMsg("magnetometer", sensor3dValue(bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT")));
+
+  hub.publish(
+    modifyFeaturePropertiesMsg(
+      "led", 
+      ledValue(
+        ledValues.r, 
+        ledValues.g, 
+        ledValues.b, 
+        ledValues.w
+      )
+    )
+  );
 }
 
 void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {

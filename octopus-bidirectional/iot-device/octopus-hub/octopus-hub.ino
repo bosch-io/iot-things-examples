@@ -63,10 +63,13 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
 {
   const char *dittoTopic = root["topic"];
   JsonObject &headers = root["headers"];
+  const char* path = root["path"];
+
+  String switchLedPath = "/features/led/inbox/messages/setColor";
 
   Serial.println(command);
 
-  if (command.equals("switch_led"))
+  if (command.equals("switch_led") || (command.equals("setColor") && switchLedPath.equals(path)))
   {
     JsonObject &value = root["value"];
     const char red = value["r"];
@@ -114,8 +117,10 @@ void loop()
     lastSensorUpdateMillis = millis();
     static Bme680Values bme680Values;
     static Bno055Values bno055Values;
+    static LedValues ledValues;
     memset(&bme680Values, 0, sizeof(bme680Values));
     memset(&bno055Values, 0, sizeof(bno055Values));
+    memset(&ledValues, 0, sizeof(ledValues));
     octopus.readBno055(bno055Values);
 #ifdef BME280
     octopus.readBme280(bme680Values);
@@ -124,8 +129,9 @@ void loop()
 #endif
     float vcc = octopus.getVcc();
 
-    //printSensorData(vcc, bme680Values, bno055Values);
-    publishSensorData(vcc, bme680Values, bno055Values);
+    octopus.readLed(ledValues);
+
+    publishSensorData(vcc, bme680Values, bno055Values, ledValues);
   }
   hub.loop();
   delay(LOOP_DELAY);

@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.ditto.client.twin.Twin;
 import org.eclipse.ditto.json.JsonArray;
 import org.eclipse.ditto.json.JsonArrayBuilder;
 import org.eclipse.ditto.json.JsonFactory;
@@ -58,8 +59,6 @@ import org.eclipse.ditto.signals.commands.things.exceptions.ThingNotCreatableExc
 import org.eclipse.ditto.signals.commands.things.exceptions.ThingNotModifiableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bosch.iot.things.clientapi.twin.Twin;
 
 public class BatchImporter {
 

@@ -30,24 +30,25 @@ import static java.util.Optional.of;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.eclipse.ditto.client.DittoClient;
+import org.eclipse.ditto.client.DittoClients;
+import org.eclipse.ditto.client.configuration.AuthenticationConfiguration.Builder;
+import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationConfiguration;
+import org.eclipse.ditto.client.configuration.MessagingConfiguration;
+import org.eclipse.ditto.client.configuration.ProxyConfiguration;
+import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
+import org.eclipse.ditto.client.messaging.AuthenticationProviders;
+import org.eclipse.ditto.client.messaging.MessagingProvider;
+import org.eclipse.ditto.client.messaging.MessagingProviders;
+import org.eclipse.ditto.client.twin.Twin;
+import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bosch.iot.things.client.ThingsClientFactory;
-import com.bosch.iot.things.client.configuration.CommonConfiguration;
-import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.iot.things.client.configuration.ProxyConfiguration;
-import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.iot.things.client.messaging.MessagingProviders;
-import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.iot.things.clientapi.ThingsClient;
-import com.bosch.iot.things.clientapi.twin.Twin;
 
 class ThingsWebsocketClient {
 
@@ -55,28 +56,19 @@ class ThingsWebsocketClient {
     private static final String CONFIG_PROPERTIES_FILE = "config.properties";
     private static final String CONFIG_FILE = "thingsConfigFile";
 
-    private final ThingsClient client;
+    private final DittoClient client;
     private final Twin twin;
 
     private final String webSocketEndpoint;
 
-    private final String solutionId;
-    private final String apiToken;
-
     private final String clientId;
-
-    private final String username;
-    private final String password;
+    private final String clientSecret;
+    private final String tokenEndpoint;
 
     private final String proxyHost;
     private final String proxyPort;
     private final String proxyPrincipal;
     private final String proxyPassword;
-
-    private URL keystoreLocation;
-    private String keystoreAlias;
-    private String keystorePassword;
-    private String keystoreAliasPassword;
 
     /**
      * Constructor.
@@ -85,50 +77,20 @@ class ThingsWebsocketClient {
 
         final Properties props = loadConfigurationFromFile();
 
-        solutionId = props.getProperty("solutionId");
-        apiToken = props.getProperty("apiToken");
-
         webSocketEndpoint = props.getProperty("webSocketEndpoint");
 
-        clientId = solutionId + ":things-batch-importer";
-
-        final String keystoreLocationProperty = props.getProperty("keystoreLocation");
-        try {
-            if (keystoreLocationProperty != null) {
-                keystoreLocation = getClass().getClassLoader().getResource(keystoreLocationProperty);
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " + e.getMessage());
-        }
-        keystorePassword = props.getProperty("keystorePassword");
-        keystoreAlias = props.getProperty("keystoreAlias");
-        keystoreAliasPassword = props.getProperty("keystoreAliasPassword");
-
-        username = props.getProperty("username");
-        password = props.getProperty("password");
+        clientId = props.getProperty("clientId");
+        clientSecret = props.getProperty("clientSecret");
+        tokenEndpoint = props.getProperty("tokenEndpoint");
 
         proxyHost = props.getProperty("proxyHost");
         proxyPort = props.getProperty("proxyPort");
         proxyPrincipal = props.getProperty("proxyPrincipal");
         proxyPassword = props.getProperty("proxyPassword");
 
-
-        CommonConfiguration twinConfiguration = null;
-
-        if (username != null && password != null) {
-            twinConfiguration = createBasicAuthConfiguration();
-        } else if (keystorePassword != null && keystoreAlias != null && keystoreAliasPassword != null) {
-            twinConfiguration = createPublicKeyConfiguration();
-
-        } else {
-            LOGGER.error("Neither Basic Auth nor Public Key is configured in config.properties file!");
-            System.exit(-1);
-        }
-
         LOGGER.info("Creating Things Client ...");
         // Create a new ThingsWebsocketClient object to start interacting with IoT Things service
-        client = ThingsClientFactory.newInstance(twinConfiguration);
+        client = createClient();
 
         // Create a new twin client for managing things
         twin = client.twin();
@@ -164,59 +126,32 @@ class ThingsWebsocketClient {
         return props;
     }
 
-    private CommonConfiguration createBasicAuthConfiguration() {
+    private DittoClient createClient() {
 
-        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
+        // Build a client-credential authentication configuration if you want to directly connect to the IoT Things service
         // via its websocket channel.
-        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
-                CredentialsAuthenticationConfiguration
+        final Builder clientCredentialsAuthenticationConfigurationBuilder =
+                ClientCredentialsAuthenticationConfiguration
                         .newBuilder()
-                        .username(username)
-                        .password(password)
-                        .build();
-
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration)
-                .endpoint(webSocketEndpoint)
-                .build();
-
-        final CommonConfiguration.OptionalConfigurationStep configuration =
-                ThingsClientFactory.configurationBuilder()
-                        .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration);
-
-        proxyConfiguration().ifPresent(configuration::proxyConfiguration);
-
-        return configuration.build();
-    }
-
-    private CommonConfiguration createPublicKeyConfiguration() {
-
-        // Build a key-based authentication configuration for communicating with IoT Things service and with live
-        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
-                PublicKeyAuthenticationConfiguration.newBuilder()
                         .clientId(clientId)
-                        .keyStoreLocation(keystoreLocation)
-                        .keyStorePassword(keystorePassword)
-                        .alias(keystoreAlias)
-                        .aliasPassword(keystoreAliasPassword)
-                        .build();
+                        .clientSecret(clientSecret)
+                        .tokenEndpoint(tokenEndpoint);
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration)
-                .endpoint(webSocketEndpoint)
-                .build();
+        final MessagingConfiguration.Builder messagingProviderConfigurationBuilder = WebSocketMessagingConfiguration.
+                newBuilder()
+                .jsonSchemaVersion(JsonSchemaVersion.V_2)
+                .reconnectEnabled(false)
+                .endpoint(webSocketEndpoint);
 
-        final CommonConfiguration.OptionalConfigurationStep configuration =
-                ThingsClientFactory.configurationBuilder()
-                        .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration);
+        proxyConfiguration().ifPresent(messagingProviderConfigurationBuilder::proxyConfiguration);
+        proxyConfiguration().ifPresent(clientCredentialsAuthenticationConfigurationBuilder::proxyConfiguration);
 
-        proxyConfiguration().ifPresent(configuration::proxyConfiguration);
+        MessagingProvider messagingProvider =
+                MessagingProviders.webSocket(messagingProviderConfigurationBuilder.build(),
+                        AuthenticationProviders.clientCredentials((ClientCredentialsAuthenticationConfiguration)
+                                clientCredentialsAuthenticationConfigurationBuilder.build()));
 
-        return configuration.build();
+        return DittoClients.newInstance(messagingProvider);
     }
 
     private Optional<ProxyConfiguration> proxyConfiguration() {

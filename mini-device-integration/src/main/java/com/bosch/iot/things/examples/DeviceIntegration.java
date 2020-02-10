@@ -27,33 +27,37 @@ package com.bosch.iot.things.examples;
 
 import static java.util.Optional.of;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
+import org.eclipse.ditto.client.DittoClient;
+import org.eclipse.ditto.client.DittoClients;
+import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationConfiguration;
+import org.eclipse.ditto.client.configuration.MessagingConfiguration;
+import org.eclipse.ditto.client.configuration.ProxyConfiguration;
+import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
+import org.eclipse.ditto.client.management.FeatureHandle;
+import org.eclipse.ditto.client.messaging.AuthenticationProviders;
+import org.eclipse.ditto.client.messaging.MessagingProvider;
+import org.eclipse.ditto.client.messaging.MessagingProviders;
+import org.eclipse.ditto.client.twin.Twin;
 import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.things.Feature;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bosch.iot.things.client.ThingsClientFactory;
-import com.bosch.iot.things.client.configuration.CommonConfiguration;
-import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.iot.things.client.configuration.ProxyConfiguration;
-import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.iot.things.client.messaging.MessagingProviders;
-import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.iot.things.clientapi.ThingsClient;
-import com.bosch.iot.things.clientapi.things.FeatureHandle;
-import com.bosch.iot.things.clientapi.twin.Twin;
 
 /**
  * This example shows how to create and use the Things Client for managing your first Thing.
@@ -64,33 +68,20 @@ public class DeviceIntegration {
     private static final String CONFIG_PROPERTIES_FILE = "config.properties";
     private static final String COUNTER = "counter";
     private static final String COUNTER_VALUE = "value";
-
+    private static final int TIMEOUT = 5;
     private final String endpoint_ws;
-    private final String solutionId;
-    private final String apiToken;
     private final String namespace;
-
     private final String clientId;
-
-    private final String userid;
-    private final String username;
-    private final String password;
-    private final String tenantName;
-
+    private final String clientSecret;
     private final String proxyHost;
     private final String proxyPort;
     private final String proxyPrincipal;
     private final String proxyPassword;
-
-    private URL keystoreLocation;
-    private String keystoreAlias;
-    private String keystorePassword;
-    private String keystoreAliasPassword;
-
-    private static final int TIMEOUT = 5;
     private final String thingId;
-    private final ThingsClient thingsClient;
+    private final DittoClient dittoClient;
     private final Twin twin;
+    private String tokenEndpoint;
+    private String scopes;
 
     /**
      * Client instantiation
@@ -100,82 +91,77 @@ public class DeviceIntegration {
         final Properties props = loadConfigurationFromFile();
 
         endpoint_ws = props.getProperty("endpoint_ws");
-        solutionId = props.getProperty("solutionId");
-        apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
 
-        clientId = solutionId + ":connector";
+        clientId = props.getProperty("clientId");
+        clientSecret = props.getProperty("clientSecret");
 
-        final String keystoreLocationProperty = props.getProperty("keystoreLocation");
-        try {
-            this.keystoreLocation = new File(keystoreLocationProperty).toURI().toURL();
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " +
-                            e.getMessage());
-        }
-        keystorePassword = props.getProperty("keystorePassword");
-        keystoreAlias = props.getProperty("keystoreAlias");
-        keystoreAliasPassword = props.getProperty("keystoreAliasPassword");
-
-        userid = props.getProperty("userid");
-        username = props.getProperty("username");
-        password = props.getProperty("password");
-        tenantName = props.getProperty("tenantName");
+        tokenEndpoint = props.getProperty("tokenEndpoint");
+        scopes = props.getProperty("scopes");
 
         proxyHost = props.getProperty("proxyHost");
         proxyPort = props.getProperty("proxyPort");
         proxyPrincipal = props.getProperty("proxyPrincipal");
         proxyPassword = props.getProperty("proxyPassword");
 
-        LOGGER.info("Creating Things Client ...");
-        // Create a new Things Client instance to start interacting with Bosch IoT Things service
-        thingsClient = initializeThingsClient();
+        LOGGER.info("Creating Ditto Client ...");
+        // Create a new Ditto Client instance to start interacting with Bosch IoT Things service
+        dittoClient = initializeDittoClient();
 
         thingId = namespace + ":" + UUID.randomUUID().toString();
 
         // Create a new twin client for managing things
-        twin = thingsClient.twin();
-    }
-
-    private ThingsClient initializeThingsClient() {
-        // Build a credential authentication configuration if you want to directly connect to the IoT Things service
-        // via its websocket channel
-        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
-                CredentialsAuthenticationConfiguration
-                        .newBuilder()
-                        .username(tenantName + "\\" + username)
-                        .password(password)
-                        .build();
-
-        // or alternatively, build a key-based authentication configuration for communicating with IoT Things service
-        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
-                PublicKeyAuthenticationConfiguration
-                        .newBuilder()
-                        .clientId(clientId)
-                        .keyStoreLocation(keystoreLocation)
-                        .keyStorePassword(keystorePassword)
-                        .alias(keystoreAlias)
-                        .aliasPassword(keystoreAliasPassword)
-                        .build();
-
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration /* or publicKeyAuthenticationConfiguration */)
-                .endpoint(endpoint_ws)
-                .build();
-
-
-        final CommonConfiguration.OptionalConfigurationStep twinConfiguration =
-                ThingsClientFactory.configurationBuilder()
-                        .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration);
-        proxyConfiguration().ifPresent(twinConfiguration::proxyConfiguration);
-        return ThingsClientFactory.newInstance(twinConfiguration.build());
+        twin = dittoClient.twin();
     }
 
     public static void main(final String... args) {
         new DeviceIntegration().execute();
+    }
+
+    private static List<String> getScopesAsList(final String scopes) {
+        try {
+            if (scopes.length() > 0) {
+                if (scopes.contains(",")) {
+                    return Arrays.stream(scopes.split(",")).collect(Collectors.toList());
+                } else {
+                    return Collections.singletonList(scopes);
+                }
+            }
+        } catch (final Exception e) {
+            LOGGER.warn("Could not get scopes as list!", e);
+        }
+        return Collections.emptyList();
+    }
+
+    private DittoClient initializeDittoClient() {
+
+
+        // Build a client-credential authentication configuration if you want to directly connect to the IoT Things service
+        // via its websocket channel
+        final ClientCredentialsAuthenticationConfiguration.ClientCredentialsAuthenticationConfigurationBuilder
+                clientCredentialsAuthenticationConfigurationBuilder =
+                ClientCredentialsAuthenticationConfiguration.newBuilder()
+                        .clientId(clientId)
+                        .clientSecret(clientSecret)
+                        .scopes(getScopesAsList(scopes))
+                        .tokenEndpoint(tokenEndpoint);
+
+
+        final MessagingConfiguration.Builder messagingProviderConfigurationBuilder = WebSocketMessagingConfiguration.
+                newBuilder()
+                .jsonSchemaVersion(JsonSchemaVersion.V_2)
+                .reconnectEnabled(false)
+                .endpoint(endpoint_ws);
+
+        proxyConfiguration().ifPresent(messagingProviderConfigurationBuilder::proxyConfiguration);
+        proxyConfiguration().ifPresent(clientCredentialsAuthenticationConfigurationBuilder::proxyConfiguration);
+
+        MessagingProvider messagingProvider =
+                MessagingProviders.webSocket(messagingProviderConfigurationBuilder.build(),
+                        AuthenticationProviders.clientCredentials(
+                                clientCredentialsAuthenticationConfigurationBuilder.build()));
+
+        return DittoClients.newInstance(messagingProvider);
     }
 
     /**
@@ -222,7 +208,7 @@ public class DeviceIntegration {
 
         try {
             featureHandle = twin.create(thing) //
-                    .thenApply(created -> twin.forFeature(thingId, COUNTER)) //
+                    .thenApply(created -> twin.forFeature(ThingId.of(thingId), COUNTER)) //
                     .get(TIMEOUT, TimeUnit.SECONDS);
 
             LOGGER.info("Thing with ID '{}' created.", thingId);
@@ -237,14 +223,14 @@ public class DeviceIntegration {
      * Find a Thing with given ThingId. Blocks until the Thing has been retrieved.
      */
     public Thing getThingById(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        return twin.forId(thingId).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
+        return twin.forId(ThingId.of(thingId)).retrieve().get(TIMEOUT, TimeUnit.SECONDS);
     }
 
     /**
      * Delete a Thing.
      */
     public void deleteThing(final String thingId) throws InterruptedException, ExecutionException, TimeoutException {
-        twin.delete(thingId)
+        twin.delete(ThingId.of(thingId))
                 .whenComplete((aVoid, throwable) -> {
                     if (null == throwable) {
                         LOGGER.info("Thing with ID deleted: {}", thingId);
@@ -275,7 +261,7 @@ public class DeviceIntegration {
      */
     public void terminate() {
         // Gracefully shutdown the thingsClient
-        thingsClient.destroy();
+        dittoClient.destroy();
     }
 
     private Properties loadConfigurationFromFile() {

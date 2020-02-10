@@ -88,6 +88,17 @@ void Octopus::showColor(char led, char red, char green, char blue, char white) {
   this->strip.show();
 }
 
+bool Octopus::readLed(LedValues &values){
+  uint32_t color = this->strip.getPixelColor(0);
+
+  values.w = (uint8_t)(color >> 24),
+  values.r = (uint8_t)(color >> 16),
+  values.g = (uint8_t)(color >>  8),
+  values.b = (uint8_t)color;
+
+  return true;
+}
+
 float Octopus::getVcc () {
   return ESP.getVcc() / 1000.0;
 }

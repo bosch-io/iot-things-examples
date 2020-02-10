@@ -34,6 +34,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.live.LiveThingHandle;
+import org.eclipse.ditto.client.live.messages.RepliableMessage;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.model.base.auth.AuthorizationContext;
 import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
@@ -42,15 +44,14 @@ import org.eclipse.ditto.model.base.common.HttpStatusCode;
 import org.eclipse.ditto.model.things.AccessControlListModelFactory;
 import org.eclipse.ditto.model.things.AclEntry;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.live.LiveThingHandle;
-import com.bosch.iot.things.clientapi.messages.RepliableMessage;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows how to register for- and reply to claim messages with the Things Client.
+ * This example shows how to register for- and reply to claim messages with the Ditto Client.
  *
  * @since 3.1.0
  */
@@ -62,12 +63,18 @@ public final class RegisterForClaimMessages extends ExamplesBase {
     private final String registrationIdClaimMessagesForThing;
 
     private RegisterForClaimMessages() {
+        super();
         registrationIdAllClaimMessages = UUID.randomUUID().toString();
         registrationIdClaimMessagesForThing = UUID.randomUUID().toString();
     }
 
     public static RegisterForClaimMessages newInstance() {
         return new RegisterForClaimMessages();
+    }
+
+    public static void main(final String... args) throws Exception {
+        final RegisterForClaimMessages registerForClaimMessages = RegisterForClaimMessages.newInstance();
+        registerForClaimMessages.registerForClaimMessagesToSingleThing();
     }
 
     /**
@@ -79,7 +86,7 @@ public final class RegisterForClaimMessages extends ExamplesBase {
         prepareClaimableThing()
                 .thenAccept(thingHandle -> {
                     client.live().registerForClaimMessage(registrationIdAllClaimMessages, this::handleMessage);
-                    LOGGER.info("Thing '{}' ready to be claimed", thingHandle.getThingId());
+                    LOGGER.info("Thing '{}' ready to be claimed", thingHandle.getThingEntityId());
                 });
     }
 
@@ -94,35 +101,29 @@ public final class RegisterForClaimMessages extends ExamplesBase {
         prepareClaimableThing()
                 .thenAccept(thingHandle -> {
                     thingHandle.registerForClaimMessage(registrationIdClaimMessagesForThing, this::handleMessage);
-                    LOGGER.info("Thing '{}' ready to be claimed!", thingHandle.getThingId());
+                    LOGGER.info("Thing '{}' ready to be claimed!", thingHandle.getThingEntityId());
                 });
     }
 
     private CompletableFuture<LiveThingHandle> prepareClaimableThing() {
         final String thingId = generateRandomThingId();
-        return client.twin().create(thingId)
+        return client.twin().create(ThingId.of(thingId))
                 .thenCompose(created -> {
                     final Thing updated =
                             created.toBuilder().setPermissions(AuthorizationModelFactory.newAuthSubject(clientId),
                                     AccessControlListModelFactory.allPermissions()).build();
                     return client.twin().update(updated);
                 })
-                .thenApply(created -> client.live().forId(thingId));
+                .thenApply(created -> client.live().forId(ThingId.of(thingId)));
     }
 
     private void handleMessage(final RepliableMessage<?, Object> message) {
-        final AuthorizationContext authorizationContext = message.getAuthorizationContext();
-        final Optional<AuthorizationSubject> firstAuthorizationSubject =
-                authorizationContext.getFirstAuthorizationSubject();
-        if (firstAuthorizationSubject.isPresent()) {
-            final AuthorizationSubject authorizationSubject = firstAuthorizationSubject.get();
-            final String thingId = message.getThingId();
-            final AclEntry aclEntry = AccessControlListModelFactory
-                    .newAclEntry(authorizationSubject, AccessControlListModelFactory.allPermissions());
 
-            client.twin().forId(thingId)
+            final String thingId = message.getThingId();
+
+            client.twin().forId(ThingId.of(thingId))
                     .retrieve()
-                    .thenCompose(thing -> client.twin().update(thing.setAclEntry(aclEntry)))
+                    .thenCompose(thing -> client.twin().update(thing.setAttribute("myAttribute", "testValue")))
                     .whenComplete((aVoid, throwable) -> {
                         if (null != throwable) {
                             message.reply()
@@ -139,22 +140,8 @@ public final class RegisterForClaimMessages extends ExamplesBase {
                                     .payload(JsonFactory.newObjectBuilder().set("success", true).build())
                                     .contentType("application/json")
                                     .send();
-                            LOGGER.info("Thing '{}' claimed from authorization subject '{}'", thingId,
-                                    authorizationSubject);
+                            LOGGER.info("Thing '{}' claimed", thingId);
                         }
                     });
-        } else {
-            message.reply()
-                    .statusCode(HttpStatusCode.BAD_REQUEST)
-                    .timestamp(OffsetDateTime.now())
-                    .payload("Error: no authorization context present.")
-                    .contentType("text/plain")
-                    .send();
-        }
-    }
-
-    public static void main(final String... args) throws Exception {
-        final RegisterForClaimMessages registerForClaimMessages = RegisterForClaimMessages.newInstance();
-        registerForClaimMessages.registerForClaimMessagesToSingleThing();
     }
 }

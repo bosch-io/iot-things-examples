@@ -33,20 +33,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.DittoClient;
 import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
 import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.eclipse.ditto.signals.commands.live.modify.ModifyFeaturePropertyLiveCommandAnswerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.ThingsClient;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows how the {@link com.bosch.iot.things.clientapi.live.Live} client can be used to register for, send,
- * and respond to live commands.
+ * This example shows how the {@link org.eclipse.ditto.client.DittoClient} can be used to register for, send,
+ * and respond to {@link org.eclipse.ditto.client.live.Live} commands.
  */
 public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
@@ -54,8 +55,8 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
     private static final String FEATURE_ID = "temp-sensor";
 
     private final String thingId;
-    private final ThingsClient backendClient;
-    private final ThingsClient clientAtDevice;
+    private final DittoClient backendClient;
+    private final DittoClient clientAtDevice;
     private final CountDownLatch latch;
 
     public RegisterForAndSendLiveCommands() {
@@ -65,14 +66,21 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
         latch = new CountDownLatch(2);
     }
 
+    public static void main(final String... args) throws Exception {
+        final RegisterForAndSendLiveCommands registerForAndSendLiveCommands = new RegisterForAndSendLiveCommands();
+        try {
+            registerForAndSendLiveCommands.registerForAndSendLiveCommands();
+        } finally {
+            registerForAndSendLiveCommands.terminate();
+        }
+    }
+
     public void registerForAndSendLiveCommands() throws InterruptedException, TimeoutException, ExecutionException {
 
         LOGGER.info("[AT BACKEND] create a Thing with required permissions: {}", thingId);
-        backendClient.twin().create(thingId).thenCompose(created -> {
+        backendClient.twin().create(ThingId.of(thingId)).thenCompose(created -> {
             final Thing updated =
                     created.toBuilder()
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId), allPermissions())
-                            .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherClientId), Permission.READ)
                             .setFeature(ThingsModelFactory.newFeature(FEATURE_ID))
                             .build();
             return backendClient.twin().update(updated);
@@ -80,7 +88,7 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
         LOGGER.info("[AT DEVICE] register handler for 'ModifyFeatureProperty' LIVE commands..");
         clientAtDevice.live()
-                .forId(thingId)
+                .forId(ThingId.of(thingId))
                 .forFeature(FEATURE_ID)
                 .handleModifyFeaturePropertyCommands(command -> {
                     LOGGER.info("[AT DEVICE] Received live command: {}", command.getType());
@@ -102,7 +110,7 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
 
         LOGGER.info("[AT BACKEND] put 'temperature' property of 'temp-sensor' LIVE Feature..");
         backendClient.live()
-                .forFeature(thingId, FEATURE_ID)
+                .forFeature(ThingId.of(thingId), FEATURE_ID)
                 .putProperty("temperature", 23.21)
                 .whenComplete(((_void, throwable) -> {
                     if (throwable != null) {
@@ -118,15 +126,6 @@ public class RegisterForAndSendLiveCommands extends ExamplesBase {
             LOGGER.info("Received all expected events!");
         } else {
             LOGGER.info("Did not receive all expected events!");
-        }
-    }
-
-    public static void main(final String... args) throws Exception {
-        final RegisterForAndSendLiveCommands registerForAndSendLiveCommands = new RegisterForAndSendLiveCommands();
-        try {
-            registerForAndSendLiveCommands.registerForAndSendLiveCommands();
-        } finally {
-            registerForAndSendLiveCommands.terminate();
         }
     }
 }

@@ -32,21 +32,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.twin.Twin;
+import org.eclipse.ditto.client.twin.TwinThingHandle;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.eclipse.ditto.model.things.ThingsModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.twin.Twin;
-import com.bosch.iot.things.clientapi.twin.TwinThingHandle;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows how a {@link com.bosch.iot.things.clientapi.things.ThingHandle}  can be used to perform
- * CRUD (Create, Read, Update, and Delete) operations on {@link org.eclipse.ditto.model.things.Attributes} of a thing.
+ * This example shows how a {@link org.eclipse.ditto.client.DittoClient}  can be used to perform
+ * CRUD (Create, Read, Update, and Delete) operations on {@link org.eclipse.ditto.model.things.Attributes} of a {@link org.eclipse.ditto.model.things.Thing}.
  */
 public class ManageAttributes extends ExamplesBase {
 
@@ -60,6 +61,15 @@ public class ManageAttributes extends ExamplesBase {
 
     private static final int TIMEOUT = 5;
 
+    public static void main(String[] args) throws Exception {
+        final ManageAttributes manageAttributes = new ManageAttributes();
+        try {
+            manageAttributes.crudAttributes();
+        } finally {
+            manageAttributes.terminate();
+        }
+    }
+
     public void crudAttributes() throws InterruptedException, ExecutionException, TimeoutException {
         LOGGER.info("Starting: {}()", Thread.currentThread().getStackTrace()[1].getMethodName());
 
@@ -72,7 +82,7 @@ public class ManageAttributes extends ExamplesBase {
 
         final Twin twin = client.twin();
         twin.create(thing).get(TIMEOUT, SECONDS);
-        final TwinThingHandle thingHandle = twin.forId(thingId);
+        final TwinThingHandle thingHandle = twin.forId(ThingId.of(thingId));
 
         thingHandle.putAttribute(ATTRIBUTE_JSON_POINTER1, NEW_ATTRIBUTE_JSON_VALUE)
                 .thenCompose(aVoid -> thingHandle.retrieve())
@@ -83,14 +93,5 @@ public class ManageAttributes extends ExamplesBase {
                         thing2 -> LOGGER.info("RETRIEVED thing after attributes where deleted is {}",
                                 thing2.toJsonString()))
                 .get(5, TimeUnit.SECONDS);
-    }
-
-    public static void main(String[] args) throws Exception {
-        final ManageAttributes manageAttributes = new ManageAttributes();
-        try {
-            manageAttributes.crudAttributes();
-        } finally {
-            manageAttributes.terminate();
-        }
     }
 }

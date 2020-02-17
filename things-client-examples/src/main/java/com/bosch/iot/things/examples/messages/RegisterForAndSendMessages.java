@@ -26,8 +26,6 @@
  */
 package com.bosch.iot.things.examples.messages;
 
-import static org.eclipse.ditto.model.base.auth.AuthorizationModelFactory.newAuthSubject;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -36,24 +34,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.live.LiveFeatureHandle;
+import org.eclipse.ditto.client.live.LiveThingHandle;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonValue;
-import org.eclipse.ditto.model.things.Permission;
 import org.eclipse.ditto.model.things.Thing;
-import org.eclipse.ditto.model.things.ThingsModelFactory;
+import org.eclipse.ditto.model.things.ThingId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.live.LiveFeatureHandle;
-import com.bosch.iot.things.clientapi.live.LiveThingHandle;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 import com.bosch.iot.things.examples.common.model.ExampleUser;
 
 
 /**
- * This examples shows the various possibilities that the {@code ThingsClient} offers to register handlers for {@link
+ * This examples shows the various possibilities that the {@code DittoClient} offers to register handlers for {@link
  * org.eclipse.ditto.model.messages.Message}s being sent to/from your {@code Thing}s, and shows how you can send such
- * {@code Message}s using the {@code ThingsClient}. NOTE: Make sure to invoke {@code
+ * {@code Message}s using the {@code DittoClient}. NOTE: Make sure to invoke {@code
  * ThingsClient.twin().startConsumption()} once after all message handlers are registered to start receiving events.
  */
 public final class RegisterForAndSendMessages extends ExamplesBase {
@@ -75,22 +72,18 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
 
         fromThingId = generateRandomThingId("fromThingId_");
         LOGGER.info("Creating thing {} as message source.", fromThingId);
-        client.twin().create(fromThingId)
+        client.twin().create(ThingId.of(fromThingId))
                 .thenCompose(created -> {
                     final Thing updated = created.toBuilder()
-                            .setPermissions(newAuthSubject(clientId), ThingsModelFactory.allPermissions())
-                            .setPermissions(newAuthSubject(anotherClientId), Permission.WRITE)
                             .build();
                     return client.twin().update(updated);
                 }).get(10, TimeUnit.SECONDS);
 
         toThingId = generateRandomThingId("toThingId_");
         LOGGER.info("Creating thing {} as message sink.", toThingId);
-        client.twin().create(toThingId)
+        client.twin().create(ThingId.of(toThingId))
                 .thenCompose(created -> {
                     final Thing updated = created.toBuilder()
-                            .setPermissions(newAuthSubject(clientId), ThingsModelFactory.allPermissions())
-                            .setPermissions(newAuthSubject(anotherClientId), Permission.WRITE)
                             .build();
                     return client.twin().update(updated);
                 }).get(10, TimeUnit.SECONDS);
@@ -99,6 +92,16 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         client2.live().startConsumption().get(10, TimeUnit.SECONDS);
 
         countDownLatch = new CountDownLatch(17);
+    }
+
+    public static void main(final String... args) throws Exception {
+        final RegisterForAndSendMessages registerForAndSendMessages = new RegisterForAndSendMessages();
+        try {
+            registerForAndSendMessages.registerForMessages();
+            registerForAndSendMessages.sendMessages();
+        } finally {
+            registerForAndSendMessages.destroy();
+        }
     }
 
     /**
@@ -132,7 +135,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         });
 
 
-        final LiveThingHandle fromThingHandle = client.live().forId(fromThingId);
+        final LiveThingHandle fromThingHandle = client.live().forId(ThingId.of(fromThingId));
 
         /* Register for *all* messages of a *specific* thing and provide payload as String */
         fromThingHandle.registerForMessage(MY_THING_STRING_MESSAGE, "*", String.class, message -> {
@@ -189,14 +192,14 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
     public void sendMessages() {
         /* Send a message *from* a thing with the given subject but without any payload */
         client2.live().message()
-                .from(fromThingId)
+                .from(ThingId.of(fromThingId))
                 .subject("some.arbitrary.subject")
                 .send();
 
         /* Send a message *from* a feature with the given subject but without any payload */
         //does not arrive
         client2.live().message()
-                .from(fromThingId)
+                .from(ThingId.of(fromThingId))
                 .featureId("sendFromThisFeature")
                 .subject("justWantToLetYouKnow")
                 .send();
@@ -204,7 +207,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         /* Send a message *to* a thing with the given subject and text payload */
         /* We won't receive this message because we send it to another Thing Client.*/
         client2.live().message()
-                .to(toThingId)
+                .to(ThingId.of(toThingId))
                 .subject("monitoring.building.fireAlert")
                 .payload("Roof is on fire")
                 .contentType("text/plain")
@@ -212,7 +215,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
 
         /* Send a message *from* a feature with the given subject and json payload */
         client2.live().message()
-                .from(toThingId)
+                .from(ThingId.of(toThingId))
                 .featureId("smokeDetector")
                 .subject("jsonMessage")
                 .payload(JsonFactory.readFrom("{\"action\" : \"call fire department\"}"))
@@ -221,21 +224,21 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
 
         /* Send a message *to* a feature with the given subject and raw payload */
         client2.live().message()
-                .from(fromThingId)
+                .from(ThingId.of(fromThingId))
                 .featureId("smokeDetector")
                 .subject("rawMessage")
                 .payload(ByteBuffer.wrap("foo".getBytes(StandardCharsets.UTF_8)))
                 .contentType("application/octet-stream")
                 .send();
 
-        final LiveThingHandle thingHandle = client2.live().forId(toThingId);
+        final LiveThingHandle thingHandle = client2.live().forId(ThingId.of(toThingId));
         /* Send a message *to* a thing (id already defined by the ThingHandle) with the given subject but without any payload */
         thingHandle.message()
                 .to()
                 .subject("somesubject")
                 .send();
 
-        final LiveFeatureHandle featureHandle = client2.live().forFeature(fromThingId, "smokeDetector");
+        final LiveFeatureHandle featureHandle = client2.live().forFeature(ThingId.of(fromThingId), "smokeDetector");
         /* Send a message *from* a feature with the given subject and text payload */
         featureHandle.message()
                 .from()
@@ -250,7 +253,7 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         /* Send a message *from* a thing with the given subject and a custom payload type */
         client2.live()
                 .message()
-                .from(fromThingId)
+                .from(ThingId.of(fromThingId))
                 .subject("example.user.created")
                 .payload(new ExampleUser("karl", "karl@bosch.com"))
                 .contentType(ExampleUser.USER_CUSTOM_CONTENT_TYPE)
@@ -261,15 +264,5 @@ public final class RegisterForAndSendMessages extends ExamplesBase {
         boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
         LOGGER.info("All messages received: {}", allMessagesReceived);
         terminate();
-    }
-
-    public static void main(final String... args) throws Exception {
-        final RegisterForAndSendMessages registerForAndSendMessages = new RegisterForAndSendMessages();
-        try {
-            registerForAndSendMessages.registerForMessages();
-            registerForAndSendMessages.sendMessages();
-        } finally {
-            registerForAndSendMessages.destroy();
-        }
     }
 }

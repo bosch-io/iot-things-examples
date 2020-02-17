@@ -26,30 +26,27 @@
  */
 package com.bosch.iot.things.examples.changes;
 
-import static org.eclipse.ditto.model.things.ThingsModelFactory.allPermissions;
-
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.ditto.client.changes.ChangeAction;
+import org.eclipse.ditto.client.management.ThingHandle;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
-import org.eclipse.ditto.model.base.auth.AuthorizationModelFactory;
 import org.eclipse.ditto.model.things.Thing;
+import org.eclipse.ditto.model.things.ThingId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.clientapi.things.ChangeAction;
-import com.bosch.iot.things.clientapi.things.ThingHandle;
 import com.bosch.iot.things.examples.common.ExamplesBase;
 
 /**
- * This example shows the various possibilities that the {@code ThingsClient} offers for registering handlers to be
- * informed about {@link com.bosch.iot.things.clientapi.things.ThingChange}s and {@link
- * com.bosch.iot.things.clientapi.things.Change}s of your {@code Thing}s. NOTE: Make sure to invoke {@code
- * ThingsClient.twin().startConsumption()} once after all handlers are registered to start receiving events.
+ * This example shows the various possibilities that the {@code DittoClient} offers for registering handlers to be
+ * informed about {@link org.eclipse.ditto.client.changes.Change}s of your {@code Thing}s. NOTE: Make sure to invoke {@code
+ * DittoClient.twin().startConsumption()} once after all handlers are registered to start receiving events.
  */
 public final class RegisterForChanges extends ExamplesBase {
 
@@ -66,6 +63,18 @@ public final class RegisterForChanges extends ExamplesBase {
         this.countDownLatch = new CountDownLatch(2);
     }
 
+    public static void main(final String... args) throws Exception {
+        final RegisterForChanges registerForChanges = new RegisterForChanges();
+        try {
+            registerForChanges.registerForThingChanges();
+            registerForChanges.registerForThingChangesWithDeregistration();
+
+            registerForChanges.createThing();
+        } finally {
+            registerForChanges.destroy();
+        }
+    }
+
     /**
      * Register for {@code ThingChange}s.
      */
@@ -77,14 +86,15 @@ public final class RegisterForChanges extends ExamplesBase {
         });
 
         /* Register for *all* change events of a *specific* thing */
-        myThing.registerForThingChanges(MY_THING, change -> LOGGER.info("My Thing: ThingChange received: {}", change));
+        client.twin()
+                .registerForThingChanges(MY_THING, change -> LOGGER.info("My Thing: ThingChange received: {}", change));
     }
 
     /**
      * Register for {@code ThingChange}s and deregister after the created-event has been retrieved.
      */
     public void registerForThingChangesWithDeregistration() {
-        final ThingHandle thingHandle = client.twin().forId(thingId);
+        final ThingHandle thingHandle = client.twin().forId(ThingId.of(thingId));
 
         /* Register for *all* change events of a *specific* thing */
         LOGGER.info("RegistrationId: {}", registrationId);
@@ -100,13 +110,9 @@ public final class RegisterForChanges extends ExamplesBase {
     }
 
     public void createThing() throws InterruptedException, ExecutionException, TimeoutException {
-        LOGGER.info("Create thing {} and set required permissions.", thingId);
+        LOGGER.info("Create thing {}.", thingId);
         final Thing thing = Thing.newBuilder()
-                .setId(thingId)
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(clientId), allPermissions())
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherClientId), allPermissions())
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(userId), allPermissions())
-                .setPermissions(AuthorizationModelFactory.newAuthSubject(anotherUserId), allPermissions())
+                .setId(ThingId.of(thingId))
                 .build();
         client2.twin().create(thing)
                 .thenCompose(createdThing -> {
@@ -121,17 +127,5 @@ public final class RegisterForChanges extends ExamplesBase {
         boolean allMessagesReceived = countDownLatch.await(10, TimeUnit.SECONDS);
         LOGGER.info("All changes received: {}", allMessagesReceived);
         terminate();
-    }
-
-    public static void main(final String... args) throws Exception {
-        final RegisterForChanges registerForChanges = new RegisterForChanges();
-        try {
-            registerForChanges.registerForThingChanges();
-            registerForChanges.registerForThingChangesWithDeregistration();
-
-            registerForChanges.createThing();
-        } finally {
-            registerForChanges.destroy();
-        }
     }
 }

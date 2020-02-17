@@ -32,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.Properties;
@@ -46,28 +45,28 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.eclipse.ditto.client.DittoClient;
+import org.eclipse.ditto.client.DittoClients;
+import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationConfiguration;
+import org.eclipse.ditto.client.configuration.MessagingConfiguration;
+import org.eclipse.ditto.client.configuration.ProxyConfiguration;
+import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
+import org.eclipse.ditto.client.live.internal.MessageSerializerFactory;
+import org.eclipse.ditto.client.live.messages.MessageSerializerRegistry;
+import org.eclipse.ditto.client.live.messages.MessageSerializers;
+import org.eclipse.ditto.client.management.ThingHandle;
+import org.eclipse.ditto.client.messaging.AuthenticationProviders;
+import org.eclipse.ditto.client.messaging.MessagingProvider;
+import org.eclipse.ditto.client.messaging.MessagingProviders;
+import org.eclipse.ditto.client.twin.Twin;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bosch.iot.things.client.ThingsClientFactory;
-import com.bosch.iot.things.client.configuration.CommonConfiguration;
-import com.bosch.iot.things.client.configuration.CredentialsAuthenticationConfiguration;
-import com.bosch.iot.things.client.configuration.MessageSerializerConfiguration;
-import com.bosch.iot.things.client.configuration.ProxyConfiguration;
-import com.bosch.iot.things.client.configuration.PublicKeyAuthenticationConfiguration;
-import com.bosch.iot.things.client.messages.MessageSerializerRegistry;
-import com.bosch.iot.things.client.messages.MessageSerializers;
-import com.bosch.iot.things.client.messaging.MessagingProviders;
-import com.bosch.iot.things.client.messaging.ThingsWsMessagingProviderConfiguration;
-import com.bosch.iot.things.clientapi.ThingsClient;
-import com.bosch.iot.things.clientapi.things.ThingHandle;
-import com.bosch.iot.things.clientapi.twin.Twin;
-import com.bosch.iot.things.clientapi.twin.TwinFeatureHandle;
 import com.bosch.iot.things.examples.common.model.ExampleUser;
 
 /**
- * Instantiates an {@link ThingsClient} and connects to the Bosch IoT Things service. It also initializes {@link Twin}
+ * Instantiates an {@link DittoClient} and connects to the Bosch IoT Things service. It also initializes {@link Twin}
  * and {@link ThingHandle} instances for reuse in tests that extend this base class.
  */
 public abstract class ExamplesBase {
@@ -75,38 +74,24 @@ public abstract class ExamplesBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExamplesBase.class);
     private static final String CONFIG_PROPERTIES_FILE = "config.properties";
 
-    protected final String solutionId;
-    protected final String apiToken;
     protected final String namespace;
 
-    protected final String endpoint_ws;
+    protected final String endpointWs;
 
     protected final String clientId;
     protected final String anotherClientId;
-
-    protected final String username;
-    protected final String userId;
-    protected final String password;
-
-    protected final String anotherUsername;
-    protected final String anotherUserId;
-    protected final String anotherPassword;
+    protected final String clientSecret;
+    protected final String anotherClientSecret;
+    protected final String tokenEndpoint;
 
     protected final String proxyHost;
     protected final String proxyPort;
     protected final String proxyPrincipal;
     protected final String proxyPassword;
-
-    private URL keystoreLocation;
-    private String keystoreAlias;
-    private String keystorePassword;
-    private String keystoreAliasPassword;
-
-    protected final ThingsClient client;
-    protected final ThingsClient client2;
+    protected final DittoClient client;
+    protected final DittoClient client2;
     protected final Twin twin;
     protected final String myThingId;
-    protected final ThingHandle<TwinFeatureHandle> myThing;
 
     /**
      * Constructor.
@@ -116,49 +101,30 @@ public abstract class ExamplesBase {
         //Read config.properties
         final Properties props = loadConfigurationFromFile();
 
-        solutionId = props.getProperty("solutionId");
-        apiToken = props.getProperty("apiToken");
         namespace = props.getProperty("namespace");
 
-        endpoint_ws = props.getProperty("endpointWs");
+        endpointWs = props.getProperty("endpointWs");
 
-        clientId = solutionId + ":example";
-        anotherClientId = solutionId + ":example2";
-
-        final String keystoreLocationProperty = props.getProperty("keystoreLocation");
-        try {
-            this.keystoreLocation = getClass().getClassLoader().getResource(keystoreLocationProperty);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    "The provided keystoreLocation '" + keystoreLocationProperty + "' is not valid: " + e.getMessage());
-        }
-        keystorePassword = props.getProperty("keystorePassword");
-        keystoreAlias = props.getProperty("keystoreAlias");
-        keystoreAliasPassword = props.getProperty("keystoreAliasPassword");
-
-        username = props.getProperty("username");
-        userId = props.getProperty("userId");
-        password = props.getProperty("password");
-        anotherUsername = props.getProperty("anotherUsername");
-        anotherUserId = props.getProperty("anotherUserId");
-        anotherPassword = props.getProperty("anotherPassword");
+        clientId = props.getProperty("clientId");
+        anotherClientId = props.getProperty("anotherClientId");
+        tokenEndpoint = props.getProperty("tokenEndpoint");
+        clientSecret = props.getProperty("clientSecret");
+        anotherClientSecret = props.getProperty("anotherClientSecret");
 
         proxyHost = props.getProperty("proxyHost");
         proxyPort = props.getProperty("proxyPort");
         proxyPrincipal = props.getProperty("proxyPrincipal");
         proxyPassword = props.getProperty("proxyPassword");
 
-        final CommonConfiguration twinConfiguration = createTwinConfiguration(username, password);
-        final CommonConfiguration twinConfiguration2 = createTwinConfiguration(anotherUsername, anotherPassword);
+        LOGGER.info("Creating Ditto Client ...");
 
-        final CommonConfiguration liveConfiguration = createLiveConfiguration(clientId);
-        final CommonConfiguration liveConfiguration2 = createLiveConfiguration(anotherClientId);
-
-        LOGGER.info("Creating Things Client ...");
-
-        // Create a new ThingsClient object to start interacting with IoT Things service
-        client = ThingsClientFactory.newInstance(twinConfiguration, liveConfiguration);
-        client2 = ThingsClientFactory.newInstance(twinConfiguration2, liveConfiguration2);
+        // Create a new DittoClient object to start interacting with IoT Things service
+        client = DittoClients.newInstance(createTwinConfiguration(clientId, clientSecret, tokenEndpoint, endpointWs),
+                createTwinConfiguration(clientId, clientSecret, tokenEndpoint, endpointWs),
+                setupCustomMessageSerializer());
+        client2 = DittoClients.newInstance(createTwinConfiguration(clientId, clientSecret, tokenEndpoint, endpointWs),
+                createTwinConfiguration(clientId, clientSecret, tokenEndpoint, endpointWs),
+                setupCustomMessageSerializer());
 
         // Create a new twin client for managing things
         twin = client.twin();
@@ -167,11 +133,10 @@ public abstract class ExamplesBase {
             // and start consuming events
             twin.startConsumption().get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new IllegalStateException("Error creating Things Client.", e);
+            throw new IllegalStateException("Error creating Ditto Client.", e);
         }
 
         this.myThingId = namespace + ":myThing_" + UUID.randomUUID().toString();
-        this.myThing = twin.forId(myThingId);
     }
 
     private Properties loadConfigurationFromFile() {
@@ -186,78 +151,38 @@ public abstract class ExamplesBase {
         return props;
     }
 
-    private CommonConfiguration createTwinConfiguration(final String userName, final String password) {
+    private MessagingProvider createTwinConfiguration(final String clientId, final String clientSecret,
+            final String tokenEndpoint, final String endpointWs) {
 
         // Build a credential authentication configuration if you want to directly connect to the IoT Things service
         // via its websocket channel.
-        final CredentialsAuthenticationConfiguration credentialsAuthenticationConfiguration =
-                CredentialsAuthenticationConfiguration
+        final ClientCredentialsAuthenticationConfiguration.Builder clientCredentialsAuthenticationConfigurationBuilder =
+                ClientCredentialsAuthenticationConfiguration
                         .newBuilder()
-                        .username(userName)
-                        .password(password)
-                        .build();
-
-
-        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
-                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(credentialsAuthenticationConfiguration);
-
-        if (endpoint_ws != null) {
-            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
-        }
-
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
-                thingsWsMessagingProviderConfigurationBuilder.build();
-
-        final CommonConfiguration.OptionalConfigurationStep configuration =
-                ThingsClientFactory.configurationBuilder()
-                        .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration)
-                        .schemaVersion(JsonSchemaVersion.V_1);
-
-        proxyConfiguration().ifPresent(configuration::proxyConfiguration);
-
-        return configuration.build();
-    }
-
-    private CommonConfiguration createLiveConfiguration(final String clientId) {
-
-        // Build a key-based authentication configuration for communicating with IoT Things service and with live
-        final PublicKeyAuthenticationConfiguration publicKeyAuthenticationConfiguration =
-                PublicKeyAuthenticationConfiguration.newBuilder()
                         .clientId(clientId)
-                        .keyStoreLocation(keystoreLocation)
-                        .keyStorePassword(keystorePassword)
-                        .alias(keystoreAlias)
-                        .aliasPassword(keystoreAliasPassword)
-                        .build();
+                        .clientSecret(clientSecret)
+                        .tokenEndpoint(tokenEndpoint);
 
-        final ThingsWsMessagingProviderConfiguration.ThingsWsMessagingProviderConfigurationBuilder
-                thingsWsMessagingProviderConfigurationBuilder = MessagingProviders
-                .thingsWebsocketProviderBuilder()
-                .authenticationConfiguration(publicKeyAuthenticationConfiguration);
 
-        if (endpoint_ws != null) {
-            thingsWsMessagingProviderConfigurationBuilder.endpoint(endpoint_ws);
+        final MessagingConfiguration.Builder messagingProviderConfigurationBuilder = WebSocketMessagingConfiguration.
+                newBuilder()
+                .jsonSchemaVersion(JsonSchemaVersion.V_2)
+                .reconnectEnabled(false);
+
+        if (endpointWs != null) {
+            messagingProviderConfigurationBuilder.endpoint(endpointWs);
         }
 
-        final ThingsWsMessagingProviderConfiguration thingsWsMessagingProviderConfiguration =
-                thingsWsMessagingProviderConfigurationBuilder.build();
+        proxyConfiguration().ifPresent(messagingProviderConfigurationBuilder::proxyConfiguration);
+        proxyConfiguration().ifPresent(clientCredentialsAuthenticationConfigurationBuilder::proxyConfiguration);
 
-        final MessageSerializerConfiguration serializerConfiguration = MessageSerializerConfiguration.newInstance();
-        setupCustomMessageSerializer(serializerConfiguration);
+        MessagingProvider messagingProvider =
+                MessagingProviders.webSocket(messagingProviderConfigurationBuilder.build(),
+                        AuthenticationProviders.clientCredentials(
+                                (ClientCredentialsAuthenticationConfiguration) clientCredentialsAuthenticationConfigurationBuilder
+                                        .build()));
 
-        final CommonConfiguration.OptionalConfigurationStep configuration =
-                ThingsClientFactory.configurationBuilder()
-                        .apiToken(apiToken)
-                        .providerConfiguration(thingsWsMessagingProviderConfiguration)
-                        .schemaVersion(JsonSchemaVersion.V_1)
-                        .serializerConfiguration(serializerConfiguration);
-
-        proxyConfiguration().ifPresent(configuration::proxyConfiguration);
-
-        return configuration.build();
+        return messagingProvider;
     }
 
     private Optional<ProxyConfiguration> proxyConfiguration() {
@@ -285,10 +210,8 @@ public abstract class ExamplesBase {
     /**
      * Sets up a serializer/deserializer for the {@link ExampleUser} model class which uses JAXB in order to serialize
      * and deserialize messages which should directly be mapped to this type.
-     *
-     * @param serializerConfiguration the initial MessageSerializerConfiguration to adjust.
      */
-    private void setupCustomMessageSerializer(final MessageSerializerConfiguration serializerConfiguration) {
+    private MessageSerializerRegistry setupCustomMessageSerializer() {
         final JAXBContext jaxbContext;
         try {
             jaxbContext = JAXBContext.newInstance(ExampleUser.class);
@@ -296,7 +219,8 @@ public abstract class ExamplesBase {
             throw new RuntimeException("Could not setup JAXBContext", e);
         }
 
-        final MessageSerializerRegistry serializerRegistry = serializerConfiguration.getMessageSerializerRegistry();
+        final MessageSerializerRegistry serializerRegistry =
+                MessageSerializerFactory.initializeDefaultSerializerRegistry();
 
         serializerRegistry.registerMessageSerializer(
                 MessageSerializers.of(ExampleUser.USER_CUSTOM_CONTENT_TYPE, ExampleUser.class, "*",
@@ -319,6 +243,7 @@ public abstract class ExamplesBase {
                                 throw new RuntimeException("Could not deserialize", e);
                             }
                         }));
+        return serializerRegistry;
     }
 
     /**

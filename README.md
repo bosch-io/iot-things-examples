@@ -30,7 +30,7 @@
 
 This repository contains examples for using the Bosch IoT Things service in the cloud.
 
-Bosch IoT Things is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch Software Innovations](https://www.bosch-si.com/corporate/home/homepage.html).
+Bosch IoT Things is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch.IO](https://bosch.io/) GmbH.
 
 The Things service is *based on* and *powered by* the open source project Eclipse Ditto https://www.eclipse.org/ditto/.
 

@@ -44,7 +44,6 @@
         <module>mini-device-integration</module>
         <module>historian</module>
         <module>inventory-browser</module>
-        <module>things-client-examples</module>
         <module>things-http-java-examples</module>
         <module>things-batch-importer</module>
         <module>octopus-telemetry</module>
@@ -64,9 +63,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.bosch.iot.things.client</groupId>
-                <artifactId>things-client</artifactId>
-                <version>${things-client.version}</version>
+                <groupId>org.eclipse.ditto</groupId>
+                <artifactId>ditto-client</artifactId>
+                <version>0-SNAPSHOT</version>
             </dependency>
 
             <!--Logging-->

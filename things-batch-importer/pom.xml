@@ -45,7 +45,7 @@
     <properties>
         <java.version>1.8</java.version>
 
-        <ditto.version>0.8.0</ditto.version>
+        <ditto.version>1.0.0</ditto.version>
         <things-client.version>4.0.0</things-client.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>

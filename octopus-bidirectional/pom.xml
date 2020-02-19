@@ -43,10 +43,6 @@
     <description>Registers a device at Bosch IoT Hub and Bosch IoT Things</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.bosch.iot.things.client</groupId>
-            <artifactId>things-client</artifactId>
-        </dependency>
         <!--Logging-->
         <dependency>
             <groupId>org.slf4j</groupId>

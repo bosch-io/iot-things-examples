@@ -94,10 +94,6 @@ This Node.js based example shows how to collect historic data in an InfluxDB tim
 
 With this tool, you can upload a large number things into your cloud service instance at once. The example uses the things-client for uploading the things from a local file.
 
-#### [things-client-examples](things-client-examples/)
-
-Bosch IoT Things provides a Java based client, which you can use within your applications. This example shows how to use the things-client.
-
 #### [things-http-java-examples](things-http-java-examples/)
 
 This example shows how to use the HTTP API within Java using the Signature Authentication.

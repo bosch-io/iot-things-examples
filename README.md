@@ -14,7 +14,6 @@
         - [historian](#historian)
         - [historian-influxdb](#historian-influxdb)
         - [things-batch-importer](#things-batch-importer)
-        - [things-client-examples](#things-client-examples)
         - [things-http-java-examples](#things-http-java-examples)
         - [http-forwarder](#http-forwarder)
     - [Device related](#Device-related)

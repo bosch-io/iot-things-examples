@@ -30,10 +30,15 @@
 export interface Config {
   websocketBaseUrl: string,
   httpBaseUrl: string,
-  httpHeaders: [string],
-  subject: string,
-  username: string,
-  password: string,
   thingId: string,
-  policyId: string
+  policyId: string,
+  oauth: OAuthConfig
+}
+
+export interface OAuthConfig {
+  host: string,
+  clientId: string,
+  clientSecret: string,
+  scope: string,
+  subjectIssuer: string
 }

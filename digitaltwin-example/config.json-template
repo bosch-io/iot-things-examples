@@ -16,7 +16,7 @@
     "suiteProvisioningHttpBaseUrl": "https://deviceprovisioning.eu-1.bosch-iot-suite.com",
     "serviceInstanceId": "### your Suite for Asset Communication service instance id ###",
     "thingsServiceInstanceId": "### your Things service instance of of your Suite for Asset Communication subscription ###",
-    "hubServiceInstanceId": "### your Hub service instance of of your Suite for Asset Communication subscription ###",
+    "hubTenantId": "### your Hub tenant of of your Suite for Asset Communication subscription ###",
     "hubDevicePassword": "### your-favored-hub-device-password ###",
     "cleanup": {
       "hubDeviceRegistryHttpBaseUrl": "https://manage.bosch-iot-hub.com"

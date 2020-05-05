@@ -31,7 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +47,7 @@ import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationCon
 import org.eclipse.ditto.client.configuration.MessagingConfiguration;
 import org.eclipse.ditto.client.configuration.ProxyConfiguration;
 import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
+import org.eclipse.ditto.client.messaging.AuthenticationProvider;
 import org.eclipse.ditto.client.messaging.AuthenticationProviders;
 import org.eclipse.ditto.client.messaging.MessagingProvider;
 import org.eclipse.ditto.client.messaging.MessagingProviders;
@@ -64,6 +65,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.BasicDBObject;
+import com.neovisionaries.ws.client.WebSocket;
 
 
 /**
@@ -86,11 +88,12 @@ public class Collector implements Runnable {
     /**
      * Collect list of individual property changes
      */
-    private static void collectChanges(List target, String thingId, String featureId, JsonPointer path,
-            JsonValue value) {
+    private static void collectChanges(
+            final List target, final String thingId, final String featureId, final JsonPointer path,
+            final JsonValue value) {
         if (value.isObject()) {
             // on Object recursively collect all individual properties with concatenated property path
-            JsonObject obj = value.asObject();
+            final JsonObject obj = value.asObject();
             obj.forEach(c -> {
                 collectChanges(target, thingId, featureId, path.addLeaf(c.getKey()), c.getValue());
             });
@@ -105,16 +108,16 @@ public class Collector implements Runnable {
      * For primitive types these are objects of type Integer, Long, Double, Boolean or String. Arrays are returned as
      * Object[] and JsonObjects as Map.
      */
-    private static Object getJavaValue(JsonValue v) {
+    private static Object getJavaValue(final JsonValue v) {
         if (v.isNull()) {
             return null;
         } else if (v.isNumber()) {
             try {
                 return v.asInt();
-            } catch (NumberFormatException ex1) {
+            } catch (final NumberFormatException ex1) {
                 try {
                     return v.asLong();
-                } catch (NumberFormatException ex2) {
+                } catch (final NumberFormatException ex2) {
                     return v.asDouble();
                 }
             }
@@ -123,11 +126,11 @@ public class Collector implements Runnable {
         } else if (v.isString()) {
             return v.asString();
         } else if (v.isArray()) {
-            JsonArray a = v.asArray();
-            return a.stream().map(w -> getJavaValue(w)).toArray();
+            final JsonArray a = v.asArray();
+            return a.stream().map(Collector::getJavaValue).toArray();
         } else if (v.isObject()) {
-            JsonObject o = v.asObject();
-            Map<String, Object> m = new HashMap<>();
+            final JsonObject o = v.asObject();
+            final Map<String, Object> m = new HashMap<>();
             o.forEach(e -> m.put(e.getKeyName(), getJavaValue(e.getValue())));
             return m;
         } else {
@@ -136,52 +139,48 @@ public class Collector implements Runnable {
         }
     }
 
-    private static DittoClient setupClient() throws RuntimeException {
-        Properties props = new Properties(System.getProperties());
+    private static DittoClient setupClient() {
+        final Properties props = new Properties(System.getProperties());
         try {
             if (new File("config.properties").exists()) {
                 props.load(new FileReader("config.properties"));
             } else {
-                InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
+                final InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
                 props.load(i);
                 i.close();
             }
             LOGGER.info("Used config: {}", props);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
 
-        String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
-        String clientId = props.getProperty("clientId");
-        String tokenEndpoint = props.getProperty("tokenEndpoint");
-        String clientSecret = props.getProperty("clientSecret");
+        final String thingsMessagingEndpointUrl = props.getProperty("thingsMessagingEndpointUrl");
+        final String clientId = props.getProperty("clientId");
+        final String clientSecret = props.getProperty("clientSecret");
+        final String tokenEndpoint = props.getProperty("tokenEndpoint");
 
-        String proxyHost = props.getProperty("http.proxyHost");
-        String proxyPort = props.getProperty("http.proxyPort");
+        final String proxyHost = props.getProperty("http.proxyHost");
+        final String proxyPort = props.getProperty("http.proxyPort");
 
-        ClientCredentialsAuthenticationConfiguration authenticationConfiguration;
+        final ClientCredentialsAuthenticationConfiguration authenticationConfiguration;
         authenticationConfiguration = ClientCredentialsAuthenticationConfiguration.newBuilder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .tokenEndpoint(tokenEndpoint)
                 .build();
+        final AuthenticationProvider<WebSocket> authenticationProvider =
+                AuthenticationProviders.clientCredentials(authenticationConfiguration);
 
-        MessagingConfiguration.Builder providerConfig = WebSocketMessagingConfiguration.newBuilder()
+        final MessagingConfiguration.Builder providerConfig = WebSocketMessagingConfiguration.newBuilder()
                 .endpoint(thingsMessagingEndpointUrl);
-
-
-        MessagingConfiguration provider;
         if (proxyHost != null && proxyPort != null) {
-            provider = providerConfig.proxyConfiguration(ProxyConfiguration.newBuilder().proxyHost(proxyHost).proxyPort(
-                    Integer.parseInt(proxyPort)).build()).build();
-        } else {
-            provider = providerConfig.build();
+            providerConfig.proxyConfiguration(ProxyConfiguration.newBuilder()
+                    .proxyHost(proxyHost)
+                    .proxyPort(Integer.parseInt(proxyPort))
+                    .build());
         }
-
-        MessagingProvider messagingProvider =
-                MessagingProviders.webSocket(provider,
-                        AuthenticationProviders.clientCredentials(
-                                authenticationConfiguration));
+        final MessagingProvider messagingProvider =
+                MessagingProviders.webSocket(providerConfig.build(), authenticationProvider);
 
         return DittoClients.newInstance(messagingProvider);
     }
@@ -194,7 +193,7 @@ public class Collector implements Runnable {
             mongoTemplate.createCollection("history");
         }
 
-        Thread thread = new Thread(this);
+        final Thread thread = new Thread(this);
         thread.start();
 
         LOGGER.info("Historian collector started");
@@ -202,7 +201,7 @@ public class Collector implements Runnable {
 
     @Override
     public void run() {
-        DittoClient client = setupClient();
+        final DittoClient client = setupClient();
 
         client.twin().registerForFeatureChanges("changes", change -> {
             final ChangeAction action = change.getAction();
@@ -210,12 +209,12 @@ public class Collector implements Runnable {
                 LOGGER.debug("Change: {}", change);
 
                 // collect list of individual property changes
-                List<History> target = new LinkedList<>();
+                final List<History> target = new LinkedList<>();
                 collectChanges(target, change.getEntityId().toString(), change.getFeature().getId(),
                         JsonPointer.empty(), change.getValue().get());
 
                 // write them all the the MongoDB
-                target.stream().forEachOrdered(h -> storeHistory(h));
+                target.stream().forEachOrdered(this::storeHistory);
             }
         });
 
@@ -226,17 +225,17 @@ public class Collector implements Runnable {
     /**
      * Write history to the the MongoDB
      */
-    private void storeHistory(History h) {
+    private void storeHistory(final History h) {
         LOGGER.trace("Store history (max {}): {}", h);
 
         // do combined update query: add newest value+timestamp to the array property and slice array if too long
-        String id = h.thingId + "/features/" + h.featureId + h.path;
-        Update update = new Update()
+        final String id = h.thingId + "/features/" + h.featureId + h.path;
+        final Update update = new Update()
                 .push("values",
-                        new BasicDBObject("$each", Arrays.asList(getJavaValue(h.value)))
+                        new BasicDBObject("$each", Collections.singletonList(getJavaValue(h.value)))
                                 .append("$slice", -HISTORY_SIZE))
                 .push("timestamps",
-                        new BasicDBObject("$each", Arrays.asList(h.timestamp))
+                        new BasicDBObject("$each", Collections.singletonList(h.timestamp))
                                 .append("$slice", -HISTORY_SIZE));
 
         // update or create document for this specific property in this thing/feature
@@ -253,7 +252,7 @@ public class Collector implements Runnable {
         private final JsonValue value;
         private final LocalDateTime timestamp;
 
-        public History(String thingId, String featureId, JsonPointer path, JsonValue value, LocalDateTime timestamp) {
+        public History(final String thingId, final String featureId, final JsonPointer path, final JsonValue value, final LocalDateTime timestamp) {
             this.thingId = thingId;
             this.featureId = featureId;
             this.path = path;

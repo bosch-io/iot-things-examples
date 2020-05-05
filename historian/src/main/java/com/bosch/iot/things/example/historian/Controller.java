@@ -30,21 +30,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.net.URI;
-import java.net.URISyntaxException;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,7 +82,7 @@ public class Controller {
         private final Param param;
         private final Map data;
 
-        public HistoricData(Param param, Map data) {
+        public HistoricData(final Param param, final Map data) {
             this.param = param;
             this.data = data;
         }
@@ -104,7 +102,7 @@ public class Controller {
         private final String featureId;
         private final String propertyPath;
 
-        private Param(String thingId, String featureId, String propertyPath) {
+        private Param(final String thingId, final String featureId, final String propertyPath) {
             this.thingId = thingId;
             this.featureId = featureId;
             this.propertyPath = propertyPath;
@@ -123,15 +121,15 @@ public class Controller {
         }
 
         static List<Param> createFromRequest() {
-            HttpServletRequest request =
+            final HttpServletRequest request =
                     ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-            String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            final String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
-            List<String> paths = expandBracketRepeats(fullPath);
+            final List<String> paths = expandBracketRepeats(fullPath);
 
-            List<Param> result = new ArrayList<>();
-            for (String p : paths) {
-                Matcher matcher = PARAM_PATTERN.matcher(p);
+            final List<Param> result = new ArrayList<>();
+            for (final String p : paths) {
+                final Matcher matcher = PARAM_PATTERN.matcher(p);
                 if (!matcher.matches()) {
                     throw new IllegalArgumentException(fullPath);
                 }
@@ -166,20 +164,20 @@ public class Controller {
 
     @RequestMapping("/history/data/**")
     public List<HistoricData> getHistoricData() throws Exception {
-        List<Param> params = Param.createFromRequest();
+        final List<Param> params = Param.createFromRequest();
 
-        List<HistoricData> data = new ArrayList<>();
-        for (Param p : params) {
+        final List<HistoricData> data = new ArrayList<>();
+        for (final Param p : params) {
 
             if (!checkAccess(p.thingId, p.featureId, p.propertyPath)) {
                 LOGGER.info("Property not found or access denied: {}", params);
                 return null;
             }
 
-            String id = p.thingId + "/features/" + p.featureId + "/properties/" + p.propertyPath;
+            final String id = p.thingId + "/features/" + p.featureId + "/properties/" + p.propertyPath;
             LOGGER.debug("Query MongoDB on id: {}", id);
 
-            Map m = mongoTemplate.findById(id, Map.class, "history");
+            final Map m = mongoTemplate.findById(id, Map.class, "history");
             if (m == null) {
                 return null;
             }
@@ -201,11 +199,11 @@ public class Controller {
         return getViewHistory(true);
     }
 
-    public ModelAndView getViewHistory(boolean embedded) throws Exception {
-        List<HistoricData> m = getHistoricData();
-        List<Param> p = Param.createFromRequest();
+    public ModelAndView getViewHistory(final boolean embedded) throws Exception {
+        final List<HistoricData> m = getHistoricData();
+        final List<Param> p = Param.createFromRequest();
 
-        ModelAndView mav = new ModelAndView();
+        final ModelAndView mav = new ModelAndView();
         mav.addObject("params", p);
         mav.addObject("values", m);
 
@@ -220,55 +218,41 @@ public class Controller {
     /**
      * Check access on specific property by doing a callback to the Things service.
      */
-    private boolean checkAccess(String thingId, String featureId, String propertyPath)
-            throws UnsupportedEncodingException, IOException {
-        HttpServletRequest httpReq =
+    private boolean checkAccess(final String thingId, final String featureId, final String propertyPath)
+            throws IOException {
+        final HttpServletRequest httpReq =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        HttpServletResponse httpRes =
+        final HttpServletResponse httpRes =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
 
-        // enforce BASIC auth
-        String auth = httpReq.getHeader("Authorization");
+        final String auth = httpReq.getHeader("Authorization");
         if (auth == null) {
-            httpRes.setHeader("WWW-Authenticate", "BASIC realm=\"Proxy for Bosch IoT Things\"");
+            httpRes.setHeader("WWW-Authenticate", "Bearer realm=\"Proxy for Bosch IoT Things\"");
             httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
 
-        String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") +
+        final String httpid = URLEncoder.encode(thingId, "UTF-8") + "/features/" + URLEncoder.encode(featureId, "UTF-8") +
                 "/properties/" + encodeURIComponent(propertyPath);
-        HttpGet thingsRequest = new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl")
-                + "/api/2/things/" + httpid);
-
-        // fill in apiToken if not provided
-        String apiToken = getConfig().getProperty("apiToken");
-        if (apiToken != null && httpReq.getHeader("x-cr-api-token") == null) {
-            thingsRequest.addHeader("x-cr-api-token", apiToken);
-        }
+        final HttpGet thingsRequest =
+                new HttpGet(getConfig().getProperty("thingsServiceEndpointUrl") + "/api/2/things/" + httpid);
 
         // forward all other Headers to Things service
-        Enumeration<String> headerNames = httpReq.getHeaderNames();
+        final Enumeration<String> headerNames = httpReq.getHeaderNames();
         if (headerNames != null) {
-            final Set<String> headersToIgnore = new HashSet(Arrays.asList(new String[]{"host"}));
+            final Set<String> headersToIgnore = Collections.singleton("host");
             while (headerNames.hasMoreElements()) {
-                String name = headerNames.nextElement();
+                final String name = headerNames.nextElement();
                 if (!headersToIgnore.contains(name)) {
                     thingsRequest.addHeader(name, httpReq.getHeader(name));
                 }
             }
         }
 
-        String username = null;
-        if (auth.toUpperCase().startsWith("BASIC ")) {
-            String userpassDecoded = new String(Base64.getDecoder().decode(auth.substring("BASIC ".length())));
-            username = userpassDecoded.substring(0, userpassDecoded.indexOf(':'));
-        }
-        LOGGER.debug("Callback to Things service: {} - with user {}", thingsRequest, username);
-
-        try (CloseableHttpResponse response = getHttpClient().execute(thingsRequest)) {
+        try (final CloseableHttpResponse response = getHttpClient().execute(thingsRequest)) {
             LOGGER.debug("... retured {}", response.getStatusLine());
 
-            int statusCode = response.getStatusLine().getStatusCode();
+            final int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode < 200 || statusCode > 299) {
                 httpRes.setStatus(statusCode);
                 return false;
@@ -285,13 +269,13 @@ public class Controller {
                 if (new File("config.properties").exists()) {
                     theConfig.load(new FileReader("config.properties"));
                 } else {
-                    InputStream i =
+                    final InputStream i =
                             Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
                     theConfig.load(i);
                     i.close();
                 }
                 LOGGER.info("Used config: {}", theConfig);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -301,33 +285,15 @@ public class Controller {
     private synchronized CloseableHttpClient getHttpClient() {
         if (theHttpClient == null) {
 
-            HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+            final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
-            // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
-            //try {
-            //   SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
-            //   httpClientBuilder.setSSLContext(sslContext);
-            //
-            //   // #### ONLY FOR TEST: Do NOT verify hostname
-            //   SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-            //
-            //   Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-            //           .register("http", PlainConnectionSocketFactory.getSocketFactory())
-            //           .register("https", sslConnectionSocketFactory)
-            //           .build();
-            //   PoolingHttpClientConnectionManager httpClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            //   httpClientBuilder.setConnectionManager(httpClientConnectionManager);
-            //} catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
-            //   LOGGER.error(ex.getMessage(), ex);
-            //}
-
-            Properties config = getConfig();
+            final Properties config = getConfig();
             if (config.getProperty("http.proxyHost") != null) {
                 httpClientBuilder.setProxy(new HttpHost(config.getProperty("http.proxyHost"),
                         Integer.parseInt(config.getProperty("http.proxyPort"))));
             }
             if (config.getProperty("http.proxyUser") != null) {
-                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                final CredentialsProvider credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(
                         new AuthScope(HttpHost.create(getConfig().getProperty("thingsServiceEndpointUrl"))),
                         new UsernamePasswordCredentials(config.getProperty("http.proxyUser"),
@@ -343,10 +309,10 @@ public class Controller {
     /**
      * Expand comma seperated alternatives put in square brackets in a String.
      */
-    private static List<String> expandBracketRepeats(String s) {
-        List<String> result = new ArrayList<>();
+    private static List<String> expandBracketRepeats(final String s) {
+        final List<String> result = new ArrayList<>();
 
-        int p = s.indexOf("[");
+        final int p = s.indexOf("[");
         if (p >= 0) {
             // find matching closing bracket
             int q = p;
@@ -363,17 +329,17 @@ public class Controller {
                 throw new IllegalArgumentException("Matching bracket not found: " + s);
             }
 
-            String prefix = s.substring(0, p);
-            String repeats = s.substring(p + 1, q);
-            String suffix = s.substring(q + 1);
+            final String prefix = s.substring(0, p);
+            final String repeats = s.substring(p + 1, q);
+            final String suffix = s.substring(q + 1);
 
             // first do recursive expand within current bracket pair
-            List<String> expands = expandBracketRepeats(repeats);
+            final List<String> expands = expandBracketRepeats(repeats);
 
             // then expand current bracket pair
-            for (String e : expands) {
-                String[] parts = e.split(",");
-                for (String part : parts) {
+            for (final String e : expands) {
+                final String[] parts = e.split(",");
+                for (final String part : parts) {
                     // expand recursivly to also do expand in suffixes
                     result.addAll(expandBracketRepeats(prefix + part + suffix));
                 }
@@ -386,10 +352,10 @@ public class Controller {
     }
 
     /** Replacement for URLEncoder.encode(s, "UTF-8") with same sementics as JavaScript encodeURIComponent. */
-    private static String encodeURIComponent(String s) {
+    private static String encodeURIComponent(final String s) {
         try {
 			return new URI(null, null, s, null).getRawPath();
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
     }    

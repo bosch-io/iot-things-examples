@@ -29,7 +29,6 @@ package com.bosch.cr.examples.jwt;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -54,7 +53,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.params.HttpParams;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 
@@ -64,20 +62,23 @@ import org.mitre.dsmiley.httpproxy.ProxyServlet;
 @WebServlet("/api/*")
 public class CustomProxyServlet extends ProxyServlet {
 
+    private static final long serialVersionUID = -8637163830288021028L;
+
+    private static final String CONFIG_PROPERTIES = "config.properties";
+
     private CloseableHttpClient httpClient;
     private Properties config;
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
+    public void init(final ServletConfig config) throws ServletException {
         super.init(config);
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // enforce BASIC auth on all requests
-        String auth = req.getHeader("Authorization");
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final String auth = req.getHeader("Authorization");
         if (auth == null) {
-            resp.setHeader("WWW-Authenticate", "BASIC realm=\"Proxy for Bosch IoT Things\"");
+            resp.setHeader("WWW-Authenticate", "Bearer realm=\"Proxy for Bosch IoT Things\"");
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -86,81 +87,71 @@ public class CustomProxyServlet extends ProxyServlet {
     }
 
     @Override
-    protected void copyRequestHeaders(HttpServletRequest req, HttpRequest proxyRequest) {
+    protected void copyRequestHeaders(final HttpServletRequest req, final HttpRequest proxyRequest) {
         super.copyRequestHeaders(req, proxyRequest);
-
-        // submit API Token
-        proxyRequest.addHeader("x-cr-api-token", getConfig().getProperty("apiToken"));
     }
 
     @Override
-    protected String getConfigParam(String key) {
-        switch (key) {
-            case "targetUri":
-                return getConfig().getProperty("thingsServiceEndpointUrl", "https://things.s-apps.de1.bosch-iot-cloud.com") +
-                        "/api";
-            case "log":
-                return getConfig().getProperty("logProxyRequests", "true");
+    protected String getConfigParam(final String key) {
+        if ("targetUri".equals(key)) {
+            return getProperty("thingsServiceEndpointUrl", "https://things.s-apps.de1.bosch-iot-cloud.com") + "/api";
+        } else if ("log".equals(key)) {
+            return getProperty("logProxyRequests", "true");
         }
         return super.getConfigParam(key);
     }
 
     @Override
-    protected HttpClient createHttpClient(HttpParams hcParams) {
-        // use custom httpClient with http-proxy support
+    protected HttpClient createHttpClient() {
         return getHttpClient();
     }
 
-    private synchronized Properties getConfig() {
+    private synchronized String getProperty(final String key, final String defaultValue) {
         if (config == null) {
             try {
                 config = new Properties(System.getProperties());
-                if (new File("config.properties").exists()) {
-                    config.load(new FileReader("config.properties"));
-                } else {
-                    InputStream i =
-                            Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
-                    config.load(i);
-                    i.close();
+                if (new File(CONFIG_PROPERTIES).exists()) {
+                    config.load(new FileReader(CONFIG_PROPERTIES));
                 }
                 System.out.println("Config: " + config);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
-        return config;
+        return config.getProperty(key, defaultValue);
     }
 
     private synchronized CloseableHttpClient getHttpClient() {
         if (httpClient == null) {
             try {
-                HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+                final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
                 // #### ONLY FOR TEST: Trust ANY certificate (self certified, any chain, ...)
-                SSLContext sslContext =
+                final SSLContext sslContext =
                         new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
                 httpClientBuilder.setSSLContext(sslContext);
 
                 // #### ONLY FOR TEST: Do NOT verify hostname
-                SSLConnectionSocketFactory sslConnectionSocketFactory =
+                final SSLConnectionSocketFactory sslConnectionSocketFactory =
                         new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 
-                Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                final Registry<ConnectionSocketFactory> socketFactoryRegistry =
                         RegistryBuilder.<ConnectionSocketFactory>create()
                                 .register("http", PlainConnectionSocketFactory.getSocketFactory())
                                 .register("https", sslConnectionSocketFactory)
                                 .build();
-                PoolingHttpClientConnectionManager httpClientConnectionManager =
+                final PoolingHttpClientConnectionManager httpClientConnectionManager =
                         new PoolingHttpClientConnectionManager(socketFactoryRegistry);
                 httpClientBuilder.setConnectionManager(httpClientConnectionManager);
 
-                if (getConfig().getProperty("http.proxyHost") != null) {
-                    httpClientBuilder.setProxy(new HttpHost(getConfig().getProperty("http.proxyHost"),
-                            Integer.parseInt(getConfig().getProperty("http.proxyPort"))));
+                final String proxyHost = getProperty("http.proxyHost", null);
+                if (proxyHost != null) {
+                    final int proxyPort = Integer.parseInt(getProperty("http.proxyPort", null));
+                    httpClientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
                 }
 
                 httpClient = httpClientBuilder.build();
-            } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
+            } catch (final NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                 throw new RuntimeException(ex);
             }
         }

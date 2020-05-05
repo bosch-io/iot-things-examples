@@ -37,7 +37,7 @@ import { setInterval } from 'timers'
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 const WEBSOCKET_OPTIONS = {
-  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
+  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy) : null,
   headers: {
     ...CONFIG.httpHeaders,
     'Authorization': 'Basic ' + Buffer.from(CONFIG.deviceSimulation.username + ':' + CONFIG.deviceSimulation.password).toString('base64')
@@ -48,7 +48,7 @@ const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
 const THING_ID: string = CONFIG.frontend.thingId
 const THING_ID_PATH = THING_ID.replace(':', '/')
-const HUB_TENANT = CONFIG.provisioning.hubServiceInstanceId
+const HUB_TENANT = CONFIG.provisioning.hubTenantId
 const HUB_DEVICE_ID = THING_ID
 const HUB_DEVICE_AUTH_ID = HUB_DEVICE_ID.replace(':', '_')
 const HUB_DEVICE_PASSWORD = CONFIG.provisioning.hubDevicePassword

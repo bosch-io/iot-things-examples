@@ -36,7 +36,7 @@ import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 const WEBSOCKET_OPTIONS = {
-  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
+  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy) : null,
   headers: {
     ...CONFIG.httpHeaders,
     'Authorization': 'Basic ' + Buffer.from(CONFIG.accessories.username + ':' + CONFIG.accessories.password).toString('base64')

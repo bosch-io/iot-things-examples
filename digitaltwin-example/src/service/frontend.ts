@@ -76,7 +76,7 @@ export class Frontend {
   private async recreateEntities() {
 
     const thing = {
-      definition: "com.bosch.iot.suite.examples.digitaltwin:DigitaltwinExample:1.0.0",
+      definition: 'com.bosch.iot.suite.examples.digitaltwin:DigitaltwinExample:1.0.0',
       attributes: {
         commissioningDate: new Date()
       },
@@ -128,7 +128,7 @@ export class Frontend {
         grant_type: 'client_credentials',
         client_id: CONFIG.provisioning.oauthClientId,
         client_secret: CONFIG.provisioning.oauthClientSecret,
-        scope: `service:iot-hub-prod:${CONFIG.provisioning.hubServiceInstanceId}/full-access service:iot-things-eu-1:${CONFIG.provisioning.thingsServiceInstanceId}/full-access`
+        scope: `service:iot-hub-prod:${CONFIG.provisioning.hubTenantId}/full-access service:iot-things-eu-1:${CONFIG.provisioning.thingsServiceInstanceId}/full-access`
       }
     })
     const accessToken = JSON.parse(r).access_token
@@ -175,13 +175,13 @@ export class Frontend {
     }))
     cleanup.push(() => requestPromise({
       auth: { bearer: accessToken },
-      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/registration/${encodeURIComponent(CONFIG.provisioning.hubServiceInstanceId)}/${encodeURIComponent(THING_ID)}`,
+      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/registration/${encodeURIComponent(CONFIG.provisioning.hubTenantId)}/${encodeURIComponent(THING_ID)}`,
       method: 'DELETE'
     }))
     const hubAuthId = THING_ID.replace(':', '_')
     cleanup.push(() => requestPromise({
       auth: { bearer: accessToken },
-      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/credentials/${encodeURIComponent(CONFIG.provisioning.hubServiceInstanceId)}?auth-id=${encodeURIComponent(hubAuthId)}&type=hashed-password`,
+      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/credentials/${encodeURIComponent(CONFIG.provisioning.hubTenantId)}?auth-id=${encodeURIComponent(hubAuthId)}&type=hashed-password`,
       method: 'DELETE'
     }))
 
@@ -218,7 +218,7 @@ export class Frontend {
     await requestPromise({
       json: true,
       auth: { bearer: accessToken },
-      url: CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices`,
+      url: CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices?skipVorto=true`,
       method: 'POST',
       body: provisioningRequest
     })

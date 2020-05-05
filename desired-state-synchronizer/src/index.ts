@@ -32,15 +32,17 @@ import { Config } from './service/config'
 import { Synchronizer } from './service/synchronizer'
 import { DeviceSimulation } from './service/device-simulation'
 import { Frontend } from './service/frontend'
+import { createAxiosInstance, SuiteAuthService } from './service/suite-auth-service'
 
 async function start(_args: string[]) {
 
-  let config: Config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
+  const config: Config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
+  const suiteAuthService = new SuiteAuthService(config.oauth)
+  const axiosInstance = createAxiosInstance({}, suiteAuthService.createAxiosAdapter())
+  await new Synchronizer(config, suiteAuthService, axiosInstance).start()
+  await new DeviceSimulation(config, suiteAuthService).start()
 
-  await new Synchronizer(config).start()
-  await new DeviceSimulation(config).start()
-
-  await new Frontend(config).start()
+  await new Frontend(config, axiosInstance).start()
 }
 
 start(process.argv.slice(2)).catch(e => console.log(`Start failed: ${e}`))

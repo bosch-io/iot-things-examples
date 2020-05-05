@@ -28,13 +28,11 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import * as NodeWebSocket from 'ws'
-import * as HttpsProxyAgent from 'https-proxy-agent'
-import * as uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { setInterval } from 'timers'
 import { Config } from './config'
-
-const WEBSOCKET_REOPEN_TIMEOUT = 1000
+import { SuiteAuthService } from './suite-auth-service'
 
 /** Simple device simulation that simulates device activity in absence of a real phyiscal device.
  *
@@ -56,27 +54,20 @@ export class DeviceSimulation {
     threshold?: number
   } = {}
 
-  private websocketOptions = {
-    agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
-    headers: {
-      ...this.serviceConfig.httpHeaders,
-      'Authorization': 'Basic ' + new Buffer(this.serviceConfig.username + ':' + this.serviceConfig.password).toString('base64')
-    }
+  constructor(private readonly serviceConfig: Config,
+              private readonly suiteAuthService: SuiteAuthService) {
   }
-
-  constructor(private serviceConfig: Config) { }
 
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
-      console.log(`[DeviceSimulation] start for user ${this.serviceConfig.username}`)
+      console.log(`[DeviceSimulation] starting`)
 
       let pendingAcks: Array<string> = []
 
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`[DeviceSimulation] start timeout; pending acks: ${pendingAcks}`), 10000)
-
-      Helpers.openWebSocket(this.serviceConfig.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
-        (ws) => {
+      this.suiteAuthService.createWebSocket(this.serviceConfig.websocketBaseUrl + '/ws/2',
+        ws => {
           this.ws = ws
 
           // send status values periodically
@@ -107,10 +98,22 @@ export class DeviceSimulation {
             }
           })
 
-          this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-          this.ws.send('START-SEND-LIVE-COMMANDS', (err) => { pendingAcks.push('START-SEND-LIVE-COMMANDS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
-          this.ws.send('START-SEND-LIVE-EVENTS', (err) => { pendingAcks.push('START-SEND-LIVE-EVENTS:ACK'); if (err) console.log(`[DeviceSimulation] websocket send error ${err}`) })
+          this.ws.send('START-SEND-EVENTS', (err) => {
+            pendingAcks.push('START-SEND-EVENTS:ACK')
+            if (err) console.log(`[DeviceSimulation] websocket send error ${err}`)
+          })
+          this.ws.send('START-SEND-MESSAGES', (err) => {
+            pendingAcks.push('START-SEND-MESSAGES:ACK')
+            if (err) console.log(`[DeviceSimulation] websocket send error ${err}`)
+          })
+          this.ws.send('START-SEND-LIVE-COMMANDS', (err) => {
+            pendingAcks.push('START-SEND-LIVE-COMMANDS:ACK')
+            if (err) console.log(`[DeviceSimulation] websocket send error ${err}`)
+          })
+          this.ws.send('START-SEND-LIVE-EVENTS', (err) => {
+            pendingAcks.push('START-SEND-LIVE-EVENTS:ACK')
+            if (err) console.log(`[DeviceSimulation] websocket send error ${err}`)
+          })
         })
     })
   }
@@ -217,7 +220,9 @@ export class DeviceSimulation {
       }
     })
 
-    this.ws!.send(msg.toJSONString(), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
+    this.ws!.send(msg.toJSONString(), (err) => {
+      if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err)
+    })
   }
 
   private async modifyThreshold(namespace, localThingId, newThreshold) {
@@ -234,7 +239,9 @@ export class DeviceSimulation {
     })
     console.log('[DeviceSimulation] confirm with message to path: %s', update.path)
 
-    this.ws!.send(update.toJSONString(), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
+    this.ws!.send(update.toJSONString(), (err) => {
+      if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err)
+    })
   }
 
   private async updateStatus() {
@@ -254,7 +261,9 @@ export class DeviceSimulation {
         headers: { 'response-required': false /*, 'correlation-id': '123'*/ }
       })
 
-      this.ws!.send(JSON.stringify(update), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
+      this.ws!.send(JSON.stringify(update), (err) => {
+        if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err)
+      })
     }
   }
 

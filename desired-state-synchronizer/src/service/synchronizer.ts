@@ -28,13 +28,11 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import * as NodeWebSocket from 'ws'
-import * as HttpsProxyAgent from 'https-proxy-agent'
-import * as requestPromise from 'request-promise-native'
 import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
 import { Config } from './config'
 import { compare as jsonCompare } from 'fast-json-patch'
-
-const WEBSOCKET_REOPEN_TIMEOUT = 5000
+import { SuiteAuthService } from './suite-auth-service'
+import { AxiosInstance } from 'axios'
 
 /**
  * Synchronizer service that supports determining "patches" to reach "desired" state.
@@ -46,61 +44,51 @@ export class Synchronizer {
   private config: Config
   private ws?: NodeWebSocket
 
-  private websocketOptions
-
-  constructor(config: Config) {
+  constructor(config: Config, private readonly suiteAuthService: SuiteAuthService, private readonly axiosInstance: AxiosInstance) {
     this.config = config
-    this.websocketOptions = {
-      agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy || process.env.HTTPS_PROXY) : null,
-      headers: {
-        ...this.config.httpHeaders,
-        'Authorization': 'Basic ' + new Buffer(this.config.username + ':' + this.config.password).toString('base64')
-      }
-    }
   }
 
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
-      console.log(`[Synchronizer] start for user ${this.config.username}`)
+      console.log(`[Synchronizer] starting`)
 
       let pendingAcks: Array<string> = []
 
       // timeout if we cannot start within 10 secs
-      setTimeout(() => reject(`[Synchronizer] start timeout; pending acks: ${pendingAcks}`), 10000)
+      const startTimeout = setTimeout(() => reject(`[Synchronizer] start timeout; pending acks: ${pendingAcks}`), 10000)
+      this.suiteAuthService.createWebSocket(this.config.websocketBaseUrl + '/ws/2', (ws) => {
+        clearTimeout(startTimeout)
+        this.ws = ws
 
-      Helpers.openWebSocket(this.config.websocketBaseUrl + '/ws/2', this.websocketOptions, WEBSOCKET_REOPEN_TIMEOUT,
-        (ws) => {
-          this.ws = ws
-
-          this.ws.on('message', (data) => {
-            const dataString = data.toString()
-            if (dataString.startsWith('{')) {
-              this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
-            } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
-              let i = pendingAcks.indexOf(dataString)
-              if (i > -1) {
-                pendingAcks.splice(i, 1)
-                if (pendingAcks.length === 0) {
-                  console.log(`[Synchronizer] started for user ${this.config.username}`)
-                  resolve()
-                }
-              } else {
-                console.log('[Synchronizer] excessive ACK ignored: ' + data)
+        this.ws.on('message', (data) => {
+          const dataString = data.toString()
+          if (dataString.startsWith('{')) {
+            this.process(new ThingMessage(JSON.parse(dataString) as ThingMessageInfo))
+          } else if (dataString.startsWith('START-SEND-') && dataString.endsWith(':ACK')) {
+            let i = pendingAcks.indexOf(dataString)
+            if (i > -1) {
+              pendingAcks.splice(i, 1)
+              if (pendingAcks.length === 0) {
+                console.log(`[Synchronizer] started`)
+                resolve()
               }
             } else {
-              console.log('[Synchronizer] unprocessed non-json data: ' + data)
+              console.log('[Synchronizer] excessive ACK ignored: ' + data)
             }
-          })
-
-          this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`[Synchronizer] websocket send error ${err}`) })
-          this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[Synchronizer] websocket send error ${err}`) })
+          } else {
+            console.log('[Synchronizer] unprocessed non-json data: ' + data)
+          }
         })
+
+        this.ws.send('START-SEND-EVENTS', (err) => { pendingAcks.push('START-SEND-EVENTS:ACK'); if (err) console.log(`[Synchronizer] websocket send error ${err}`) })
+        this.ws.send('START-SEND-MESSAGES', (err) => { pendingAcks.push('START-SEND-MESSAGES:ACK'); if (err) console.log(`[Synchronizer] websocket send error ${err}`) })
+      })
     })
   }
 
   private async process(m: ThingMessage) {
 
-    if (m.channel === 'live' && m.criterion === 'messages' && m.path === '/outbox/messages/determineDesiredPatch') {
+    if (m.channel === 'live' && m.criterion === 'messages' && m.path === '/inbox/messages/determineDesiredPatch') {
       const input = { ...m.value, thingId: m.thingId }
 
       Helpers.processWithResponse(m, (p) => this.determineDesiredPatch(p), input).then(r => {
@@ -117,15 +105,8 @@ export class Synchronizer {
 
     console.log('[Synchronizer] request determineDesiredPatch received %s', p.thingId)
 
-    let r = requestPromise({
-      url: this.config.httpBaseUrl + '/api/2/things/' + p.thingId + '/features',
-      method: 'GET',
-      json: true,
-      auth: { sendImmediately: true, user: this.config.username, pass: this.config.password },
-      headers: this.config.httpHeaders
-    } as requestPromise.Options)
     try {
-      const features = await r
+      const features = await this.getFeatures(p.thingId)
       // console.log('[Synchronizer] full features: ' + JSON.stringify(features, null, 2))
 
       // build compare objects for each perspective (desired/reported) with same feature ids
@@ -149,9 +130,14 @@ export class Synchronizer {
       return result
     } catch (e) {
       let result = { statusCode: e.statusCode, error: e.error }
-      console.log('[Synchronizer] determineDesiredPatch response error %s', result)
+      console.log('[Synchronizer] determineDesiredPatch response error %s', JSON.stringify(result))
       return result
     }
+  }
+
+  private getFeatures(thingId: string): Promise<any> {
+    return this.axiosInstance.get(`${this.config.httpBaseUrl}/api/2/things/${thingId}/features`)
+      .then(response => response.data)
   }
 
 }

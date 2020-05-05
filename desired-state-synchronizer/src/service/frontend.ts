@@ -27,9 +27,8 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
-import * as requestPromise from 'request-promise-native'
 import { Config } from './config'
-import { Helpers } from './helpers'
+import { AxiosInstance } from 'axios'
 
 /** Example frontend of an IoT application.
  *
@@ -38,25 +37,29 @@ import { Helpers } from './helpers'
 
 export class Frontend {
 
-  private readonly defaultOptions: requestPromise.RequestPromiseOptions = {
-    json: true,
-    auth: { user: this.config.username, pass: this.config.password },
-    headers: this.config.httpHeaders
+  constructor(private readonly config: Config,
+              private readonly axiosInstance: AxiosInstance) {
   }
-
-  constructor(private config: Config) { }
 
   async start() {
     console.log()
-    console.log(`[Frontend] start for user ${this.config.username}`)
+    console.log(`[Frontend] starting`)
 
     await this.recreateEntities()
 
-    setInterval(await (() => this.retrieveDeviceTwinState()), 3000)
-    setInterval(await (() => this.configureThreshold()), 25000)
+    setInterval(() => this.retrieveDeviceTwinState(), 3000)
+    setInterval(() => this.configureThreshold(), 25000)
+  }
+
+  private createSubjects(): { [authSubject: string]: { type: string } } {
+    return this.config.oauth.scope.split(/\s+/g)
+      .map(scp => `${this.config.oauth.subjectIssuer}:${scp}`)
+      .map(authSubject => ({ [authSubject]: { type: 'generated-in-example' } }))
+      .reduce((prev, curr) => ({ ...prev, ...curr }))
   }
 
   private async recreateEntities() {
+    const subjects = this.createSubjects()
 
     const thing = {
       policyId: this.config.policyId,
@@ -64,8 +67,7 @@ export class Frontend {
         Device: {
           definition: ['com.acme.device:D100:2.1.0'],
           properties: {
-            status: {
-            }
+            status: {}
           }
         },
         'Device@desired': {
@@ -82,9 +84,7 @@ export class Frontend {
     const policy = {
       entries: {
         owner: {
-          subjects: {
-            [this.config.subject]: { type: 'any' }
-          },
+          subjects,
           resources: {
             'thing:/': {
               grant: ['READ', 'WRITE'],
@@ -101,9 +101,7 @@ export class Frontend {
           }
         },
         synchronizer: {
-          subjects: {
-            [this.config.subject]: { type: 'any' }
-          },
+          subjects,
           resources: {
             'thing:/features/Device/properties': {
               grant: ['READ'],
@@ -120,9 +118,7 @@ export class Frontend {
           }
         },
         simulation: {
-          subjects: {
-            [this.config.subject]: { type: 'any' }
-          },
+          subjects,
           resources: {
             'thing:/features/Device/properties/status': {
               grant: ['WRITE'],
@@ -141,101 +137,65 @@ export class Frontend {
       }
     }
 
-    let cleanup: Array<() => void> = []
-
-    // delete old Thing / Policy
-
-    cleanup.push(() => {
-      console.log('[Frontend] ...cleanup thing')
-      return requestPromise({
-        ...this.defaultOptions,
-        url: this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId,
-        method: 'DELETE'
+    await Promise.resolve()
+      .then(_ => {
+        console.log('[Frontend] ...cleanup thing')
+        return this.deleteThing(this.config.thingId)
       })
-    })
-    cleanup.push(async () => {
-      console.log('[Frontend] ...cleanup policy')
-      await Helpers.sleep(2000)
-      return requestPromise({
-        ...this.defaultOptions,
-        url: this.config.httpBaseUrl + '/api/2/policies/' + this.config.policyId,
-        method: 'DELETE'
+      .catch(e => console.log(`[Frontend] ignore failed cleanup: ${JSON.stringify(e.error || e)}`))
+      .then(_ => {
+        console.log('[Frontend] ...cleanup policy')
+        return this.deletePolicy(this.config.policyId)
       })
-    })
-
-    console.log('[Frontend] cleanup')
-    await Helpers.processAll(cleanup, '[Frontend] ignore failed cleanup')
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(5000)
+      .catch(e => console.log(`[Frontend] ignore failed cleanup: ${JSON.stringify(e.error || e)}`))
 
     // create Policy
-
     console.log('[Frontend] create policy %s', this.config.policyId)
-    await requestPromise({
-      ...this.defaultOptions,
-      url: this.config.httpBaseUrl + '/api/2/policies/' + this.config.policyId,
-      method: 'PUT',
-      body: policy
-    })
-
-    cleanup.push(() => requestPromise({
-      ...this.defaultOptions,
-      url: this.config.httpBaseUrl + '/api/2/policies/' + this.config.policyId,
-      method: 'DELETE'
-    }))
-
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(2000)
+    await this.createPolicy(this.config.policyId, policy)
 
     // create Thing
-
-    try {
-      console.log('[Frontend] create thing %s', this.config.thingId)
-      await requestPromise({
-        ...this.defaultOptions,
-        url: this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId,
-        method: 'PUT',
-        body: thing
+    await this.createThing(this.config.thingId, thing)
+      .catch(e => {
+        this.deletePolicy(this.config.policyId)
+          .catch(er => console.log(`[Frontend] ignore failed cleanup: ${JSON.stringify(er.error || er)}`))
+        throw e
       })
-    } catch (e) {
-      await Helpers.processAll(cleanup, '[Frontend] ignore failed create/update thing cleanup')
-      throw e
-    }
-
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(10000)
   }
 
-  private async configureThreshold() {
+  private configureThreshold(): Promise<any> {
     let threshold = 18 + Math.random() * 10
 
     console.log(`[Frontend] configureThreshold ${threshold}`)
-    const options = {
-      ...this.defaultOptions,
-      url: this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId
-        + '/features/Device@desired/properties/config/threshold',
-      method: 'PUT',
-      body: threshold
-    }
-    try {
-      await requestPromise(options)
-    } catch (e) {
-      console.log(`[Frontend] configureThreshold failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
-    }
+    return this.axiosInstance.put(this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId
+      + '/features/Device@desired/properties/config/threshold', threshold)
+      .catch(e => console.log(`[Frontend] configureThreshold failed ${e}`))
   }
 
-  private async retrieveDeviceTwinState() {
-    const options = {
-      ...this.defaultOptions,
-      url: this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId + '/features',
-      method: 'GET'
-    }
-    try {
-      const state = await requestPromise(options)
-      console.log(`[Frontend] Thing: ${JSON.stringify(state)}`)
-    } catch (e) {
-      console.log(`[Frontend] retrieveDeviceTwinState failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
-    }
+  private retrieveDeviceTwinState(): Promise<void> {
+    return this.getFeatures(this.config.thingId)
+      .then(thing => console.log(`[Frontend] Thing: ${JSON.stringify(thing)}`))
+      .catch(e => console.log(`[Frontend] retrieveDeviceTwinState failed ${e}`))
+  }
+
+  private deleteThing(thingId: string): Promise<any> {
+    return this.axiosInstance.delete(`${this.config.httpBaseUrl}/api/2/things/${thingId}`)
+  }
+
+  private deletePolicy(policyId: string): Promise<any> {
+    return this.axiosInstance.delete(`${this.config.httpBaseUrl}/api/2/policies/${policyId}`)
+  }
+
+  private createPolicy(policyId: string, policy: any): Promise<any> {
+    return this.axiosInstance.put(`${this.config.httpBaseUrl}/api/2/policies/${policyId}`, policy)
+  }
+
+  private createThing(thingId: string, thing: any): Promise<any> {
+    return this.axiosInstance.put(`${this.config.httpBaseUrl}/api/2/things/${thingId}`, thing)
+  }
+
+  private getFeatures(thingId: string): Promise<any> {
+    return this.axiosInstance.get(`${this.config.httpBaseUrl}/api/2/things/${thingId}/features`)
+      .then(response => response.data)
   }
 
 }

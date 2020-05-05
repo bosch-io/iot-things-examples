@@ -205,8 +205,4 @@ export namespace Helpers {
     })
   }
 
-  export async function sleep(milliseconds): Promise<void> {
-    return new Promise<void>(resolve => setTimeout(resolve, milliseconds))
-  }
-
 }

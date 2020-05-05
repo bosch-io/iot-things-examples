@@ -35,9 +35,9 @@ export default (window.Event = new class {
                                name: "eventbus",
                                store,
                                computed: {
-                                   connection: {
+                                   platform: {
                                        get() {
-                                           return this.$store.getters.getConnection;
+                                           return this.$store.getters.getPlatform;
                                        }
                                    },
                                    selected: {
@@ -49,11 +49,6 @@ export default (window.Event = new class {
                                        get() {
                                            return this.$store.getters.getItems;
                                        }
-                                   },
-                                   suiteAuthActive: {
-                                       get() {
-                                           return this.$store.getters.getSuiteAuthActive;
-                                       }
                                    }
                                }
                            });
@@ -61,44 +56,21 @@ export default (window.Event = new class {
     }
 
     fire(event, data = null) {
-
         if (event === "initSSE") {
-
             // start listening with a little timeout
             let values = Object.values(this.vue.items);
             let thingIds = values.map(element => element.thingId).join(",");
-            switch(this.vue.suiteAuthActive){
-                case true:
-                    this.source = new EventSourcePolyfill(
-                        `${
-                            this.vue.connection.http_endpoint
-                            }/api/2/things?ids=${thingIds}&fields=thingId,policyId,attributes,features,_revision`,
-                        {
-                            headers: {
-                                Authorization: Api.getConfig().headers.Authorization
-                            },
-                            withCredentials: true
-                        }
-                    );
-                break;
-                case false:
-                    this.source = new EventSourcePolyfill(
-                        `${
-                            this.vue.connection.http_endpoint
-                            }/api/2/things?ids=${thingIds}&x-cr-api-token=${
-                            this.vue.connection.api_token
-                            }&fields=thingId,policyId,attributes,features,_revision`,
-                        {
-                            headers: {
-                                Authorization: Api.getConfig().headers.Authorization
-                            },
-                            withCredentials: true
-                        }
-                    );
-                break;
-                default: console.log('Unknown state occurred. Please contact the service team.');
-            }
-
+            this.source = new EventSourcePolyfill(
+              `${
+                this.vue.platform
+              }/api/2/things?ids=${thingIds}&fields=thingId,policyId,attributes,features,_revision`,
+              {
+                  headers: {
+                      Authorization: Api.getConfig().headers.Authorization
+                  },
+                  withCredentials: true
+              }
+            );
             this.source.onmessage = sse => {
                 if (sse.data && sse.data.length > 0) {
                     this.vue.$store.commit("incrementTelemetryCount");

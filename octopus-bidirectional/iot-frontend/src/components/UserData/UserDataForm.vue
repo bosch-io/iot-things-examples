@@ -39,55 +39,15 @@
           <option value="2">Bosch IoT Cloud (BIC)</option>
         </select>
       </div>
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <label class="input-group-text" for="inputGroupSelect02">Authent.</label>
-        </div>
-        <select
-          class="custom-select"
-          id="inputGroupSelect02"
-          @change="onChangeAuthentication($event)"
-        >
-          <option value="1" @select="onChangeAuthentication($event)">OAuth2</option>
-          <option value="2">BasicAuth</option>
-        </select>
-      </div>
 
-      <!-- SuiteAuth Form (Default) -->
-      <div
-        class="m-top-10px"
-        v-for="key in Object.keys(connection)"
-        :key="key"
-        v-show="key !== 'http_endpoint' && key !== 'suiteAuthToken'"
-      >
-        <div :for="key" v-if="suiteAuthActive" v-show="key !== 'username' && key !== 'password' && key !== 'api_token'">
-          <label :for="key">
+      <div class="m-top-10px">
+        <div>
+          <label>
             <small class="grey">
-              <i>{{ key }}:</i>
+              <i>Bearer Token</i>
             </small>
           </label>
-          <input
-            :type="key === 'password' || key === 'client_secret' ? 'password' : 'text'"
-            class="form-control"
-            :id="key"
-            :value="connection[key]"
-            @input="setUserData($event)"
-          >
-        </div>
-        <!-- Basic Auth Form -->
-        <div :for="key" v-else v-show="key !== 'oAuth2_Token'">
-          <label :for="key">
-            <small class="grey">
-              <i>{{ key }}:</i>
-            </small>
-          </label>
-          <input
-            :type="key === 'password' || key === 'client_secret' ? 'password' : 'text'"
-            class="form-control"
-            :id="key"
-            :value="connection[key]"
-            @input="setUserData($event)"
-          >
+          <input type="text" class="form-control" id="bearerToken" @input="setBearerToken($event)">
         </div>
       </div>
       <!-- Alert Button -->
@@ -103,7 +63,7 @@
         v-show="!connectionStatus"
         class="btn btn-primary m-top-26px"
         @click="connect()"
-        :disabled="connectionEmpty"
+        :disabled="bearerTokenEmpty"
       >Connect
       </button>
       <button
@@ -128,7 +88,7 @@
 
         data() {
             return {
-                connectionEmpty: true,
+                bearerTokenEmpty: true,
                 alert: {
                     alertId: "",
                     isError: false
@@ -137,71 +97,37 @@
         },
 
         computed: {
-            connection: {
+            bearerToken: {
                 get() {
-                    return this.$store.getters.getConnection;
+                    return this.$store.getters.getBearerToken;
                 }
             },
             connectionStatus: {
                 get() {
                     return this.$store.getters.getConnectionStatus;
                 }
-            },
-            suiteAuthActive: {
-                get() {
-                    return this.$store.getters.getSuiteAuthActive;
-                }
             }
         },
 
-        watch: {
-            connection: function (val) {
-                this.connectionEmpty = this.suiteAuthActive &&
-                                       this.connection.oAuth2_Token === "" ||
-                                       !this.suiteAuthActive &&
-                                       this.connection.api_token === "" &&
-                                       this.connection.username === "" &&
-                                       this.connection.password === "";
-            }
-        },
         methods: {
-            setUserData(event) {
-                this.connection[event.target.id] = event.target.value;
-                this.$store.commit("setConnectionData", this.connection);
+            setBearerToken(event) {
+              this.bearerTokenEmpty = event.target.value === '';
+              this.$store.commit("setBearerToken", event.target.value);
             },
-
             connect() {
-                if (!this.suiteAuthActive) {
-                    this.$store
-                        .dispatch("getAllThings")
-                        .then(res => {
-                            this.showAlert(res.toString());
+              this.$store
+                  .dispatch("getAllThings")
+                  .then(res => {
+                    this.showAlert(res.toString());
 
-                        })
-                        .catch(err => console.log(err));
-                } else {
-                    this.$store
-                        .dispatch("getAllThings")
-                        .then(res => {
-                            this.showAlert(res.toString());
-                        })
-                        .catch(
-                            err => console.log(err));
-                }
+                  })
+                  .catch(err => console.log(err));
             },
-
             disconnect() {
                 this.$store.dispatch("disconnect");
             },
             onChangePlatform(event) {
                 this.$store.dispatch("setPlatform", event.target.value);
-            },
-            onChangeAuthentication(event) {
-                this.$store.dispatch("setSuiteAuthActive", event.target.value);
-                // Clear all Input-Fields by keys
-                Object.keys(this.connection).map(key => (this.connection[key] = ""));
-                // Set Connection back to empty
-                this.connectionEmpty = true;
             },
             showAlert(errMessage) {
                 if (errMessage !== "[object Object]") {

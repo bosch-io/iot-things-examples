@@ -25,12 +25,9 @@
  * EMPLOYEES, REPRESENTATIVES AND ORGANS.
  */
 
-/* eslint-disable */
-
 import Vue from "vue";
-import store from "../store";
 import axios from "axios";
-import qs from "qs";
+import store from "../store";
 
 export default (window.Api = new class {
     constructor() {
@@ -38,117 +35,56 @@ export default (window.Api = new class {
                                name: "api",
                                store,
                                computed: {
-                                   connection: {
+                                   platform: {
                                        get() {
-                                           return this.$store.getters.getConnection;
+                                           return this.$store.getters.getPlatform;
+                                       }
+                                   },
+                                   bearerToken: {
+                                       get() {
+                                           return this.$store.getters.getBearerToken;
                                        }
                                    },
                                    selected: {
                                        get() {
                                            return this.$store.getters.getSelected;
                                        }
-                                   },
-                                   suiteAuthHost: {
-                                       get() {
-                                           return this.$store.getters.getSuiteAuthHost;
-                                       }
-                                   },
-                                   suiteAuthActive: {
-                                       get() {
-                                           return this.$store.getters.getSuiteAuthActive;
-                                       }
-                                   },
+                                   }
                                }
                            });
 
         this.routes = {
             policies:
-                this.vue.connection.http_endpoint + "/api/2" + "/policies",
+                `${this.vue.platform}/api/2/policies`,
             searchThings:
-                this.vue.connection.http_endpoint + "/api/2" +
-                "/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified",
-            things: this.vue.connection.http_endpoint + "/api/2" + "/things",
+                `${this.vue.platform}/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+            things: `${this.vue.platform}/api/2/things`,
             messages:
-                this.vue.connection.http_endpoint +
-                "/api/2" +
-                "/things/" +
-                this.vue.selected.thingId
+                `${this.vue.platform}/api/2/things/${this.vue.selected.thingId}`
         };
     }
 
-    createAuthHeaderBasic = (username, password) => {
-        return (
-            "Basic " +
-            btoa(
-                encodeURIComponent(username + ":" + password).replace(
-                    /%([0-9A-F]{2})/g,
-                    function toSolidBytes(match, p1) {
-                        return String.fromCharCode("0x" + p1);
-                    }
-                )
-            )
-        );
-    };
-
-    getConfig = (additionalHeader = null) => {
-        if (additionalHeader && !this.vue.suiteAuthActive) {
-            return {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: this.createAuthHeaderBasic(
-                        this.vue.connection.username,
-                        this.vue.connection.password
-                    ),
-                    "x-cr-api-token": this.vue.connection.api_token,
-                    "x-correlation-id": additionalHeader
-                }
-            };
+    getConfig = (correlationId = null) => {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.vue.bearerToken}`
+        };
+        if (correlationId) {
+            headers['x-correlation-id'] = correlationId;
         }
-        if (additionalHeader && this.vue.suiteAuthActive) {
-            return {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token,
-                    'x-correlation-id': additionalHeader
-                }
-            };
-        }
-        if (!additionalHeader && !this.vue.suiteAuthActive) {
-            return {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: this.createAuthHeaderBasic(
-                        this.vue.connection.username,
-                        this.vue.connection.password
-                    ),
-                    "x-cr-api-token": this.vue.connection.api_token
-                }
-            };
-        }
-        if (!additionalHeader && this.vue.suiteAuthActive) {
-            return {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + this.vue.connection.oAuth2_Token
-                }
-            }
-        }
+        return { headers };
     };
 
     getAllThings = () => {
         return axios.get(
-            `${
-                this.vue.connection.http_endpoint
-                }/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
+            `${this.vue.platform}/api/2/search/things?&fields=thingId,policyId,attributes,features,_revision,_modified`,
             this.getConfig()
         );
     };
 
     sendMessage = (message, topic, corrId) => {
         return axios.post(
-            `${this.vue.connection.http_endpoint}/api/2/things/${
-                this.vue.selected.thingId
-                }/inbox/messages/${topic}`,
+            `${this.vue.platform}/api/2/things/${this.vue.selected.thingId}/inbox/messages/${topic}`,
             `${JSON.stringify(message)}`,
             this.getConfig(corrId)
         );

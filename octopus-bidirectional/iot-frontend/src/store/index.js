@@ -38,39 +38,34 @@ const BIC = "https://things.s-apps.de1.bosch-iot-cloud.com";
 
 const store = new Vuex.Store({
                                  state: {
-                                     suiteAuthActive: true,
-                                     connection: {
-                                         http_endpoint: AWS,
-                                         api_token: "",
-                                         username: "",
-                                         password: "",
-                                         oAuth2_Token: "",
-                                     },
+                                     platform: AWS,
+                                     bearerToken: '',
                                      items: {},
-                                     selected: "No thing selected",
+                                     selected: 'No thing selected',
                                      connectionStatus: false,
                                      telemetryCount: 0,
-                                     suiteAuthHost: "https://access.bosch-iot-suite.com/token",
-                                     accessToken: '',
                                      userDataFormCollapsed: true,
                                      httpErrorRequestAlert: {
-                                         alertId: "",
+                                         alertId: '',
                                          isSuccess: false,
                                          isError: false,
-                                         successMessage: "",
-                                         errorMessage: ""
+                                         successMessage: '',
+                                         errorMessage: ''
                                      }
                                  },
 
                                  getters: {
-                                     getConnection: state => {
-                                         return state.connection;
+                                     getPlatform: state => {
+                                         return state.platform;
                                      },
-                                     getSelected: state => {
-                                         return state.selected;
+                                     getBearerToken: state => {
+                                         return state.bearerToken;
                                      },
                                      getItems: state => {
                                          return state.items;
+                                     },
+                                     getSelected: state => {
+                                         return state.selected;
                                      },
                                      getConnectionStatus: state => {
                                          return state.connectionStatus;
@@ -78,13 +73,6 @@ const store = new Vuex.Store({
                                      getTelemetryCount: state => {
                                          return state.telemetryCount;
                                      },
-                                     getSuiteAuthActive: state => {
-                                         return state.suiteAuthActive;
-                                     },
-                                     getSuiteAuthHost:
-                                         state => {
-                                             return state.suiteAuthHost;
-                                         },
                                      getUserDataFormCollapsed:
                                          state => {
                                              return state.userDataFormCollapsed;
@@ -92,12 +80,14 @@ const store = new Vuex.Store({
                                      getHTTPErrorRequestAlert: state => {
                                          return state.httpErrorRequestAlert;
                                      }
-
                                  },
 
                                  mutations: {
-                                     setSelected(state, thing) {
-                                         state.selected = thing;
+                                     setPlatform(state, value) {
+                                         state.platform = value;
+                                     },
+                                     setBearerToken(state, value) {
+                                         state.bearerToken = value;
                                      },
                                      setItems(state, items) {
                                          state.items = items;
@@ -106,9 +96,8 @@ const store = new Vuex.Store({
                                          let thing = JSON.parse(item);
                                          state.items[thing.thingId] = deepmerge(state.items[thing.thingId], thing);
                                      },
-                                     setConnectionData(state, value) {
-                                         state.connection = Object.assign({}, state.connection, value);
-
+                                     setSelected(state, thing) {
+                                         state.selected = thing;
                                      },
                                      setConnectionStatus(state, status) {
                                          state.connectionStatus = status;
@@ -121,12 +110,6 @@ const store = new Vuex.Store({
                                          state.selected = "No thing selected.";
                                          state.items = {};
                                      },
-                                     updatePlatform(state, value) {
-                                         state.connection.http_endpoint = value;
-                                     },
-                                     setSuiteAuthActive(state, value) {
-                                         state.suiteAuthActive = value;
-                                     },
                                      setUserDataFormCollapsed(state, value) {
                                          state.userDataFormCollapsed = value;
                                      },
@@ -135,7 +118,7 @@ const store = new Vuex.Store({
                                          state.httpErrorRequestAlert.isError = true;
                                          if (value.toString().includes('401')) {
                                              state.httpErrorRequestAlert.errorMessage =
-                                                 value + ' - token expired.';
+                                                 `${value} - token expired.`;
                                          } else {
                                              state.httpErrorRequestAlert.errorMessage = value;
                                          }
@@ -152,18 +135,6 @@ const store = new Vuex.Store({
                                       * API action calls
                                       */
 
-                                     setSuiteAuthActive({commit}, authenticationIndex) {
-                                         switch (authenticationIndex) {
-                                             case "1":
-                                                 this.commit("setSuiteAuthActive", true);
-                                                 break;
-                                             case "2":
-                                                 this.commit("setSuiteAuthActive", false);
-                                                 break;
-                                             default:
-                                                 break;
-                                         }
-                                     },
                                      getAllThings({commit}) {
                                          return new Promise((resolve, reject) => {
                                              Api.getAllThings()
@@ -235,10 +206,10 @@ const store = new Vuex.Store({
                                      setPlatform({commit}, platformIndex) {
                                          switch (platformIndex) {
                                              case "1":
-                                                 this.commit("updatePlatform", AWS);
+                                                 this.commit("setPlatform", AWS);
                                                  break;
                                              case "2":
-                                                 this.commit("updatePlatform", BIC);
+                                                 this.commit("setPlatform", BIC);
                                                  break;
                                              default:
                                                  break;

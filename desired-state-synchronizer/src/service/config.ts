@@ -27,18 +27,12 @@
 
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
+import { OAuthConfig } from 'javascript-utils/src/suite-auth-service'
+
 export interface Config {
   websocketBaseUrl: string,
   httpBaseUrl: string,
   thingId: string,
   policyId: string,
   oauth: OAuthConfig
-}
-
-export interface OAuthConfig {
-  host: string,
-  clientId: string,
-  clientSecret: string,
-  scope: string,
-  subjectIssuer: string
 }

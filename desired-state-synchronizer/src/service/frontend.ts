@@ -167,7 +167,7 @@ export class Frontend {
 
     console.log(`[Frontend] configureThreshold ${threshold}`)
     return this.axiosInstance.put(this.config.httpBaseUrl + '/api/2/things/' + this.config.thingId
-      + '/features/Device@desired/properties/config/threshold', threshold)
+      + '/features/Device@desired/properties/config/threshold', `${threshold}`)
       .catch(e => console.log(`[Frontend] configureThreshold failed ${e}`))
   }
 

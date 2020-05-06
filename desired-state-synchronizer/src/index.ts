@@ -32,7 +32,7 @@ import { Config } from './service/config'
 import { Synchronizer } from './service/synchronizer'
 import { DeviceSimulation } from './service/device-simulation'
 import { Frontend } from './service/frontend'
-import { createAxiosInstance, SuiteAuthService } from './service/suite-auth-service'
+import { createAxiosInstance, SuiteAuthService } from 'javascript-utils/dist/suite-auth-service'
 
 async function start(_args: string[]) {
 

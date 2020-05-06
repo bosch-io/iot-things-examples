@@ -29,7 +29,7 @@ import { AxiosAdapter, AxiosInstance, AxiosRequestConfig, AxiosResponse } from '
 import * as HttpsProxyAgent from 'https-proxy-agent'
 import * as NodeWebSocket from 'ws'
 import { Helpers } from './helpers'
-import { OAuthConfig } from './config'
+import * as jwtDecode from 'jwt-decode'
 
 const axios = require('axios').default
 const axiosHttp = require('axios/lib/adapters/http')
@@ -52,9 +52,22 @@ function createDefaultWebsocketOptions(): NodeWebSocket.ClientOptions {
   }
 }
 
+export interface OAuthConfig {
+  host: string,
+  clientId: string,
+  clientSecret: string,
+  scope: string,
+  subjectIssuer: string
+}
+
 export class SuiteAuthService {
+  private static REFRESH_TOKEN_BEFORE_EXPIRY: number = 60 * 1000; // 60 seconds
   private readonly axiosInstance: AxiosInstance
   private readonly clientCredentialsBody: any
+  private knownToken?: {
+    token: string,
+    expiry: Date
+  };
 
   constructor(oauthConfig: OAuthConfig) {
     this.axiosInstance = createAxiosInstance({
@@ -86,6 +99,9 @@ export class SuiteAuthService {
   }
 
   getToken(): Promise<string> {
+    if (this.isTokenStillValid()) {
+      return Promise.resolve(this.knownToken!.token)
+    }
     return this.axiosInstance.post('token', this.clientCredentialsBody)
       .then(response => {
         if (response.status === 200) {
@@ -93,6 +109,28 @@ export class SuiteAuthService {
         }
         throw new Error(`Failed to retrieve client credentials token with status ${response.status}: ${response.data}`)
       })
+      .then(token => {
+        this.updateKnownToken(token)
+        return token;
+      })
+  }
+
+  private isTokenStillValid(): boolean {
+    return this.knownToken !== undefined && this.knownToken.expiry
+      && ((this.knownToken.expiry.getTime() - Date.now()) > SuiteAuthService.REFRESH_TOKEN_BEFORE_EXPIRY);
+  }
+
+  private updateKnownToken(newToken: string) {
+    try {
+      const decoded = jwtDecode(newToken)
+      const expiry = new Date(decoded.exp * 1000)
+      this.knownToken = {
+        token: newToken,
+        expiry
+      }
+    } catch (e) {
+      console.log(`Caught unexpected error while decoding JWT token: ${e}. Will request a new one for the next request`)
+    }
   }
 
   private requestAuthorized(config: AxiosRequestConfig): Promise<AxiosResponse> {

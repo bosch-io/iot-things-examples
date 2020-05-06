@@ -28,10 +28,10 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import * as NodeWebSocket from 'ws'
-import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
+import { ThingMessage, ThingMessageInfo, Helpers } from 'javascript-utils/dist/helpers'
 import { Config } from './config'
 import { compare as jsonCompare } from 'fast-json-patch'
-import { SuiteAuthService } from './suite-auth-service'
+import { SuiteAuthService } from 'javascript-utils/dist/suite-auth-service'
 import { AxiosInstance } from 'axios'
 
 /**

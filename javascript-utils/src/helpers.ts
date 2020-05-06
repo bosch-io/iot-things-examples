@@ -174,7 +174,6 @@ export namespace Helpers {
     } catch (e) {
       response = { error: e.toString() }
       status = 400
-      // console.log(`processWithResponse error ${e}`)
     }
 
     return new ThingMessage({
@@ -191,18 +190,6 @@ export namespace Helpers {
       'status': status,
       'value': response
     } as ThingMessageInfo)
-  }
-
-  /** Sequentielly invokes and array of functions, waiting for each execution. Errors are just logged, but execution continues. */
-  export async function processAll(a: Array<() => void>, errorLogPrefix) {
-    a.forEach(async (f, i, a) => {
-      try {
-        await f()
-      } catch (e) {
-        console.log(`${errorLogPrefix}: ${JSON.stringify(e.error || e)}`)
-      }
-      a.splice(i, 1)
-    })
   }
 
 }

@@ -29,10 +29,10 @@
 
 import * as NodeWebSocket from 'ws'
 import { v4 as uuidv4 } from 'uuid'
-import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
+import { ThingMessage, ThingMessageInfo, Helpers } from 'javascript-utils/dist/helpers'
 import { setInterval } from 'timers'
 import { Config } from './config'
-import { SuiteAuthService } from './suite-auth-service'
+import { SuiteAuthService } from 'javascript-utils/dist/suite-auth-service'
 
 /** Simple device simulation that simulates device activity in absence of a real phyiscal device.
  *

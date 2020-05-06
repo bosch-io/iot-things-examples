@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "cd ../javascript-utils/ && npm install && npm run build",
     "start": "npm run serve",
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist",
@@ -21,14 +22,13 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "~12.0.12",
-    "@types/request-promise-native": "~1.0.16",
     "@types/uuid": "~7.0.3",
     "@types/ws": "~6.0.1",
     "axios": "^0.19.2",
     "fast-json-patch": "~2.1.0",
-    "https-proxy-agent": "~2.2.3",
     "uuid": "~7.0.3",
-    "ws": "^7.2.5"
+    "ws": "^7.2.5",
+    "javascript-utils": "file:../javascript-utils/"
   },
   "devDependencies": {
     "concurrently": "~5.2.0",

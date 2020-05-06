@@ -145,12 +145,10 @@ export class Frontend {
     console.log('[Frontend] read policy')
     let policy = await this.getPolicy(POLICY_ID)
 
-    policy.entries.DEFAULT.subjects[CONFIG.frontend.subject] = { type: 'iot-permissions-user' }
-    policy.entries.DEVICE.subjects[CONFIG.deviceSimulation.subject] = { type: 'iot-permissions-user' }
     delete policy.entries.DEVICE.resources['message:/']
     policy.entries.ACCESSORIES = {
       subjects: {
-        [CONFIG.accessories.subject]: { type: 'iot-permissions-user' }
+        '{{ request:subjectId }}': { type: 'suite auth digitaltwin example' }
       },
       resources: {
         'message:/features/Accessories/inbox/messages': {

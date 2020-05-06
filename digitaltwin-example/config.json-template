@@ -1,14 +1,6 @@
 {
   "websocketBaseUrl": "### your-things-service-endpoint_ws",
   "httpBaseUrl": "### your-things-service-endpoint_http ###",
-  "httpHeaders": {
-    "x-cr-api-token": "### your-things-service-api_token ###"
-  },
-  "accessories": {
-    "subject": "iot-permissions:### your-accessories-permissions-userid ###",
-    "username": "### your-iot-permissions-tenant-name ###\\### your-accessories-username ###",
-    "password": "### your-accessories-password ###"
-  },
   "oauth": {
     "host": "### endpoint of the OAuth provider, e.g. https://access.bosch-iot-suite.com for Suite Auth ###",
     "clientId": "### Client ID of the used OAuth client ###",
@@ -17,27 +9,12 @@
     "subjectIssuer": "### known subject issuer for the OAuth provider, e.g. iot-suite for Suite Auth ###"
   },
   "provisioning": {
-    "oauthTokenEndpoint": "https://access.bosch-iot-suite.com/token",
-    "oauthClientId": "### your Suite authorization client-id ###",
-    "oauthClientSecret": "### your Suite authorization client-secret ###",
     "suiteProvisioningHttpBaseUrl": "https://deviceprovisioning.eu-1.bosch-iot-suite.com",
     "serviceInstanceId": "### your Suite for Asset Communication service instance id ###",
-    "thingsServiceInstanceId": "### your Things service instance of of your Suite for Asset Communication subscription ###",
     "hubTenantId": "### your Hub tenant of of your Suite for Asset Communication subscription ###",
     "hubDevicePassword": "### your-favored-hub-device-password ###",
-    "cleanup": {
-      "hubDeviceRegistryHttpBaseUrl": "https://manage.bosch-iot-hub.com"
-    }
-  },
-  "deviceSimulation": {
-    "subject": "iot-permissions:### your-deviceSimulation-permissions-userid ###",
-    "username": "### your-iot-permissions-tenant-name ###\\### your-deviceSimulation-username ###",
-    "password": "### your-deviceSimulation-password ###"
   },
   "frontend": {
-    "subject": "iot-permissions:### your-frontend-permissions-userid ###",
-    "username": "### your-iot-permissions-tenant-name ###\\### your-frontend-username ###",
-    "password": "### your-frontend-password ###",
     "thingId": "### your-thingid ###"
   }
 }

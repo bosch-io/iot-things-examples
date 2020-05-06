@@ -30,8 +30,13 @@
 import { Frontend } from './service/frontend'
 import { DeviceSimulation } from './service/device-simulation'
 import { Accessories } from './service/accessories'
+import * as fs from "fs";
+import { createAxiosInstance, SuiteAuthService } from 'javascript-utils/dist/suite-auth-service'
 
 async function start(args: string[]) {
+  const config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
+  const suiteAuthService = new SuiteAuthService(config.oauth)
+  const axiosInstance = createAxiosInstance({}, suiteAuthService.createAxiosAdapter())
 
   const startAll = Object.keys(args).length === 0
 
@@ -39,11 +44,11 @@ async function start(args: string[]) {
 
   if (startAll || args.indexOf('accessories') >= 0) {
     if (!startAll) args.splice(args.indexOf('accessories'), 1)
-    services.push(new Accessories().start())
+    services.push(new Accessories(suiteAuthService, axiosInstance).start())
   }
   if (startAll || args.indexOf('simulation') >= 0) {
     if (!startAll) args.splice(args.indexOf('simulation'), 1)
-    services.push(new DeviceSimulation().start())
+    services.push(new DeviceSimulation(suiteAuthService).start())
   }
 
   // wait for parallel start of supporting services
@@ -52,7 +57,7 @@ async function start(args: string[]) {
 
   if (startAll || args.indexOf('frontend') >= 0) {
     if (!startAll) args.splice(args.indexOf('frontend'), 1)
-    services.push(new Frontend().start())
+    services.push(new Frontend(axiosInstance).start())
   }
 
   if (args.length > 0) {

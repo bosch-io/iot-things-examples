@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "cd ../javascript-utils/ && npm install && npm run build",
     "start": "npm run serve",
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist",
@@ -25,8 +26,10 @@
     "@types/request-promise-native": "^1.0.16",
     "@types/ws": "~6.0.1",
     "ajv": "~6.10.0",
+    "axios": "^0.19.2",
     "express": "^4.17.1",
     "https-proxy-agent": "~2.2.1",
+    "javascript-utils": "file:../javascript-utils",
     "request": "^2.88.0",
     "request-promise-native": "~1.0.7",
     "sha.js": "^2.4.11",

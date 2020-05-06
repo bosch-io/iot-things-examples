@@ -9,6 +9,13 @@
     "username": "### your-iot-permissions-tenant-name ###\\### your-accessories-username ###",
     "password": "### your-accessories-password ###"
   },
+  "oauth": {
+    "host": "### endpoint of the OAuth provider, e.g. https://access.bosch-iot-suite.com for Suite Auth ###",
+    "clientId": "### Client ID of the used OAuth client ###",
+    "clientSecret": "### Client secret of the used OAuth client ###",
+    "scope": "### whitespace separated list of scopes that are requested in the token; at least one ###",
+    "subjectIssuer": "### known subject issuer for the OAuth provider, e.g. iot-suite for Suite Auth ###"
+  },
   "provisioning": {
     "oauthTokenEndpoint": "https://access.bosch-iot-suite.com/token",
     "oauthClientId": "### your Suite authorization client-id ###",

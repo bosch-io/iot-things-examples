@@ -28,20 +28,13 @@
 /* Copyright (c) 2018 Bosch Software Innovations GmbH, Germany. All rights reserved. */
 
 import * as fs from 'fs'
-import * as requestPromise from 'request-promise-native'
 import * as Ajv from 'ajv'
-import { Helpers } from './helpers'
+import { AxiosInstance } from 'axios';
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 const THING_ID: string = CONFIG.frontend.thingId
 const POLICY_ID = THING_ID
-
-const DEFAULT_OPTIONS: requestPromise.RequestPromiseOptions = {
-  json: true,
-  auth: { user: CONFIG.frontend.username, pass: CONFIG.frontend.password },
-  headers: CONFIG.httpHeaders
-}
 
 const JSON_SCHEMA_VALIDATOR = new Ajv({ schemaId: 'auto', allErrors: true })
   .addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'))
@@ -60,17 +53,20 @@ const ACCESSORIES_RESPONSE_VALIDATION = JSON_SCHEMA_VALIDATOR.compile(JSON.parse
 
 export class Frontend {
 
+  constructor(private readonly axiosInstance: AxiosInstance) {
+  }
+
   async start() {
     console.log()
     console.log('[Frontend] start')
 
     await this.recreateEntities()
 
-    setInterval(await this.retrieveDeviceTwinState, 3000)
+    setInterval(() => this.retrieveDeviceTwinState(), 3000)
 
-    setInterval(await this.retrieveSupportedAccessories, 7000)
+    setInterval(() => this.retrieveSupportedAccessories(), 7000)
 
-    setInterval(await this.configureThreshold, 15000)
+    setInterval(() => this.configureThreshold(), 15000)
   }
 
   private async recreateEntities() {
@@ -113,83 +109,10 @@ export class Frontend {
       }
     }
 
-    let cleanup: Array<() => void> = []
-
-    // get oauth token
-
-    console.log('[Frontend] get oauth token')
-    let r = await requestPromise({
-      url: CONFIG.provisioning.oauthTokenEndpoint,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      method: 'POST',
-      form: {
-        grant_type: 'client_credentials',
-        client_id: CONFIG.provisioning.oauthClientId,
-        client_secret: CONFIG.provisioning.oauthClientSecret,
-        scope: `service:iot-hub-prod:${CONFIG.provisioning.hubTenantId}/full-access service:iot-things-eu-1:${CONFIG.provisioning.thingsServiceInstanceId}/full-access`
-      }
-    })
-    const accessToken = JSON.parse(r).access_token
-    // console.log(`[Frontend] oauth accessToken:\n${accessToken}\n`)
-
-    // delete old Thing / Policy
-    // TODO switch to DELETE of Suite Device Provisioning
-
-    cleanup.push(async () => {
-      try {
-        await requestPromise({
-          auth: { bearer: accessToken },
-          url: CONFIG.httpBaseUrl + '/api/2/policies/' + encodeURIComponent(THING_ID),
-          headers: { 'if-none-match': '*' },
-          json: true,
-          body: {
-            entries: {
-              DEFAULT: {
-                subjects: { '{{ request:subjectId }}': { type: 'any' } },
-                resources: {
-                  'policy:/': { grant: ['READ', 'WRITE'], revoke: [] },
-                  'thing:/': { grant: ['READ', 'WRITE'], revoke: [] },
-                  'message:/': { grant: ['READ', 'WRITE'], revoke: [] }
-                }
-              }
-            }
-          },
-          method: 'PUT'
-        })
-      } catch (e) {
-        // ignore completely
-      }
-      // await Helpers.sleep(2000)
-    })
-    cleanup.push(() => requestPromise({
-      auth: { bearer: accessToken },
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + encodeURIComponent(THING_ID),
-      method: 'DELETE'
-    }))
-    cleanup.push(() => requestPromise({
-      auth: { bearer: accessToken },
-      url: CONFIG.httpBaseUrl + '/api/2/policies/' + encodeURIComponent(POLICY_ID),
-      method: 'DELETE'
-    }))
-    cleanup.push(() => requestPromise({
-      auth: { bearer: accessToken },
-      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/registration/${encodeURIComponent(CONFIG.provisioning.hubTenantId)}/${encodeURIComponent(THING_ID)}`,
-      method: 'DELETE'
-    }))
-    const hubAuthId = THING_ID.replace(':', '_')
-    cleanup.push(() => requestPromise({
-      auth: { bearer: accessToken },
-      url: `${CONFIG.provisioning.cleanup.hubDeviceRegistryHttpBaseUrl}/credentials/${encodeURIComponent(CONFIG.provisioning.hubTenantId)}?auth-id=${encodeURIComponent(hubAuthId)}&type=hashed-password`,
-      method: 'DELETE'
-    }))
 
     console.log('[Frontend] cleanup')
-    await Helpers.processAll(cleanup, '[Frontend] ignore failed cleanup')
-
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(2000)
+    await this.deprovisionDevice(THING_ID)
+      .catch(e => console.log(`[Frontend] ignore failed cleanup: ${e.message}`))
 
     // provision thing+device (incl. policy+credentials)
 
@@ -215,23 +138,12 @@ export class Frontend {
 
     // console.log('<-- ' + JSON.stringify(provisioningRequest))
 
-    await requestPromise({
-      json: true,
-      auth: { bearer: accessToken },
-      url: CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices?skipVorto=true`,
-      method: 'POST',
-      body: provisioningRequest
-    })
+    await this.provisionDevice(provisioningRequest)
 
     // extend policy
 
     console.log('[Frontend] read policy')
-    let policy = await requestPromise({
-      auth: { bearer: accessToken },
-      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
-      method: 'GET',
-      json: true
-    })
+    let policy = await this.getPolicy(POLICY_ID)
 
     policy.entries.DEFAULT.subjects[CONFIG.frontend.subject] = { type: 'iot-permissions-user' }
     policy.entries.DEVICE.subjects[CONFIG.deviceSimulation.subject] = { type: 'iot-permissions-user' }
@@ -253,73 +165,61 @@ export class Frontend {
     }
 
     console.log('[Frontend] write extended policy')
-    await requestPromise({
-      auth: { bearer: accessToken },
-      url: CONFIG.httpBaseUrl + '/api/2/policies/' + POLICY_ID,
-      body: policy,
-      json: true,
-      method: 'PUT'
-    })
-
-    // wait some time as prior operation could take a bit to be visible everywhere in a CAP-theorem-driven world
-    await Helpers.sleep(1000)
-
+    await this.updatePolicy(POLICY_ID, policy)
   }
 
-  private async configureThreshold() {
+  private configureThreshold(): Promise<void> {
     let threshold = 18 + Math.random() * 10
 
     console.log(`[Frontend] configureThreshold ${threshold}`)
-    const options = {
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/config/threshold',
-      method: 'PUT',
-      body: threshold
-    }
-    try {
-      await requestPromise(options)
-      console.log('[Frontend] configureThreshold successful')
-    } catch (e) {
-      console.log(`[Frontend] configureThreshold failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
-    }
+    return this.axiosInstance.put(CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/config/threshold',
+      `${threshold}`)
+      .then(_ => console.log('[Frontend] configureThreshold successful'))
+      .catch(e => console.log(`[Frontend] configureThreshold failed ${e}`))
   }
 
-  private async retrieveDeviceTwinState() {
-    const options = {
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/status',
-      method: 'GET'
-    }
-    try {
-      const state = await requestPromise(options)
-      console.log(`[Frontend] retrieveDeviceTwinState response: ${JSON.stringify(state)}`)
-    } catch (e) {
-      console.log(`[Frontend] retrieveDeviceTwinState failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
-    }
+  private retrieveDeviceTwinState(): Promise<void> {
+    return this.axiosInstance.get(CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Device/properties/status')
+      .then(response => console.log(`[Frontend] retrieveDeviceTwinState response: ${JSON.stringify(response.data)}`))
+      .catch(e => console.log(`[Frontend] retrieveDeviceTwinState failed ${e}`))
   }
 
   private async retrieveSupportedAccessories(): Promise<any> {
     console.log('[Frontend] trigger retrieveSupportedAccessories')
-    const options = {
-      ...DEFAULT_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID + '/features/Accessories/inbox/messages/retrieveSupportedAccessories',
-      method: 'POST',
-      body: {}
-    }
     try {
-      const response = await requestPromise(options)
+      const response = await this.axiosInstance.post(CONFIG.httpBaseUrl + '/api/2/things/' + THING_ID +
+        '/features/Accessories/inbox/messages/retrieveSupportedAccessories', {})
+        .then(r => r.data)
       console.log(`[Frontend] retrieveSupportedAccessories response: ${JSON.stringify(response)}`)
 
       if (ACCESSORIES_RESPONSE_VALIDATION(response)) {
         console.log(`[Frontend] retrieveSupportedAccessories response valid`)
         return response
       } else {
-        console.log(`[Frontend] retrieveSupportedAccessories response validation faild: ${JSON.stringify(ACCESSORIES_RESPONSE_VALIDATION.errors)}`)
+        console.log(`[Frontend] retrieveSupportedAccessories response validation failed: ${JSON.stringify(ACCESSORIES_RESPONSE_VALIDATION.errors)}`)
       }
     } catch (e) {
-      console.log(`[Frontend] retrieveSupportedAccessories failed ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
+      console.log(`[Frontend] retrieveSupportedAccessories failed ${e}`)
+      console.log(this)
+      console.log(this.axiosInstance)
+      console.log(e)
     }
     return undefined
+  }
+
+  private provisionDevice(provisioningRequest: any): Promise<void> {
+    return this.axiosInstance.post(CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices?skipVorto=true`,
+      provisioningRequest);
+  }
+  private deprovisionDevice(deviceId: string): Promise<void> {
+    return this.axiosInstance.delete(CONFIG.provisioning.suiteProvisioningHttpBaseUrl + `/api/1/${CONFIG.provisioning.serviceInstanceId}/devices/${deviceId}`)
+  }
+  private getPolicy(policyId: string): Promise<any> {
+    return this.axiosInstance.get(CONFIG.httpBaseUrl + '/api/2/policies/' + policyId)
+      .then(response => response.data);
+  }
+  private updatePolicy(policyId: string, policy: any): Promise<any> {
+    return this.axiosInstance.put(CONFIG.httpBaseUrl + '/api/2/policies/' + policyId, policy);
   }
 
 }

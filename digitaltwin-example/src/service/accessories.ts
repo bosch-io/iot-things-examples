@@ -29,30 +29,15 @@
 
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
-import * as HttpsProxyAgent from 'https-proxy-agent'
-import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
+import { ThingMessage, ThingMessageInfo, Helpers } from 'javascript-utils/dist/helpers'
+import { SuiteAuthService } from 'javascript-utils/dist/suite-auth-service';
+import { AxiosInstance } from 'axios';
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
-const WEBSOCKET_OPTIONS = {
-  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy) : null,
-  headers: {
-    ...CONFIG.httpHeaders,
-    'Authorization': 'Basic ' + Buffer.from(CONFIG.accessories.username + ':' + CONFIG.accessories.password).toString('base64')
-  }
-}
-const WEBSOCKET_REOPEN_TIMEOUT = 1000
-
-const REQUEST_OPTIONS: requestPromise.RequestPromiseOptions = {
-  json: true,
-  auth: { user: CONFIG.accessories.username, pass: CONFIG.accessories.password },
-  headers: CONFIG.httpHeaders
-}
-
 /** Microservice to provide a custom functionality to determine supported accessory products.
  *
- * By knowning the context of the digital twin it determines accessories that can be combined with the device
+ * By knowing the context of the digital twin it determines accessories that can be combined with the device
  * (e.g. batteries, spare parts).
  * In real-world scenarios this business functionality could be retrieved from a product catalog system (e.g. via SAP).
  */
@@ -60,6 +45,9 @@ const REQUEST_OPTIONS: requestPromise.RequestPromiseOptions = {
 export class Accessories {
 
   private ws?: NodeWebSocket
+  constructor(private readonly suiteAuthService: SuiteAuthService,
+              private readonly axiosInstance: AxiosInstance) {
+  }
 
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
@@ -70,8 +58,8 @@ export class Accessories {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`Accessories start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      Helpers.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
-        (ws) => {
+      this.suiteAuthService.createWebSocket(CONFIG.websocketBaseUrl + '/ws/2',
+        ws => {
           this.ws = ws
 
           this.ws.on('message', (data) => {
@@ -109,9 +97,9 @@ export class Accessories {
       const input = { ...m.value, thingId: m.thingId, localThingId: m.localThingId }
       console.log(`[Accessories] received request ${subject}`)
 
-      let processor = (p: any): Promise<any> => { throw new Error(`Unsupport message subject ${subject}`) }
-      switch (subject) {
-        case 'retrieveSupportedAccessories': processor = this.retrieveSupportedAccessories
+      let processor = (p: any): Promise<any> => { throw new Error(`Unsupported message subject ${subject}`) }
+      if (subject === 'retrieveSupportedAccessories') {
+        processor = (p: { thingId, localThingId }) => this.retrieveSupportedAccessories(p)
       }
 
       Helpers.processWithResponse(m, processor, input).then(r => {
@@ -126,11 +114,8 @@ export class Accessories {
   private async retrieveSupportedAccessories(p: { thingId, localThingId })
     : Promise<Array<{ name: string, manufacturer: string, gtin: string }>> {
 
-    const productinfo = await requestPromise({
-      ...REQUEST_OPTIONS,
-      url: CONFIG.httpBaseUrl + '/api/2/things/' + p.thingId + '/features/Productinfo/properties/config',
-      method: 'GET'
-    })
+    const productinfo = await this.axiosInstance.get(`${CONFIG.httpBaseUrl}/api/2/things/${p.thingId}/features/Productinfo/properties/config`)
+      .then(response => response.data);
     console.log(`[Accessories] lookup product info: ${JSON.stringify(productinfo)}`)
 
     if (productinfo.model === 'D100A' && productinfo.manufacturer === 'ACME') {

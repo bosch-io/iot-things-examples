@@ -29,22 +29,12 @@
 
 import * as fs from 'fs'
 import * as NodeWebSocket from 'ws'
-import * as HttpsProxyAgent from 'https-proxy-agent'
-import * as requestPromise from 'request-promise-native'
-import { ThingMessage, ThingMessageInfo, Helpers } from './helpers'
+import { ThingMessage, ThingMessageInfo, Helpers } from 'javascript-utils/dist/helpers'
 import { setInterval } from 'timers'
+import { AxiosInstance } from 'axios';
+import { createAxiosInstance, SuiteAuthService } from 'javascript-utils/dist/suite-auth-service';
 
 const CONFIG = JSON.parse(fs.readFileSync('config.json', 'utf8'))
-
-const WEBSOCKET_OPTIONS = {
-  agent: process.env.https_proxy ? new HttpsProxyAgent(process.env.https_proxy) : null,
-  headers: {
-    ...CONFIG.httpHeaders,
-    'Authorization': 'Basic ' + Buffer.from(CONFIG.deviceSimulation.username + ':' + CONFIG.deviceSimulation.password).toString('base64')
-
-  }
-}
-const WEBSOCKET_REOPEN_TIMEOUT = 1000
 
 const THING_ID: string = CONFIG.frontend.thingId
 const THING_ID_PATH = THING_ID.replace(':', '/')
@@ -78,6 +68,12 @@ export class DeviceSimulation {
     threshold?: number
   } = {}
 
+  private readonly axiosInstance: AxiosInstance
+
+  constructor(private readonly suiteAuthService: SuiteAuthService) {
+    this.axiosInstance = createAxiosInstance();
+  }
+
   start(): Promise<void> {
     return new Promise((resolve, reject): void => {
       console.log('[DeviceSimulation] start')
@@ -87,8 +83,8 @@ export class DeviceSimulation {
       // timeout if we cannot start within 10 secs
       setTimeout(() => reject(`DeviceSimulation start timeout; pending acks: ${pendingAcks}`), 10000)
 
-      Helpers.openWebSocket(CONFIG.websocketBaseUrl + '/ws/2', WEBSOCKET_OPTIONS, WEBSOCKET_REOPEN_TIMEOUT,
-        (ws) => {
+      this.suiteAuthService.createWebSocket(CONFIG.websocketBaseUrl + '/ws/2',
+        ws => {
           this.ws = ws
 
           setTimeout(() => setInterval(() => this.updateStatus(), 4000), 10000)
@@ -145,7 +141,7 @@ export class DeviceSimulation {
     console.log('[DeviceSimulation] unprocessed data: ' + m.channel + ',' + m.criterion + ': ' + m.topic + ' ' + m.thingId + ' ' + m.path + ' ' + m.status + ' ' + JSON.stringify(m.value))
   }
 
-  private async updateStatus() {
+  private updateStatus() {
     this.status.temperature = 18 + Math.random() * 10
 
     if (!this.config.threshold || this.status.temperature > this.config.threshold) {
@@ -158,22 +154,13 @@ export class DeviceSimulation {
         headers: { 'response-required': false /*, 'correlation-id': '123'*/ }
       })
 
-      // publish update to Hub via HTTP
-      const options = {
-        url: 'https://http.bosch-iot-hub.com/telemetry/' + HUB_TENANT + '/' + HUB_DEVICE_ID,
-        auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD },
-        method: 'PUT',
-        json: true,
-        body: update
-      }
-      try {
-        await requestPromise(options)
-      } catch (e) {
-        console.log(`[DeviceSimulation] send update ${e} ${JSON.stringify({ ...options, auth: { ...options.auth, pass: 'xxx' } })}`)
-      }
-
-      // ### alternativly: publich directly to Things via WebSocket
-      // this.ws!.send(JSON.stringify(update), (err) => { if (err) console.log('[DeviceSimulation] updateStatus websocket send error ' + err) })
+      // publish update to Hub via HTTP and basic auth
+      this.axiosInstance.put(`https://http.bosch-iot-hub.com/telemetry/${HUB_TENANT}/${HUB_DEVICE_ID}`, update,
+        { auth: { username: HUB_DEVICE_AUTH_ID + '@' + HUB_TENANT, password: HUB_DEVICE_PASSWORD } })
+        .catch(e => {
+          console.log(`[DeviceSimulation] update via Hub failed ${e}`)
+          console.log(e)
+        })
     }
   }
 

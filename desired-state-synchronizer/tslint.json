@@ -1,8 +1,0 @@
-{
-    "extends": "tslint-config-standard",
-    "rules": {
-        "await-promise": false,
-        "no-floating-promises": false,
-        "space-before-function-paren": false
-    }
-}

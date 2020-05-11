@@ -1,9 +1,0 @@
-target/
-.extract/
-.idea
-*.iml
-**/ThingsClient.jks
-.classpath
-.project
-.settings
-/src/main/resources/config.properties

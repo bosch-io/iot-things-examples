@@ -38,7 +38,7 @@ Finally, there needs to be a place where the orchestration is described. Policie
 
 The following conceptual model describe the composition of a digital twin:
 
-![concept](doc/digitaltwin-concept.png)
+![concept](images/digitaltwin-concept.png)
 
 ## Implementation and Deployment of Digital Twins
 
@@ -51,7 +51,7 @@ The most important characteristic of a digital twin is the representation of sta
 
 The following diagram shows deployment options for digital twins with Bosch IoT Things / Eclipse Ditto:
 
-![deployment](doc/digitaltwin-deployment.png)
+![deployment](images/digitaltwin-deployment.png)
 
 # Example
 
@@ -68,117 +68,7 @@ The contract is defined in: [http://vorto.eclipse.org/#/details/com.bosch.iot.su
 
 Adding all of these aspects in the general conceptual model gives the following picture:
 
-![concept-example](doc/digitaltwin-concept-example.png)
-
-## Example microservice implementation
-
-The example implementation includes all the microservices that provide the features of the digital twin as well as an exemplary business application ("Frontend") in one single runtime application based on Node.js.
-In addition, it adds a simple device simulation microservice that simulates a real physical device by sending telemetry data and respecting configuration data.
-
-INFO: The device simulation currently uses the Bosch IoT Hub / Eclipse Hono HTTP channel to emit telemetry data AND in parallel the Bosch IoT Things / Eclipse Ditto WebSocket channel to receive configuration changes. The WebSocket channel is not proposed for large scale scenarios with high number of device connections but should be replaced by an appropriate device connectivity channel like MQTT via Bosch IoT Hub.
-
-Following the deployment model from above this looks like this:
-
-![concept-example](doc/digitaltwin-deployment-example.png)
-
-The policy-based orchestration works with different (technical) users that are used for each microservice. In the policy notation the IDs of these users are called subjects and the subjects reflect the role each microservice has within the digital twin:
-You will need users for following roles:
-- **owner**: this is a user that owns the overall digital twin. It is set-up to have all access rights on all features and the policy itself. In the example the _Frontend_ user is the owner of the digital twin.
-- **integration**: this is a "virtual" user/subject that is used to define access rights used in the integration with Bosch IoT Hub / Eclipse Hono. This subject is allowed to write status properties and read configuration properties. As it is "virtual", no real (technical) user entity is required, but any unique, arbitrary subject ID can be used for that.
-- **simulation**: used by the device simulation microservice to act as replacement for a real physical device. It will be configured with the same access rights as the _Integration_ subject.
-- **accessories**: as the example accessories microservice uses a message-based interaction pattern ("retrieveSupportedAccessories") this subject requires receive permissions on these messages. The retrieval is based on product information and so this subject requires access on the respective _ProductInfo_ feature also.
-
-The following JSON snippet shows a Bosch IoT Things / Eclipse Ditto policy document, that defined all the access rights of the various roles for one or more digital twin instances. As described this also defines the orchestration of these roles within the digital twin:
-
-```json
-{
-  "policyId": "com.example.foo.bar:policy-100",
-  "entries": {
-    "DEFAULT": {
-      "subjects": {
-        "iot-permissions:0e08a311-xxxx-xxxx-xxxx-6209bbf7ad7a": { "type": "iot-permissions-userid" }
-      },
-      "resources": {
-        "policy:/": {
-          "grant": [ "READ", "WRITE" ],
-          "revoke": []
-        },
-        "thing:/": {
-          "grant": [ "READ", "WRITE" ],
-          "revoke": []
-        },
-        "message:/": {
-          "grant": [ "READ", "WRITE" ],
-          "revoke": []
-        }
-      }
-    },
-    "DEVICE": {
-      "subjects": {
-        "integration:b55b6221-xxxx-xxxx-xxxx-d7cd9cbf454a:hub-abc": { "type": "iot-things-integration" },
-        "iot-permissions:cae7eaa0-xxxx-xxxx-xxxx-f2da514201bb": {
-           "type": "iot-permissions-userid",
-           "//": "user for device simulation"
-        }
-      },
-      "resources": {
-        "thing:/features/Device/properties/status": {
-          "grant": [ "WRITE" ],
-          "revoke": []
-        },
-        "thing:/features/Device/properties/config": {
-          "grant": [ "READ" ],
-          "revoke": []
-        }
-      }
-    },
-    "ACCESSORIES": {
-      "subjects": {
-        "iot-permissions1799eeb9-xxxx-xxxx-xxxx-0f2308640b9d": { "type": "iot-permissions-userid" }
-      },
-      "resources": {
-        "thing:/features/Productinfo": {
-          "grant": [ "READ" ],
-          "revoke": []
-        },
-        "message:/features/Accessories/inbox/messages": {
-          "grant": [ "READ", "WRITE" ],
-          "revoke": []
-        }
-      }
-    }
-  }
-}
-```
-
-# Prepare
-
-## Use an existing or request a new Bosch IoT Suite for Asset Comunication service subscription
-
-Book the Bosch IoT Suite for Asset Communication (including Bosch Iot Things and Bosch IoT Hub) as described in our [documentation](https://docs.bosch-iot-suite.com/asset-communication/Subscribe-a-package-instance.html).
-
-## Prepare users (subjects) for each microservice
-
-As described above, the microservices of a digital twin use different (technical) users/subjects. To prepare and manage these subjects you can use [Bosch IoT Permissions](https://www.bosch-iot-suite.com/service/permissions/).
-For evaluation/example scenarios you can alternatively setup some evaluation users as described at: [Register a user](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/).
-
-## Configure your settings
-
-Set your credentials in a file called "config.json". You can copy "config.json-template" as template and fill out the placeholders.
-
-# Build and Run
-
-```
-npm install
-tsc
-npm run start
-```
-
-If you need to access the Internet using a proxy configuration, please make sure to set the environment variable HTTPS_PROXY.
-
-# Extensions / Further reading
-
-A lot of usage scenarios of digital twins require the integration of **history data** of properties of one or more Features of a digital twin. Therefore we provide an example implementation of a general-purpose historian service that can be easily plugged into any digital twin to provide a managed way for collecting and accessing history data. See this example for details: [https://github.com/bosch-io/iot-things-examples/tree/dev/historian-influxdb]
+![concept-example](images/digitaltwin-concept-example.png)
 
 # License
 See the iot-things-examples top level README.md file for license details.

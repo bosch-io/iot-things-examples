@@ -1,27 +1,19 @@
-# Bosch IoT Things - Octopus bidirectional use case via Bosch IoT Hub
+# Bosch IoT Things - Octopus device integration via Bosch IoT Hub
 
-![](../octopus-app/images/things-screenshot-safe.png)
+This example provides a prototype of a real world device integration - based on the Octopus board (ESP8266).
+It shows how to subscribe to Bosch IoT Suite for Asset Communication and use it's API to provision a device.
 
-## Summary
-
-This example shows how to use Bosch IoT Things and Bosch IoT Hub to connect your device with our cloud services and a frontend solution. It shows how to subscribe to our Bosch IoT Suite for Asset Communication service, how to use its HTTP endpoints, and how to send data within these services.</br>
-Furthermore, the example provides a prototype of a real world device - based on the Octopus board (ESP8266) - and a web application to manage your things.
-
-The **device** will be able to connect automatically to a given wireless internet access, to send telemetry data to the
-Things service, and to react to messages which will be sent by the provided web application.
-
-The **web application** will use our Bosch IoT Things HTTP endpoints to communicate with the "digital twin" of the device and the physical device itself.
+The octopus will be able to connect automatically to a given wireless internet access, to send telemetry data to the
+Things service, and to react to messages which can be sent by a [web application](../octopus-app).
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)
 2. [Register the device via Device Provisioning API](#device-provisioning-api)
-3. [Add a subject to your policy](#add-a-subject-to-your-policy)
-4. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
-5. [Send messages to your device and switch LEDs via the web application](#getting-started)
+3. [Set-up the Arduino IDE](#prepare-the-octopus-device-with-arduino)
 
 We will use the _telemetry_, _event_ as well as the _command & control_ pattern of the Bosch IoT Hub.
 
-![](../octopus-app/images/Bidirectional_Overview.png)
+![](./images/overview.png)
 
 ## About the Octopus board
 The Octopus board is created by Guido Burger. Its original purpose was to be used as a teaching tool for hackatons in
@@ -170,45 +162,6 @@ Click _Execute_ to submit the request.
 
 Upon success, you have created a _device_ in the context of Bosch IoT Hub associated with credentials, and an empty _digital twin_ in _thing_ notation associated with a default policy.
 
-## Add a subject to your policy
-
-A policy enables developers to configure **fine-grained** access control for Things and other entities in an easy way. A specific policy provides someone (called **subject**), permission to _read_ and/or _write_ at a given **resource**. Your Device Provisioning Request at our API generated a default policy for you.
-
-In order to get _read_ access to our registered thing on the things-dashboard, we have to create a new subject with our `bosch-id` by requesting the `PUT` `​/policies​/{policyId}​/entries​/{label}` route on our [Bosch IoT Things HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/).
-                                                                                                                                                                                                                   
-You will need to do the following steps:
-
-1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated input field.
-2. Provide your _policyId_ on the required input-field. You can find your _policyId_ in the response of your previous Device Provisioning request.
-3. Set any _label_ (e.g `solution-owner`) for your new **subject**, by typing it in the dedicated input-field.
-4. Edit the request body to send a valid message to the server.
-
-Your request body should contain the following information:
-
-```json
-{
-  "subjects": {
-    "bosch:<your-technical-user-id>": {
-      "type": "bosch-id"
-    }
-  },
-  "resources": {
-    "thing:/": {
-      "grant": [
-        "READ" 
-      ],
-      "revoke": []
-    }
-  }
-}
-```
-You will need to edit the following `<placeholders>`:
-* "bosch:`<your-technical-user-id>`" - You can find your _technical-user-id_  under the Show Credentials button of your Service Subscription page in the Bosch IoT Suite
-
-Click Execute to submit the request.
-
-Upon success, you have created a subject in your policy with _read_ access for your registered thing (octopus board).
-
 ## Prepare the Octopus device with Arduino
 
 ### Requirements
@@ -238,46 +191,12 @@ Upon success, you have created a subject in your policy with _read_ access for y
 The Arduino Sketch we have prepared publishes the sensor information via the Bosch IoT Hub to Bosch IoT Things.
 
 **Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
-https://vorto.eclipse.org/#/details/com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.0.0
+https://vorto.eclipse.org/#/details/com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.1.0
 
-Open `iot-device/octopus-hub/octopus-hub.ino` in your Arduino IDE.
+Open `src/octopus-hub.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `iot-device/octopus-hub/settings.h`. You can use `iot-device/octopus-hub/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
-
-```cpp
-#ifndef SETTINGS_H
-#define SETTINGS_H
-
-// ---- WiFi configuration ----
-#define WIFI_SSID "XXX" // The SSID of the WiFi you want your octopus board to connect to.
-#define WIFI_PASSWORD "XXX" // The password of the WiFi you want your octopus board to connect to.
-
-// ---- Things registration properties ----
-#define THINGS_NAMESPACE "XXX" // The namespace you created in your solution.
-#define THING_NAME "octopus" // Should not be changed - This is the thing id without the namespace.
-
-// ---- Hub registration properties ----
-#define HUB_TENANT "XXX" // The tenant id of your hub instance, which is provided by the credentials of the Bosch IoT Suite - service subscriptions page.
-#define HUB_DEVICE_ID "XXX" // The device id that was included in the response of the device provisioning API request.
-#define HUB_DEVICE_AUTH_ID "XXX" // The auth id that was included in the response of the device provisioning API request.
-#define HUB_DEVICE_PASSWORD "XXX" // The device password that was used for the device provisioning API request in plain text.
-
-// ---- Update rate of sensors ----
-#define SENSOR_UPDATE_RATE_MS 5000 // Print updated sensor value every 5 seconds
-#define LOOP_DELAY 100
-
-// ---- Hub MQTT configuration ----
-// Do not change this
-#define MQTT_BROKER "mqtt.bosch-iot-hub.com"
-#define MQTT_PORT 8883
-
-//#define BME280 // uncomment this line if your board has a BME280 instead of BME680
-
-extern const unsigned char mqtt_server_ca[];
-extern const unsigned int mqtt_server_ca_len;
-
-#endif
-```
+All properties relevant for the connection to our cloud services have to be set in `src/settings.h`.
+You can use `src/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
 
 Once you have stored the file at the expected location, verify the sketch.
 
@@ -287,82 +206,4 @@ The prepared Arduino sketch will connect to the Bosch IoT Hub with TLS standard,
 send and receive MQTT messages, read sensors data, and depending on incoming messages (from the web application) it will set new values for the LED on the board.
 
 Feel free to play with code.
-
-## Front-end
-
-The example in [iot-frontend](iot-frontend/) uses following frameworks:
-
-- [Vue.js](https://vuejs.org)
-- [Bootstrap](http://getbootstrap.com/)
-- [axios](https://github.com/axios/axios)
-- [Vuex](https://vuex.vuejs.org/)
-- [Codemirror](https://codemirror.net/)
-
-### Getting started
-
-All the code can be found under [iot-frontend](iot-frontend/).
-
-**Tip**: Our Demo section provides the [Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/) online.<br/>
-
-You can run the example locally as well - just follow the instructions below.
-
-Installation:
-
-```bash
-$ cd iot-frontend
-
-// or install dependencies using npm
-$ npm i
-// or
-$ npm install
-```
-
-Running Dev-Server (with hot reloading):
-
-```bash
-// serving the ui using yarn
-$ npm run serve
-```
-
-When everything is set up properly, you have access to the Command & Control Example through
-`http://localhost:3000`
-
-## Use the web app to remotely change the LED setting
-
-We assume you work with the version hosted at our demo
-[Octopus-bidirectional example](https://demos.s-apps.de1.bosch-iot-cloud.com/octopus-bidirectional/).
-
-You can use your _SuiteAuth_ authentication by choosing from the dropdown input and logging in with a valid Token. Request a new token and paste it in the dedicated input field. **Your Token will be valid for 5 minutes**.
-
-The second way to authenticate at this UI is the _BasicAuth_ - with an API token, username and password. Find details at [Register Evaluation User](https://docs.bosch-iot-suite.com/things/examples-demo/createuser/) and make sure the user is empowered in the [policy](https://docs.bosch-iot-suite.com/things/tutorials/hello-world/#e-learn-to-read-the-policy-notation) of your octopus.
-
-After you have added your credentials and pressed _connect_, you should see a list with your things (at least the octopus).
-
-Just click on the thing you want to observe or send data to.<br/>
-Depending on your device, you can now send command messages to it.
-
-This example provides LED control on the Octopus board via messages.
-
-Send following message to the topic `switch_led`.
-
-```json
-{
-  "r": 0,
-  "g": 0,
-  "b": 0,
-  "w": 0
-}
-```
-
-This is in fact a POST request at the [Messages API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/Messages).
-
-The response will be either _success_ or an _error_ message.
-
-In case the request was successful, the LED is switched off. The board will send the respective telemetry data to the Hub, which forwards the data to Bosch IoT Things.
-
-The web application uses SSE ('server sent events') to get live updates from Bosch IoT Things - these updates are directly
-reflected in the web application.
-
-From this point on feel free to extend the code and build your own IoT solution.
-
 Happy coding!

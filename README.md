@@ -4,8 +4,9 @@
 
 - [About Things](#about-things)
 - [desired-state-synchronizer](#desired-state-synchronizer)
-- [octopus-bidirectional](#octopus-bidirectional)
 - [things-batch-importer](#things-batch-importer)
+- [octopus-device-integration](#octopus-device-integration)
+- [octopus-app](#octopus-app)
 - [License](#License)
 
 ## About Things
@@ -28,13 +29,13 @@ This example shows an end-to-end scenario for digital twins based on Bosch IoT T
 
 This example shows a usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto. It is focused on distinguishing between the _current_ reported state of device information and a _desired_, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably.
 
-## [octopus-bidirectional](octopus-bidirectional/)
+## [octopus-device-integration](octopus-device-integration/)
 
-This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_.
+This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_ and how to update a digital twin via "telemetry" data sent from the device.
 
-It shows how to 
-* update a digital twin via "telemetry" data sent from the device
-* send command-and-control messages via the HTTP API of _Bosch IoT Things_ to _Bosch IoT Hub_ to the physical device - and back
+## [octopus-app](octopus-app/)
+
+This example shows how to send command-and-control messages via the HTTP API of _Bosch IoT Things_ to _Bosch IoT Hub_ to the physical device.
 
 ## [things-batch-importer](things-batch-importer/)
 

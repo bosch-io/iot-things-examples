@@ -1,7 +1,7 @@
 # Examples for Bosch IoT Things
 
 This repository contains examples for using Bosch IoT Things.
-It is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch.IO](https://bosch.io/) GmbH.
+It is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch.IO](https://bosch.io/).
 The service is *based on* and *powered by* the open source project [Eclipse Ditto](https://www.eclipse.org/ditto/).
 
 The example code provided here shows a *selection* of the Bosch IoT Things service functionality. Thus, the examples do not cover the complete service offering.

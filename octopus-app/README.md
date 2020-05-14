@@ -1,4 +1,4 @@
-# Bosch IoT Things - Octopus app
+# Octopus app
 
 This example provides a web application to manage your things.
 It shows how to use Bosch IoT Things API to communicate with the "digital twin" of the device and the physical device itself.

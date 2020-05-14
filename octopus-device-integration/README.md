@@ -1,4 +1,4 @@
-# Bosch IoT Things - Octopus device integration via Bosch IoT Hub
+# Octopus device integration
 
 This example provides a prototype of a real world device integration - based on the Octopus board (ESP8266).
 It shows how to subscribe to Bosch IoT Suite for Asset Communication and use it's API to provision a device.

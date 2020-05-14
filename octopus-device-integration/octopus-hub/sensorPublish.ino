@@ -183,7 +183,7 @@ void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Val
   if (altitudeMin > altitude) {
     altitudeMin = altitude;
   }
-  if (humidityMax < altitude) {
+  if (altitudeMax < altitude) {
     altitudeMax = altitude;
   }
 

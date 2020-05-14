@@ -193,10 +193,10 @@ The Arduino Sketch we have prepared publishes the sensor information via the Bos
 **Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
 https://vorto.eclipse.org/#/details/com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.1.0
 
-Open `src/octopus-hub.ino` in your Arduino IDE.
+Open `octopus-hub/octopus-hub.ino` in your Arduino IDE.
 
-All properties relevant for the connection to our cloud services have to be set in `src/settings.h`.
-You can use `src/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
+All properties relevant for the connection to our cloud services have to be set in `octopus-hub/settings.h`.
+You can use `octopus-hub/settings-template.h` as a template. Replace all `XXX` placeholders with your configuration properties and write your credentials within the `" "` quotation marks.
 
 Once you have stored the file at the expected location, verify the sketch.
 

@@ -40,63 +40,57 @@ float altitudeMin = 1E+20;
 float altitudeMax = 1E-20;
 
 String modifyFeaturePropertiesMsg(String featureName, const String& properties) {
-  StaticJsonBuffer<600> jsonBuffer;
-  JsonObject& dittoProtocolMsg = jsonBuffer.createObject();
+  DynamicJsonDocument dittoProtocolMsg(600);
   dittoProtocolMsg["topic"] = String(THINGS_NAMESPACE) + "/" + String(THING_NAME) + "/things/twin/commands/modify";
-  JsonObject& headers = dittoProtocolMsg.createNestedObject("headers");
+  JsonObject headers = dittoProtocolMsg.createNestedObject("headers");
   headers["response-required"] = false;
   headers["content-type"] = "application/vnd.eclipse.ditto+json";
   dittoProtocolMsg["path"] = "/features/" + featureName + "/properties";
-  dittoProtocolMsg["value"] = jsonBuffer.parseObject(properties);
+  DynamicJsonDocument props(200);
+  deserializeJson(props, properties);
+  dittoProtocolMsg["value"] = props;
 
   String output;
-  dittoProtocolMsg.printTo(output);
-  jsonBuffer.clear();
+  serializeJson(dittoProtocolMsg, output);
   return output;
 }
 
 String sensorMinMaxValue(float sensorValue, float minValue, float maxValue, const String& units) {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& properties = jsonBuffer.createObject();
-  JsonObject& statusProps = properties.createNestedObject("status");
+  DynamicJsonDocument properties(200);
+  JsonObject statusProps = properties.createNestedObject("status");
   statusProps["sensorValue"] = sensorValue;
   statusProps["minMeasuredValue"] = minValue;
   statusProps["maxMeasuredValue"] = maxValue;
   statusProps["sensorUnits"] = units;
   
   String output;
-  properties.printTo(output);
-  jsonBuffer.clear();
+  serializeJson(properties, output);
   return output;
 }
 
 String sensor3dValue(float xValue, float yValue, float zValue, const String& units) {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& properties = jsonBuffer.createObject();
-  JsonObject& statusProps = properties.createNestedObject("status");
+  DynamicJsonDocument properties(200);
+  JsonObject statusProps = properties.createNestedObject("status");
   statusProps["xValue"] = xValue;
   statusProps["yValue"] = yValue;
   statusProps["zValue"] = zValue;
   statusProps["sensorUnits"] = units;
   
   String output;
-  properties.printTo(output);
-  jsonBuffer.clear();
+  serializeJson(properties, output);
   return output;
 }
 
 String ledValue(short r, short g, short b, short w) {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& properties = jsonBuffer.createObject();
-  JsonObject& statusProps = properties.createNestedObject("status");
+  DynamicJsonDocument properties(200);
+  JsonObject statusProps = properties.createNestedObject("status");
   statusProps["r"] = r;
   statusProps["g"] = g;
   statusProps["b"] = b;
   statusProps["w"] = w;
   
   String output;
-  properties.printTo(output);
-  jsonBuffer.clear();
+  serializeJson(properties, output);
   return output;
 }
 

@@ -32,7 +32,7 @@
 #include <ArduinoJson.h>
 #include "octopus.h"
 
-#define HUB_COMMAND_CALLBACK_SIGNATURE void (*callback)(JsonObject&,String,String)
+#define HUB_COMMAND_CALLBACK_SIGNATURE void (*callback)(DynamicJsonDocument,String,String)
 
 class BoschIotHub {
   private:

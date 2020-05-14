@@ -28,14 +28,12 @@
 #include "printer.h"
 #define MSG_LENGTH 4096
 
-StaticJsonBuffer<MSG_LENGTH> jsonBuffer;
-
 BoschIotHub::BoschIotHub(const char *mqttBroker_, const int mqttPort_, const unsigned char *mqttServerCA_, const unsigned int mqttServerCALen_)
     : mqttBroker(mqttBroker_), mqttPort(mqttPort_), mqttServerCA(mqttServerCA_), mqttServerCALen(mqttServerCALen_)
 {
 }
 
-void (*onDittoProtocolMessage)(JsonObject &, String, String);
+void (*onDittoProtocolMessage)(DynamicJsonDocument, String, String);
 
 void BoschIotHub::registerOnDittoProtocolMessage(HUB_COMMAND_CALLBACK_SIGNATURE)
 {
@@ -56,7 +54,8 @@ void hubCommandReceived(char *topic, byte *payload, unsigned int length)
   byte *p = (byte *)malloc(length);
   // Copy the payload to the new buffer
   memcpy(p, payload, length);
-  JsonObject &root = jsonBuffer.parseObject(p);
+  DynamicJsonDocument root(MSG_LENGTH);
+  DeserializationError error = deserializeJson(root, p);
 
   if (root.size() > 0 && root.containsKey("topic") && root.containsKey("path"))
   {
@@ -75,7 +74,6 @@ void hubCommandReceived(char *topic, byte *payload, unsigned int length)
   }
   // Free the memory
   free(p);
-  jsonBuffer.clear();
 }
 
 bool BoschIotHub::connect()

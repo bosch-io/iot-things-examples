@@ -59,10 +59,10 @@ void setup()
   Serial.println();
 }
 
-void customMessageHandler(JsonObject &root, String command, String replyTopic)
+void customMessageHandler(DynamicJsonDocument root, String command, String replyTopic)
 {
   const char *dittoTopic = root["topic"];
-  JsonObject &headers = root["headers"];
+  JsonObject headers = root["headers"];
   const char* path = root["path"];
 
   String switchLedPath = "/features/led/inbox/messages/setColor";
@@ -71,7 +71,7 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
 
   if (command.equals("switch_led") || (command.equals("setColor") && switchLedPath.equals(path)))
   {
-    JsonObject &value = root["value"];
+    JsonObject value = root["value"];
     const char red = value["r"];
     const char green = value["g"];
     const char blue = value["b"];
@@ -96,7 +96,7 @@ void customMessageHandler(JsonObject &root, String command, String replyTopic)
   }
 
   String output;
-  root.printTo(output);
+  serializeJson(root, output);
   String replyTopicAndStatusCode = replyTopic + "200";
   hub.publish(replyTopicAndStatusCode.c_str(), output);
 }

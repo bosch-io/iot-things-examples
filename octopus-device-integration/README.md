@@ -174,14 +174,13 @@ Upon success, you have created a _device_ in the context of Bosch IoT Hub associ
 
 1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino) (tested with 2.4.1).
 2. Install the following libraries (Sketch -> Include Library -> Manage Libraries)
-   1. [Adafruit Unified Sensor Library](https://github.com/adafruit/Adafruit_Sensor) (tested with 1.0.2)
-   2. [Adafruit BME680 library](https://github.com/adafruit/Adafruit_BME680) (tested with 1.0.7)
-   3. [Adafruit BME280 library](https://github.com/adafruit/Adafruit_BME280) (tested with 1.0.7)
-   4. [Adafruit BNO055 library](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.1.6)
-   5. [Adafruit NeoPixel library](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.1.7)
-   6. [PubSubClient library](https://github.com/knolleary/pubsubclient) (tested with 2.7.0)
-   7. [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (tested with 5.13.4)
-   8. [ESP8266Ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
+   * [Adafruit BME680](https://github.com/adafruit/Adafruit_BME680) (tested with 1.0.7)
+   * [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280) (tested with 1.0.7)
+   * [Adafruit BNO055](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.1.6)
+   * [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.1.7)
+   * [PubSubClient](https://github.com/knolleary/pubsubclient) (tested with 2.7.0)
+   * [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (tested with 5.13.4)
+   * [ESP8266-ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
 4. Change the Board (Tools -> Board: -> Adafruit Feather HUZZAH ESP8266)

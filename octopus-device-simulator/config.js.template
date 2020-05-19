@@ -39,7 +39,8 @@ const config = {
                                 // text.
 
     // ---- Update rate of sensors ----
-    SENSOR_UPDATE_RATE_MS: 5000, // Print updated sensor value every 5 seconds
+    SENSOR_UPDATE_RATE_MS: 60000, // Print updated sensor value every 60 seconds. Faster update rates mean more transactions,
+                                  // which might exceed your Free Plan capacities of a Asset Communication package quite fast.
     LOOP_DELAY: 100,
 
     BME_280: false,              // set to true if BME280 should be used instead of BME680

@@ -16,7 +16,8 @@
 #define HUB_DEVICE_PASSWORD "" // The device password that was used for the device provisioning API request in plain text.
 
 // ---- Update rate of sensors ----
-#define SENSOR_UPDATE_RATE_MS 5000 // Print updated sensor value every 5 seconds
+#define SENSOR_UPDATE_RATE_MS 60000 // Print updated sensor value every 60 seconds. Faster update rates mean more transactions,
+                                   // which might exceed your Free Plan capacities of a Asset Communication package quite fast.
 #define LOOP_DELAY 100
 
 // ---- Hub MQTT configuration ----

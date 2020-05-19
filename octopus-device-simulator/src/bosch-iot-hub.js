@@ -77,7 +77,10 @@ class BoschIotHub {
     return this.axiosInstance({
       url: `/${topic}`,
       method: 'post',
-      data: stringified
+      data: stringified,
+      headers: {
+        'response-required': false
+      }
     })
       .catch(error => console.log('[Bosch IoT Hub] Publish failed.', error));
   }

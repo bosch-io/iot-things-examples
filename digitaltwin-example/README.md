@@ -1,4 +1,4 @@
-# Bosch IoT Things - End-to-End Digital Twin Example
+# Bosch IoT Things - End-to-End Digital Twin concept
 
 **Table of contents**
 
@@ -16,13 +16,7 @@
 
 # Introduction
 
-This example shows a simple end-to-end scenario for digital twins based on Bosch IoT Things / Eclipse Ditto with a digital twin that represents an IoT device.
-
-## Prerequisites
-
-The following background knowledge is required for this example:
-- npm
-- TypeScript
+This concept shows a simple end-to-end scenario for digital twins based on Bosch IoT Things / Eclipse Ditto with a digital twin that represents an IoT device.
 
 # General concept
 

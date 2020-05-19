@@ -1,8 +1,9 @@
-# Bosch IoT Things - Synchronizer example to support Desired vs Reported state of Devices
+# Bosch IoT Things - Synchronizer concept to support Desired vs Reported state of Devices
 
-This example shows a simple implementation and usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto that is based on distinguishing between the current reported state of device information and a desired, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably. Devices that are used for telemetry data ingestion only or devices that are connected very reliable without interruptions may not need such an approach.
+This concept shows a simple implementation and usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto that is based on distinguishing between the current reported state of device information and a desired, target state for that device. This is mainly required for configuration parameters of devices that are connected either sporadically or unstably. Devices that are used for telemetry data ingestion only or devices that are connected very reliable without interruptions may not need such an approach.
 
-This example shows a preliminary implementation that could be refactored towards a core functionally of Bosch IoT Things / Eclipse Ditto. See [ditto#125](https://github.com/eclipse/ditto/issues/125) for the discussion/progress on this functionally/refactoring.
+There is a discussion in [ditto#125](https://github.com/eclipse/ditto/issues/125) on how this concept can be integrated
+as a core functionality of Bosch IoT Things / Eclipse Ditto.
 
 # Chosen approach
 

@@ -1,0 +1,12 @@
+hub:
+  host:
+  port:
+  username:
+  password:
+local:
+  server:
+    port:
+logging:
+  level:
+    com.bosch.iot.things.example.message.processor: INFO
+spring.main.web-application-type: none

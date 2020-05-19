@@ -61,8 +61,6 @@ void setup()
 
 void customMessageHandler(DynamicJsonDocument root, String command, String replyTopic)
 {
-  const char *dittoTopic = root["topic"];
-  JsonObject headers = root["headers"];
   const char* path = root["path"];
 
   String switchLedPath = "/features/led/inbox/messages/setColor";

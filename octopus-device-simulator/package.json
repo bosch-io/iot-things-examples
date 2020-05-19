@@ -2,12 +2,25 @@
   "name": "octopus-device-simulator",
   "version": "1.0.0",
   "private": true,
-  "description": "",
+  "description": "Node.js app which simulates an Octopus firmware like the one provided in the octopus-device-integration example",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "semistandard --env jest",
+    "serve": "node src/index",
+    "start": "npm run serve",
+    "simulate": "npm run serve",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Bosch IoT Things",
-  "license": "see license in LICENSE file"
+  "license": "see license in root LICENSE file",
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "semistandard": "^14.2.0",
+    "standard": "^14.3.4"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "https-proxy-agent": "^5.0.0"
+  }
 }

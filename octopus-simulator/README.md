@@ -2,12 +2,12 @@
 
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/standard/semistandard)
 
-This example provides a Node.js simulator for real world [octopus-device-integration prototype](../octopus-device-integration) - based on the Octopus board (ESP8266).
+This example provides a Node.js simulator for real world [octopus-device-integration prototype](../octopus-firmware) - based on the Octopus board (ESP8266).
 It shows how to subscribe to Bosch IoT Suite for Asset Communication and use it's API to provision a device. You can
 use it if you don't have access to an Octopus device, or if you just want to play around.
 
 The simulator will send telemetry data to the
-Things service, and to react to messages which can be sent by a [web application](../octopus-app).
+Things service, and to react to messages which can be sent by a [web application](../octopus-frontend).
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)

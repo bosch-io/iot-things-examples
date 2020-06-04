@@ -19,17 +19,17 @@ It is focused on distinguishing between the _current_ reported state of device i
 target state for that device. This is mainly required for configuration parameters of devices that are connected
 either sporadically or unstably.
 
-## [octopus-device-integration](octopus-device-integration/)
+## [octopus-device-integration](octopus-firmware/)
 
 This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_ and how to 
 update a digital twin via "telemetry" data sent from the device.
 
-## [octopus-device-simulator](octopus-device-simulator/)
+## [octopus-device-simulator](octopus-simulator/)
 
-This example is a local Node.js simulator which you can use as a replacement for [octopus-device-integration](octopus-device-integration/)
+This example is a local Node.js simulator which you can use as a replacement for [octopus-device-integration](octopus-firmware/)
 if you don't have access to an Octopus.
 
-## [octopus-app](octopus-app/)
+## [octopus-app](octopus-frontend/)
 
 This example shows how to send command-and-control messages via the HTTP API of _Bosch IoT Things_ to _Bosch IoT Hub_ to the physical device.
 

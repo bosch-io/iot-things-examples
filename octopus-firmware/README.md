@@ -4,7 +4,7 @@ This example provides a prototype of a real world device integration - based on 
 It shows how to subscribe to Bosch IoT Suite for Asset Communication and use it's API to provision a device.
 
 The octopus will be able to connect automatically to a given wireless internet access, to send telemetry data to the
-Things service, and to react to messages which can be sent by a [web application](../octopus-app).
+Things service, and to react to messages which can be sent by a [web application](../octopus-frontend).
 
 Before you can start, you have to prepare your setup. This includes the following steps:
 1. [Subscribe for the Bosch IoT Suite for Asset Communication](#setting-up-bosch-iot-suite-for-asset-communication)

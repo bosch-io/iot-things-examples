@@ -39,4 +39,4 @@ With this tool, you can upload a large number things into your cloud service ins
 
 ## License
 
-The examples are available under the terms of Bosch SI Example Code License. See individual files for details.
+The examples are available under the terms of Bosch SI or Bosch.IO Example Code License. See individual files for details.

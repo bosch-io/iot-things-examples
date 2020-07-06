@@ -70,10 +70,10 @@ void customMessageHandler(DynamicJsonDocument root, String command, String reply
   if (command.equals("switch_led") || (command.equals("setColor") && switchLedPath.equals(path)))
   {
     JsonObject value = root["value"];
-    const char red = value["r"];
-    const char green = value["g"];
-    const char blue = value["b"];
-    const char white = value["w"];
+    const long red = value["r"];
+    const long green = value["g"];
+    const long blue = value["b"];
+    const long white = value["w"];
     octopus.showColor(0, red, green, blue, white);
     octopus.showColor(1, red, green, blue, white);
 

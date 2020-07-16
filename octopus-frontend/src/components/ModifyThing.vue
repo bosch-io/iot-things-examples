@@ -105,7 +105,6 @@
     import "codemirror/theme/idea.css";
     import "codemirror/addon/selection/active-line.js";
     import AlertView from "./shared/AlertView.vue";
-    import UserDataViewVue from './UserData/UserDataView.vue';
 
     export default {
         name: "ModifyThing",
@@ -166,7 +165,7 @@
             }
         },
         watch: {
-            isSelected: function (val) {
+            isSelected: function () {
                 this.isReady = true;
             },
             isConnected: function (val) {

@@ -94,7 +94,7 @@
             }
         },
         watch: {
-            items: function (val) {
+            items: function () {
                 if (this.isActiveId !== "") {
                     this.isActiveId = "";
                 }

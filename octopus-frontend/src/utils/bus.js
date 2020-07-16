@@ -28,6 +28,7 @@
 import Vue from "vue";
 import {EventSourcePolyfill} from "event-source-polyfill";
 import store from "../store";
+import Api from "./api.js";
 
 export default (window.Event = new class {
     constructor() {

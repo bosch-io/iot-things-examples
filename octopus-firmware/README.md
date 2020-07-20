@@ -10,7 +10,7 @@ Things service, and to react to messages which can be sent by a [web application
 
 The device will send telemetry data to the Things service, and will react to messages, which can be sent by a web application, e.g. [octopus-frontend](../octopus-frontend).
 
-The example is structured in following steps:
+The example is divided into the following steps:
 
 1. [About the Octopus board](about-the-octopus-board)
 2. [Subscribe to the Bosch IoT Suite for Asset Communication](#subscribe-to-the-bosch-iot-suite-for-asset-communication)

@@ -16,7 +16,7 @@ will be read automatically from the `https_proxy` environment variable.
 The simulator will send telemetry data to the
 Things service, and will react to messages which can be sent by a web application, e.g. [octopus-frontend](../octopus-frontend).
 
-The example is structured in following steps:
+The example is divided into the following steps:
 
 1. [Subscribe to the Bosch IoT Suite for Asset Communication](#subscribe-to-the-bosch-iot-suite-for-asset-communication)
 2. [Register the device via Device Provisioning API](#register-the-device-via-device-provisioning-api)

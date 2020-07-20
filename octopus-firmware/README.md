@@ -13,7 +13,7 @@ The device will send telemetry data to the Things service, and will react to mes
 The example is structured in following steps:
 
 1. [About the Octopus board](about-the-octopus-board)
-2. [Subscribe for the Bosch IoT Suite for Asset Communication](#subscribe-for-the-bosch-iot-suite-for-asset-communication)
+2. [Subscribe to the Bosch IoT Suite for Asset Communication](#subscribe-to-the-bosch-iot-suite-for-asset-communication)
 3. [Register the device via Device Provisioning API](#register-the-device-via-device-provisioning-api)
 4. [Prepare the Octopus device with Arduino](#prepare-the-octopus-device-with-arduino)
 
@@ -38,12 +38,12 @@ For example, the Bosch IoT Suite edition board contains the following sensors:
 * [Bosch Sensortec BME680](https://www.bosch-sensortec.com/bst/products/all_products/bme680)
 environmental sensor – provides temperature, humidity, air pressure, altitude, air quality
 
-## Subscribe for the Bosch IoT Suite for Asset Communication
+## Subscribe to the Bosch IoT Suite for Asset Communication
 
 All services can be booked online at [Bosch IoT Suite](https://bosch-iot-suite.com/tutorials/howtosubscribe/) portal. For your subscription, you will need a
 _Bosch ID_ for authentication. If you don't have a Bosch ID yet, feel free to register a new account. Once you are successfully registered, you will be redirected to the Bosch IoT Suite portal.
 
-You will need to subscribe for the **Bosch IoT Suite for Asset Communication** package - a ready-to-use integration of Bosch IoT Hub and Bosch IoT Things. In order to book your **Bosch IoT Suite for Asset Communication**, please stick to the [Getting Started](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/).
+You will need to subscribe to the **Bosch IoT Suite for Asset Communication** package - a ready-to-use integration of Bosch IoT Hub and Bosch IoT Things. In order to book your **Bosch IoT Suite for Asset Communication**, please stick to the [Getting Started](https://www.bosch-iot-suite.com/getting-started-bosch-iot-suite-asset-communication/).
 
 ### Namespace
 
@@ -59,7 +59,7 @@ The `namespace` must conform to the reserve domain name notation:
 ### Connection
 
 Furthermore, you will get a pre-configured connection between Hub and Things.
-You can see it at the a Things dashboard, on tab [Connections/Integrations](https://docs.bosch-iot-suite.com/asset-communication/First-configuration-steps.html#src-894245029_Firstconfigurationsteps-Checkyourconnection).
+You can see it at the Things dashboard, on tab [Connections/Integrations](https://docs.bosch-iot-suite.com/asset-communication/First-configuration-steps.html#src-894245029_Firstconfigurationsteps-Checkyourconnection).
 
 We will use the _telemetry_, _event_ as well as the _command & control_ pattern of the Bosch IoT Hub.
 
@@ -173,7 +173,7 @@ Your request body should contain the following information:
 
 You will need to edit the following placeholders:
 
-* "id": "`<your-namespace>:<your-device-id>`" - Use your created namespace followed by `:` and your specific thing ID.
+* "id": "`<your-namespace>:<your-device-id>`" - Use your created namespace followed by `:` and your specific thing name.
 * "password": "`any-password`" - Type in a secure password in plain text. It will be hashed on our server.
 * "manufacturer": "`<my-awesome-company>`" - Type in your company Name.
 

@@ -14,8 +14,8 @@ The frontend will look like in the following screenshot.
 ![](./images/screenshot.png)
 
 The Bearer Token input field is required for authentication.
-In case your went through the _octopus-firmware_ or _octopus-simulator_ example, you might have created already a Suite authorization token.
-Otherwise, [Create a Suite Auth Client](https://docs.bosch-iot-suite.com/asset-communication/Create-a-Suite-Auth-client.html) as described in the Asset Communication package documentation.
+In case you went through the _octopus-firmware_ or _octopus-simulator_ example, you might have created already a Suite authorization token.
+Otherwise, [create a Suite Auth Client](https://docs.bosch-iot-suite.com/asset-communication/Create-a-Suite-Auth-client.html) as described in the Asset Communication package documentation.
 Upon request, the client will issue a token, which is valid 60 minutes.
 
 ### Frontend dependencies

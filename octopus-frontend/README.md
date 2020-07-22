@@ -1,56 +1,24 @@
-# Octopus app
+# Octopus frontend
 
 This example provides a web application to manage your things.
-It shows how to use Bosch IoT Things API to communicate with the "digital twin" of the device and the physical device itself.
+It shows how to use the Bosch IoT Things API to communicate with the "digital twin" of the device and the physical device itself.
 
-Before you can start, you have to prepare your setup. This includes the following steps:
-1. [Add a subject to your policy](#add-a-subject-to-your-policy)
-2. [Send messages to your device and switch LEDs via the web application](#getting-started)
+Further, the example assumes that you have successfully connected a device, and shows how to send command-and-control messages via the HTTP API to the physical device. Once your message reaches the device, and the firmware knows how to react on it, the respective change is reported back to the digital twin and visible on the frontend. 
+
+![](./images/octo-firmware.png)
+
+## Frontend screenshot
+
+The frontend will look like in the following screenshot.
 
 ![](./images/screenshot.png)
 
-## Add a subject to your policy
+The Bearer Token input field is required for authentication.
+In case you went through the _octopus-firmware_ or _octopus-simulator_ example, you might have created already a Suite authorization token.
+Otherwise, [create a Suite Auth Client](https://docs.bosch-iot-suite.com/asset-communication/Create-a-Suite-Auth-client.html) as described in the Asset Communication package documentation.
+Upon request, the client will issue a token, which is valid 60 minutes.
 
-A policy enables developers to configure **fine-grained** access control for Things and other entities in an easy way.
-A specific policy provides someone (called **subject**), permission to _read_ and/or _write_ at a given **resource**.
-Your Device Provisioning Request at our API generated a default policy for you.
-
-In order to get _read_ access to our registered thing on the things-dashboard, we have to create a new subject with our `bosch-id` by requesting the `PUT` `​/policies​/{policyId}​/entries​/{label}` route on our [Bosch IoT Things HTTP API](https://apidocs.bosch-iot-suite.com/?urls.primaryName=Bosch%20IoT%20Things%20-%20API%20v2#/).
-                                                                                                                                                                                                                   
-You will need to do the following steps:
-
-1. Authorize your API request via Suite authorization token, by clicking on the **Authorize** button on the upper right corner and paste the token into the dedicated input field.
-2. Provide your _policyId_ on the required input-field. You can find your _policyId_ in the response of your previous Device Provisioning request.
-3. Set any _label_ (e.g `solution-owner`) for your new **subject**, by typing it in the dedicated input-field.
-4. Edit the request body to send a valid message to the server.
-
-Your request body should contain the following information:
-
-```json
-{
-  "subjects": {
-    "bosch:<your-technical-user-id>": {
-      "type": "bosch-id"
-    }
-  },
-  "resources": {
-    "thing:/": {
-      "grant": [
-        "READ" 
-      ],
-      "revoke": []
-    }
-  }
-}
-```
-You will need to edit the following `<placeholders>`:
-* "bosch:`<your-technical-user-id>`" - You can find your _technical-user-id_  under the Show Credentials button of your Service Subscription page in the Bosch IoT Suite
-
-Click Execute to submit the request.
-
-Upon success, you have created a subject in your policy with _read_ access for your registered thing (octopus board).
-
-## Front-end
+### Frontend dependencies
 
 The example uses the following dependencies:
 
@@ -76,11 +44,14 @@ $ npm run serve
 
 You can now open your browser and navigate to the app at `http://localhost:3000`
 
-## Use the app to remotely change the LED setting
+## Use the app to remotely change the LED settings of an Octopus device
 
-After you have added a JWT token and pressed _connect_, you should see a list with your things (at least the octopus).
+### Authenticate with a JWT
 
-Just click on the thing you want to observe or send data to.
+Issue a new token at https://accounts.bosch-iot-suite.com/oauth2-clients/.
+Copy it to your clipboard and enter it into the Bearer Token field. Then click _connect_ and you should see a list with things, which have been created in this context. At least we assume the Octopus device has been provisioned using the same token, thus, the policy should allow to read it and to send messages.
+
+Click on a thing to see its details (JSON).
 
 Depending on your device, you can now send command messages to it.
 
@@ -105,6 +76,6 @@ In case the request was successful, the LED is switched off. The board will send
 
 The web application uses SSE ('server sent events') to get live updates from Bosch IoT Things - these updates are directly reflected in the web application.
 
-From this point on feel free to extend the code and build your own IoT solution.
+From this point on, feel free to extend the code and build your own IoT solution.
 
 Happy coding!

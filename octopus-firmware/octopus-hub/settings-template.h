@@ -7,7 +7,7 @@
 
 // ---- Things registration properties ----
 #define THINGS_NAMESPACE "" // The namespace you created in your solution.
-#define THING_NAME ""   // Should not be changed - This is the thing id without the namespace.
+#define THING_NAME ""   // This is the thing id without the namespace.
 
 // ---- Hub registration properties ----
 #define HUB_TENANT ""          // The tenant id of your hub instance, which is provided by the credentials of the Bosch IoT Suite - service subscriptions page.

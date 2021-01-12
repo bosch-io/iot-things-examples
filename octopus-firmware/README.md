@@ -20,8 +20,10 @@ The example is divided into the following steps:
 ## About the Octopus board
 The Octopus board is created by Guido Burger. Its original purpose was to be used as a teaching tool for hackatons in
 secondary schools in Germany. It features a number of sensors, and the ability to connect sensors, inputs, and
-actuators in a relatively simple way. More information and the source code for the schematics can be found on the
-<a href="https://www.tindie.com/products/FabLab/iot-octopus-badge-for-iot-evaluation/">Fab-Lab.eu Octopus page</a>.
+actuators in a relatively simple way. 
+
+You can buy it in the <a href="https://www.tindie.com/products/FabLab/iot-octopus-badge-for-iot-evaluation/">Fab-Lab.eu Tindie shop</a> 
+where you also find more information and the source code for the schematics.
 While Guido Burger offers some boards in his Tindie store, overall the Octopus board is a not-for-profit activity.
 The Octopus board is a small board based on a ESP8266 chip that can be programmed e.g. using the Arduino IDE.
 The special thing about this board is, that it already contains components that makes it a ready-to-run starter-kit

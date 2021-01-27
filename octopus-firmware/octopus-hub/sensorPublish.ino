@@ -70,7 +70,6 @@ DynamicJsonDocument getChangedFeaturesList(float power, const Bme680Values& bme6
 
   String output;
   serializeJson(featuresList, output);
-  Serial.println("output: " + output);
 
   return featuresList;
 }

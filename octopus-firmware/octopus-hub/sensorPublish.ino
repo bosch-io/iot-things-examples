@@ -167,7 +167,7 @@ String getDittoProtocolMsgWithMergeActionFor(DynamicJsonDocument featuresList) {
   dittoProtocolMsg["topic"] = String(THINGS_NAMESPACE) + "/" + String(THING_NAME) + "/things/twin/commands/merge";
   JsonObject headers = dittoProtocolMsg.createNestedObject("headers");
   headers["response-required"] = false;
-  headers["content-type"] = "application/vnd.eclipse.ditto+json";
+  headers["content-type"] = "application/merge-patch+json";
   dittoProtocolMsg["path"] = "/features";
   dittoProtocolMsg["value"] = featuresList;
 

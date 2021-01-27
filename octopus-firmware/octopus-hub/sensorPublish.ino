@@ -40,7 +40,7 @@ float altitudeMin = 1E+20;
 float altitudeMax = 1E-20;
 
 // memory allocation of the features json object
-//                                    14*FeatureID          +14*properties         +14*status             +14*statusValues       +Bytes of featureId Strings
+//                                    14*FeatureID          +14*properties         +14*status             +14*statusValues       +Bytes of strings
 const size_t FEATURES_LIST_CAPACITY = 1*JSON_OBJECT_SIZE(14)+14*JSON_OBJECT_SIZE(1)+14*JSON_OBJECT_SIZE(1)+14*JSON_OBJECT_SIZE(4)+300;
 // memory allocation of the ditto protocol message 
 const size_t DITTO_PROTOCOL_CAPACITY = 1*JSON_OBJECT_SIZE(4)+1*JSON_OBJECT_SIZE(2)+FEATURES_LIST_CAPACITY;

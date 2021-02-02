@@ -27,176 +27,194 @@
  */
 
 class SensorStatistics {
-  constructor (config) {
-    this.namespace = config.THINGS_NAMESPACE;
-    this.name = config.THING_NAME;
+    constructor(config) {
+        this.namespace = config.THINGS_NAMESPACE;
+        this.name = config.THING_NAME;
 
-    this.humidityMin = 1e+20;
-    this.humidityMax = 1e-20;
-    this.tempMin = 1e+20;
-    this.tempMax = 1e-20;
-    this.barometerMin = 1e+20;
-    this.barometerMax = 1e-20;
-    this.gasMin = 1e+20;
-    this.gasMax = 1e-20;
-    this.powerMin = 1e+20;
-    this.powerMax = 1e-20;
-    this.tempBnoMin = 1e+20;
-    this.tempBnoMax = 1e-20;
-    this.altitudeMin = 1e+20;
-    this.altitudeMax = 1e-20;
-  }
+        this.humidityMin = 1e+20;
+        this.humidityMax = 1e-20;
+        this.tempMin = 1e+20;
+        this.tempMax = 1e-20;
+        this.barometerMin = 1e+20;
+        this.barometerMax = 1e-20;
+        this.gasMin = 1e+20;
+        this.gasMax = 1e-20;
+        this.powerMin = 1e+20;
+        this.powerMax = 1e-20;
+        this.tempBnoMin = 1e+20;
+        this.tempBnoMax = 1e-20;
+        this.altitudeMin = 1e+20;
+        this.altitudeMax = 1e-20;
+    }
 
-  getFeatureUpdates(power, bmeValues, bnoValues, ledValues){
-    return {
-      "features": {
-        "voltage": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(power, this.powerMin, this.powerMax, 'V')
-        },
-        "humidity": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.temperature, this.tempMin, this.tempMax, '°C')
-        },
-        "temperature": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.temperature, this.tempMin, this.tempMax, '°C')
-        },
-        "pressure": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.pressure / 100.0, this.barometerMin, this.barometerMax, 'hPa')
-        },
-        "gas_resistance": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.gas_resistance, this.gasMin, this.gasMax, 'KOhms')
-        },
-        "altitude": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.altitude, this.altitudeMin, this.altitudeMax, 'M')
-        },
-        "ambient_temperature": {
-          "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bnoValues.temperature, this.tempBnoMin, this.tempBnoMax, '°C')
-        },
-        "acceleration": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.acceleration.x, bnoValues.acceleration.y, bnoValues.acceleration.z, 'm/s^2')
-        },
-        "orientation": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.orientation.x, bnoValues.orientation.y, bnoValues.orientation.z, '°')
-        },
-        "gravity": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.gravity.x, bnoValues.gravity.y, bnoValues.gravity.z, 'm/s^2')
-        },
-        "angular_velocity": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.angular_velocity.x, bnoValues.angular_velocity.y, bnoValues.angular_velocity.z, 'rad/s')
-        },
-        "linear_acceleration": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.LinearAcceleration.x, bnoValues.LinearAcceleration.y, bnoValues.LinearAcceleration.z, 'V')
-        },
-        "magnetometer": {
-          "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.magneticFieldStrength.x, bnoValues.magneticFieldStrength.y, bnoValues.magneticFieldStrength.z, 'V')
-        },
-        "led": {
-          "properties": SensorStatistics.createLedFeatureProperties(ledValues)
+    getFeatureUpdates(power, bmeValues, bnoValues, ledValues) {
+        return {
+            "voltage": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(power, this.powerMin, this.powerMax,
+                                                                                   'V')
+            },
+            "humidity": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.temperature, this.tempMin,
+                                                                                   this.tempMax, '°C')
+            },
+            "temperature": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.temperature, this.tempMin,
+                                                                                   this.tempMax, '°C')
+            },
+            "pressure": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.pressure / 100.0,
+                                                                                   this.barometerMin, this.barometerMax,
+                                                                                   'hPa')
+            },
+            "gas_resistance": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.gas_resistance,
+                                                                                   this.gasMin, this.gasMax, 'KOhms')
+            },
+            "altitude": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bmeValues.altitude, this.altitudeMin,
+                                                                                   this.altitudeMax, 'M')
+            },
+            "ambient_temperature": {
+                "properties": SensorStatistics.createSensorMinMaxFeatureProperties(bnoValues.temperature,
+                                                                                   this.tempBnoMin, this.tempBnoMax,
+                                                                                   '°C')
+            },
+            "acceleration": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.acceleration.x,
+                                                                               bnoValues.acceleration.y,
+                                                                               bnoValues.acceleration.z, 'm/s^2')
+            },
+            "orientation": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.orientation.x,
+                                                                               bnoValues.orientation.y,
+                                                                               bnoValues.orientation.z, '°')
+            },
+            "gravity": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.gravity.x, bnoValues.gravity.y,
+                                                                               bnoValues.gravity.z, 'm/s^2')
+            },
+            "angular_velocity": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.angular_velocity.x,
+                                                                               bnoValues.angular_velocity.y,
+                                                                               bnoValues.angular_velocity.z, 'rad/s')
+            },
+            "linear_acceleration": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.LinearAcceleration.x,
+                                                                               bnoValues.LinearAcceleration.y,
+                                                                               bnoValues.LinearAcceleration.z, 'V')
+            },
+            "magnetometer": {
+                "properties": SensorStatistics.createSensor3dFeatureProperties(bnoValues.magneticFieldStrength.x,
+                                                                               bnoValues.magneticFieldStrength.y,
+                                                                               bnoValues.magneticFieldStrength.z, 'V')
+            },
+            "led": {
+                "properties": SensorStatistics.createLedFeatureProperties(ledValues)
+            }
         }
-      }
-    }
-  }
-
-  createFeatureMergeCommand (power, bmeValues, bnoValues, ledValues) {
-    this.updateMinMax(power, bmeValues, bnoValues);
-    return this.createModifyFeaturePropertiesMsg(this.getFeatureUpdates(power, bmeValues, bnoValues, ledValues));
-  }
-
-  static createSensorMinMaxFeatureProperties (sensorValue, minMeasuredValue, maxMeasuredValue, sensorUnits) {
-    return {
-      status: {
-        sensorValue,
-        minMeasuredValue,
-        maxMeasuredValue,
-        sensorUnits
-      }
-    };
-  }
-
-  static createSensor3dFeatureProperties (xValue, yValue, zValue, sensorUnits) {
-    return {
-      status: {
-        xValue,
-        yValue,
-        zValue,
-        sensorUnits
-      }
-    };
-  }
-
-  static createLedFeatureProperties (ledValues) {
-    return {
-      status: ledValues
-    };
-  }
-
-  updateMinMax (power, bmeValues, bnoValues) {
-    if (this.powerMin > power) {
-      this.powerMin = power;
-    }
-    if (this.powerMax < power) {
-      this.powerMax = power;
     }
 
-    const humidity = bmeValues.humidity;
-    if (this.humidityMin > humidity) {
-      this.humidityMin = humidity;
-    }
-    if (this.humidityMax < humidity) {
-      this.humidityMax = humidity;
+    createFeatureMergeCommand(power, bmeValues, bnoValues, ledValues) {
+        this.updateMinMax(power, bmeValues, bnoValues);
+        return this.createMergeFeaturesMsg(this.getFeatureUpdates(power, bmeValues, bnoValues, ledValues));
     }
 
-    const temp = bmeValues.temperature;
-    if (this.tempMin > temp) {
-      this.tempMin = temp;
-    }
-    if (this.tempMax < temp) {
-      this.tempMax = temp;
-    }
-
-    const barometer = bmeValues.pressure / 100.0;
-    if (this.barometerMin > barometer) {
-      this.barometerMin = barometer;
-    }
-    if (this.barometerMax < barometer) {
-      this.barometerMax = barometer;
+    static createSensorMinMaxFeatureProperties(sensorValue, minMeasuredValue, maxMeasuredValue, sensorUnits) {
+        return {
+            status: {
+                sensorValue,
+                minMeasuredValue,
+                maxMeasuredValue,
+                sensorUnits
+            }
+        };
     }
 
-    const tempBno = bnoValues.temperature;
-    if (this.tempBnoMin > tempBno) {
-      this.tempBnoMin = tempBno;
-    }
-    if (this.tempBnoMax < tempBno) {
-      this.tempBnoMax = tempBno;
-    }
-
-    const altitude = bmeValues.altitude;
-    if (this.altitudeMin > altitude) {
-      this.altitudeMin = altitude;
-    }
-    if (this.altitudeMax < altitude) {
-      this.altitudeMax = altitude;
+    static createSensor3dFeatureProperties(xValue, yValue, zValue, sensorUnits) {
+        return {
+            status: {
+                xValue,
+                yValue,
+                zValue,
+                sensorUnits
+            }
+        };
     }
 
-    const gas = bmeValues.gas_resistance / 1000.0;
-    if (this.gasMin > gas) {
-      this.gasMin = gas;
+    static createLedFeatureProperties(ledValues) {
+        return {
+            status: ledValues
+        };
     }
-    if (this.gasMax < gas) {
-      this.gasMax = gas;
-    }
-  }
 
-  createModifyFeaturePropertiesMsg (features) {
-    return {
-      topic: `${this.namespace}/${this.name}/things/twin/commands/merge`,
-      headers: {
-        'response-required': false,
-        'content-type': 'application/merge-patch+json'
-      },
-      path: `/features`,
-      value: features
-    };
-  }
+    updateMinMax(power, bmeValues, bnoValues) {
+        if (this.powerMin > power) {
+            this.powerMin = power;
+        }
+        if (this.powerMax < power) {
+            this.powerMax = power;
+        }
+
+        const humidity = bmeValues.humidity;
+        if (this.humidityMin > humidity) {
+            this.humidityMin = humidity;
+        }
+        if (this.humidityMax < humidity) {
+            this.humidityMax = humidity;
+        }
+
+        const temp = bmeValues.temperature;
+        if (this.tempMin > temp) {
+            this.tempMin = temp;
+        }
+        if (this.tempMax < temp) {
+            this.tempMax = temp;
+        }
+
+        const barometer = bmeValues.pressure / 100.0;
+        if (this.barometerMin > barometer) {
+            this.barometerMin = barometer;
+        }
+        if (this.barometerMax < barometer) {
+            this.barometerMax = barometer;
+        }
+
+        const tempBno = bnoValues.temperature;
+        if (this.tempBnoMin > tempBno) {
+            this.tempBnoMin = tempBno;
+        }
+        if (this.tempBnoMax < tempBno) {
+            this.tempBnoMax = tempBno;
+        }
+
+        const altitude = bmeValues.altitude;
+        if (this.altitudeMin > altitude) {
+            this.altitudeMin = altitude;
+        }
+        if (this.altitudeMax < altitude) {
+            this.altitudeMax = altitude;
+        }
+
+        const gas = bmeValues.gas_resistance / 1000.0;
+        if (this.gasMin > gas) {
+            this.gasMin = gas;
+        }
+        if (this.gasMax < gas) {
+            this.gasMax = gas;
+        }
+    }
+
+    createMergeFeaturesMsg(features) {
+        return {
+            topic: `${this.namespace}/${this.name}/things/twin/commands/merge`,
+            headers: {
+                'response-required': false,
+                'content-type': 'application/merge-patch+json'
+            },
+            path: `/features`,
+            value: features
+        };
+    }
 }
 
 module.exports = SensorStatistics;

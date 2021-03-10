@@ -39,104 +39,39 @@ float tempBnoMax = 1E-20;
 float altitudeMin = 1E+20;
 float altitudeMax = 1E-20;
 
-String modifyFeaturePropertiesMsg(String featureName, const String& properties) {
-  DynamicJsonDocument dittoProtocolMsg(600);
-  dittoProtocolMsg["topic"] = String(THINGS_NAMESPACE) + "/" + String(THING_NAME) + "/things/twin/commands/modify";
-  JsonObject headers = dittoProtocolMsg.createNestedObject("headers");
-  headers["response-required"] = false;
-  headers["content-type"] = "application/vnd.eclipse.ditto+json";
-  dittoProtocolMsg["path"] = "/features/" + featureName + "/properties";
-  DynamicJsonDocument props(200);
-  deserializeJson(props, properties);
-  dittoProtocolMsg["value"] = props;
-
-  String output;
-  serializeJson(dittoProtocolMsg, output);
-  return output;
-}
-
-String sensorMinMaxValue(float sensorValue, float minValue, float maxValue, const String& units) {
-  DynamicJsonDocument properties(200);
-  JsonObject statusProps = properties.createNestedObject("status");
-  statusProps["sensorValue"] = sensorValue;
-  statusProps["minMeasuredValue"] = minValue;
-  statusProps["maxMeasuredValue"] = maxValue;
-  statusProps["sensorUnits"] = units;
-  
-  String output;
-  serializeJson(properties, output);
-  return output;
-}
-
-String sensor3dValue(float xValue, float yValue, float zValue, const String& units) {
-  DynamicJsonDocument properties(200);
-  JsonObject statusProps = properties.createNestedObject("status");
-  statusProps["xValue"] = xValue;
-  statusProps["yValue"] = yValue;
-  statusProps["zValue"] = zValue;
-  statusProps["sensorUnits"] = units;
-  
-  String output;
-  serializeJson(properties, output);
-  return output;
-}
-
-String ledValue(short r, short g, short b, short w) {
-  DynamicJsonDocument properties(200);
-  JsonObject statusProps = properties.createNestedObject("status");
-  statusProps["r"] = r;
-  statusProps["g"] = g;
-  statusProps["b"] = b;
-  statusProps["w"] = w;
-  
-  String output;
-  serializeJson(properties, output);
-  return output;
-}
+// memory allocation of the features json object
+//                                    14*FeatureID          +14*properties         +14*status             +14*statusValues       +Bytes of strings
+const size_t FEATURES_LIST_CAPACITY = 1*JSON_OBJECT_SIZE(14)+14*JSON_OBJECT_SIZE(1)+14*JSON_OBJECT_SIZE(1)+14*JSON_OBJECT_SIZE(4)+300;
+// memory allocation of the ditto protocol message 
+const size_t DITTO_PROTOCOL_CAPACITY = 1*JSON_OBJECT_SIZE(4)+1*JSON_OBJECT_SIZE(2)+FEATURES_LIST_CAPACITY;
 
 void publishSensorData(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values, const LedValues& ledValues) {
-
   updateMinMax(power, bme680Values, bno055Values);
+  hub.publish(getDittoProtocolMsgWithMergeActionFor(getChangedFeaturesList(power, bme680Values, bno055Values, ledValues)));
+}
 
-  hub.publish(
-    modifyFeaturePropertiesMsg("voltage", sensorMinMaxValue(power, powerMin, powerMax, "V")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("humidity", sensorMinMaxValue(bme680Values.humidity, humidityMin, humidityMax, "%")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("temperature", sensorMinMaxValue(bme680Values.temperature, tempMin, tempMax, "°C")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("pressure", sensorMinMaxValue(bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("gas_resistance", sensorMinMaxValue(bme680Values.gas_resistance / 1000.0, gasMin, gasMax, "KOhms")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("altitude", sensorMinMaxValue(bme680Values.altitude, altitudeMin, altitudeMax, "m")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("ambient_temperature", sensorMinMaxValue(bno055Values.temperature, tempBnoMin, tempBnoMax, "°C")));
+DynamicJsonDocument getChangedFeaturesList(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values, const LedValues& ledValues) {
+  DynamicJsonDocument featuresList(FEATURES_LIST_CAPACITY);
+  
+  setSensorMinMaxPropertiesForFeature("voltage", power, powerMin, powerMax, "V", featuresList);
+  setSensorMinMaxPropertiesForFeature("humidity", bme680Values.humidity, humidityMin, humidityMax, "%", featuresList);
+  setSensorMinMaxPropertiesForFeature("temperature", bme680Values.temperature, tempMin, tempMax, "°C", featuresList);
+  setSensorMinMaxPropertiesForFeature("pressure", bme680Values.pressure / 100.0, barometerMin, barometerMax, "hPa", featuresList);
+  setSensorMinMaxPropertiesForFeature("gas_resistance", bme680Values.gas_resistance / 1000.0, gasMin, gasMax, "KOhms", featuresList);
+  setSensorMinMaxPropertiesForFeature("altitude", bme680Values.altitude, altitudeMin, altitudeMax, "m", featuresList);
+  setSensorMinMaxPropertiesForFeature("ambient_temperature", bno055Values.temperature, tempBnoMin, tempBnoMax, "°C", featuresList);
+  setSensor3dPropertiesForFeature("acceleration", bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2", featuresList);
+  setSensor3dPropertiesForFeature("orientation", bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°", featuresList);
+  setSensor3dPropertiesForFeature("gravity", bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2", featuresList);
+  setSensor3dPropertiesForFeature("angular_velocity", bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s", featuresList);
+  setSensor3dPropertiesForFeature("linear_acceleration", bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2", featuresList);
+  setSensor3dPropertiesForFeature("magnetometer", bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT", featuresList);
+  setLedPropertiesForFeature("led", ledValues.r,ledValues.g,ledValues.b,ledValues.w, featuresList);
 
-  hub.publish(
-    modifyFeaturePropertiesMsg("acceleration", sensor3dValue(bno055Values.accelerationX, bno055Values.accelerationY, bno055Values.accelerationZ, "m/s^2")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("orientation", sensor3dValue(bno055Values.orientationX, bno055Values.orientationY, bno055Values.orientationZ, "°")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("gravity", sensor3dValue(bno055Values.gravityX, bno055Values.gravityY, bno055Values.gravityZ, "m/s^2")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("angular_velocity", sensor3dValue(bno055Values.angularVelocityX, bno055Values.angularVelocityY, bno055Values.angularVelocityZ, "rad/s")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("linear_acceleration", sensor3dValue(bno055Values.LinearAccelerationX, bno055Values.LinearAccelerationY, bno055Values.LinearAccelerationZ, "m/s^2")));
-  hub.publish(
-    modifyFeaturePropertiesMsg("magnetometer", sensor3dValue(bno055Values.magneticFieldStrengthX, bno055Values.magneticFieldStrengthY, bno055Values.magneticFieldStrengthZ, "uT")));
+  String output;
+  serializeJson(featuresList, output);
 
-  hub.publish(
-    modifyFeaturePropertiesMsg(
-      "led", 
-      ledValue(
-        ledValues.r, 
-        ledValues.g, 
-        ledValues.b, 
-        ledValues.w
-      )
-    )
-  );
+  return featuresList;
 }
 
 void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Values& bno055Values) {
@@ -194,4 +129,48 @@ void updateMinMax(float power, const Bme680Values& bme680Values, const Bno055Val
   if (gasMax < gas) {
     gasMax = gas;
   }
+}
+
+void setSensorMinMaxPropertiesForFeature(const String& featureId, float sensorValue, float minValue, float maxValue, const String& units, DynamicJsonDocument& featuresList) {
+  JsonObject feature = featuresList.createNestedObject(featureId);
+  JsonObject properties = feature.createNestedObject("properties");
+  JsonObject statusProps = properties.createNestedObject("status");
+  statusProps["sensorValue"] = sensorValue;
+  statusProps["minMeasuredValue"] = minValue;
+  statusProps["maxMeasuredValue"] = maxValue;
+  statusProps["sensorUnits"] = units;
+}
+
+void setSensor3dPropertiesForFeature(const String& featureId,float xValue, float yValue, float zValue, const String& units, DynamicJsonDocument& featuresList) {
+  JsonObject feature = featuresList.createNestedObject(featureId);
+  JsonObject properties = feature.createNestedObject("properties");
+  JsonObject statusProps = properties.createNestedObject("status");
+  statusProps["xValue"] = xValue;
+  statusProps["yValue"] = yValue;
+  statusProps["zValue"] = zValue;
+  statusProps["sensorUnits"] = units;
+}
+
+void setLedPropertiesForFeature(const String& featureId, short r, short g, short b, short w, DynamicJsonDocument& featuresList) {
+  JsonObject feature = featuresList.createNestedObject(featureId);
+  JsonObject properties = feature.createNestedObject("properties");
+  JsonObject statusProps = properties.createNestedObject("status");
+  statusProps["r"] = r;
+  statusProps["g"] = g;
+  statusProps["b"] = b;
+  statusProps["w"] = w;
+}
+
+String getDittoProtocolMsgWithMergeActionFor(DynamicJsonDocument featuresList) {
+  DynamicJsonDocument dittoProtocolMsg(DITTO_PROTOCOL_CAPACITY);
+  dittoProtocolMsg["topic"] = String(THINGS_NAMESPACE) + "/" + String(THING_NAME) + "/things/twin/commands/merge";
+  JsonObject headers = dittoProtocolMsg.createNestedObject("headers");
+  headers["response-required"] = false;
+  headers["content-type"] = "application/merge-patch+json";
+  dittoProtocolMsg["path"] = "/features";
+  dittoProtocolMsg["value"] = featuresList;
+
+  String output;
+  serializeJson(dittoProtocolMsg, output);
+  return output;
 }

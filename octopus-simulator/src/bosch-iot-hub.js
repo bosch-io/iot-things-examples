@@ -67,10 +67,6 @@ class BoschIotHub {
     return this.connected;
   }
 
-  publishAll (messages) {
-    messages.map(message => this.publish('telemetry', message));
-  }
-
   publish (topic, message) {
     const stringified = JSON.stringify(message);
     console.log(`[Bosch IoT Hub] Publishing on topic '${topic}': ${stringified}`);

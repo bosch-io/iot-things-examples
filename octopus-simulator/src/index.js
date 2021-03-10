@@ -81,9 +81,9 @@ class Arduino {
       const vcc = this.octopus.getVcc();
       const ledValues = this.octopus.readLed();
 
-      const featurePropertyUpdateCommands =
-                this.sensorStatistics.createFeaturePropertyUpdateCommands(vcc, bmeValues, bnoValues, ledValues);
-      this.hub.publishAll(featurePropertyUpdateCommands);
+      const featureMergeCommand =
+                this.sensorStatistics.createFeatureMergeCommand(vcc, bmeValues, bnoValues, ledValues);
+      this.hub.publish('telemetry', featureMergeCommand);
     }
   }
 

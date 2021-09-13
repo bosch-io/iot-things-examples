@@ -20,7 +20,7 @@
     "standard": "^14.3.4"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "https-proxy-agent": "^5.0.0"
   }
 }

@@ -196,15 +196,15 @@ _File > Preferences > Network_ and add SSL certificates (e.g. xxx.crt) to ${Ardu
 
 ### Install the right versions
 
-1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino) (tested with 2.4.1).
+1. Add the ESP8266 Platform to the IDE, see [ESP8266 Arduino Platform](https://github.com/esp8266/Arduino) (tested with  2.6.0 and 2.7.4).
 2. Install the following libraries (Sketch > Include Library > Manage Libraries)
-   * [Adafruit BME680](https://github.com/adafruit/Adafruit_BME680) (tested with 1.0.7)
-   * [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280) (tested with 2.0.2)
-   * [Adafruit BNO055](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.1.11)
-   * [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.3.5)
+   * [Adafruit BME680](https://github.com/adafruit/Adafruit_BME680) (tested with 2.0.1)
+   * [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280) (tested with  2.2.2)
+   * [Adafruit BNO055](https://github.com/adafruit/Adafruit_BNO055) (tested with 1.3.0)
+   * [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) (tested with 1.4.0)
    * [Adafruit Unified Sensor](https://github.com/adafruit/Adafruit_Sensor) (tested with 1.1.2)
    * [PubSubClient](https://github.com/knolleary/pubsubclient) (tested with 2.7.0)
-   * [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (tested with 6.15.2)
+   * [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (tested with 6.18.5)
    * [ESP8266-ping](https://github.com/dancol90/ESP8266Ping) (tested with 2.0.1)
 3. _IMPORTANT:_ Edit the file `${ArduinoDirectory}/libraries/pubsubclient/src/PubSubClient.h` and set the
    `MQTT_MAX_PACKET_SIZE` to `2048`.
@@ -222,9 +222,6 @@ Then, open the Arduino serial monitor, which will later display what the device 
 ### Configure with valid credentials
 
 The Arduino Sketch we have prepared publishes the sensor information via the Bosch IoT Hub to Bosch IoT Things.
-
-**Tip**: Find the information model of the Octopus device in the Eclipse Vorto repository.
-https://vorto.eclipse.org/#/details/com.bosch.iot.suite.example.octopussuiteedition:OctopusSuiteEdition:1.1.0
 
 Open `octopus-hub/octopus-hub.ino` in your Arduino IDE.
 

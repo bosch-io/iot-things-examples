@@ -4,25 +4,21 @@ This repository contains examples for using Bosch IoT Things.
 It is part of the [Bosch IoT Suite](https://www.bosch-iot-suite.com) which is the cloud-based IoT platform provided by [Bosch.IO](https://bosch.io/).
 The service is *based on* and *powered by* the open source project [Eclipse Ditto](https://www.eclipse.org/ditto/).
 
-The example code provided here shows a *selection* of the Bosch IoT Things service functionality. Thus, the examples do not cover the complete service offering.
+The provided example code offers a glimpse into the functionality of the Bosch IoT Things service, showcasing a subset of its features. It's important to note that these examples do not encompass the entirety of the service offering.
 
-If you need more information, please visit the links above or contact us.
+For additional information, kindly refer to the provided links or feel free to reach out to us.
 
 ## [digitaltwin-example](digitaltwin-example/)
 
-This concept shows an end-to-end scenario for digital twins based on Bosch IoT Things / Eclipse Ditto.
+This concept illustrates a comprehensive end-to-end scenario for digital twins utilizing Bosch IoT Things / Eclipse Ditto.
 
 ## [desired-state-synchronizer](desired-state-synchronizer/)
 
-This example shows a usage scenario for an integration of IoT devices with Bosch IoT Things / Eclipse Ditto.
-It is focused on distinguishing between the _current_ reported state of device information and a _desired_,
-target state for that device. This is mainly required for configuration parameters of devices that are connected
-either sporadically or unstably.
+This example demonstrates a usage scenario for integrating IoT devices with Bosch IoT Things / Eclipse Ditto. The emphasis is on distinguishing between the presently reported state of device information and a desired target state. This distinction is particularly crucial for configuration parameters of devices that are intermittently or unreliably connected.
 
 ## [octopus-firmware](octopus-firmware/)
 
-This example shows how to connect an ESP8266 based IoT board via _Bosch IoT Hub_ to _Bosch IoT Things_ and how to
-update a digital twin via "telemetry" data sent from the device.
+This example illustrates the process of connecting an ESP8266-based IoT board to Bosch IoT Hub, subsequently linking it to Bosch IoT Things. It further demonstrates how to update a digital twin through the transmission of "telemetry" data sent from the device.
 
 ## [octopus-simulator](octopus-simulator/)
 
@@ -31,12 +27,12 @@ if you don't have access to an Octopus.
 
 ## [octopus-frontend](octopus-frontend/)
 
-This example shows how to send command-and-control messages via the HTTP API of _Bosch IoT Things_ to _Bosch IoT Hub_ to the physical device.
+This example demonstrates the procedure for dispatching command-and-control messages through the HTTP API of Bosch IoT Things to Bosch IoT Hub and, subsequently, to the physical device.
 
 ## [things-batch-importer](things-batch-importer/)
 
-With this tool, you can upload a large number things into your cloud service instance at once. The example uses the things-client for uploading the things from a local file.
+Utilizing this tool enables the simultaneous upload of a substantial number of things into your cloud service instance. The provided example employs the things-client for uploading the things from a local file.
 
 ## License
 
-The examples are available under the terms of Bosch SI or Bosch.IO Example Code License. See individual files for details.
+The examples are made accessible under the terms of the Bosch SI or Bosch.IO Example Code License. Please refer to individual files for specific details.
